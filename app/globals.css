@@ -1,0 +1,366 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (driven by next-themes) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   RelationOS design tokens
+   Petrol = structure/saved · Amber = the AI acting
+   Ink = chrome · Paper = canvas · Green/Red = signal only
+   ============================================================ */
+:root {
+  /* brand constants (appendix B) */
+  --petrol: #0c4a45;
+  --amber: #be6f18;
+  --ink: #14171c;
+  --paper: #f4f3ef;
+  --green: #1e875b;
+  --red: #c0492f;
+
+  /* ---- LIGHT THEME (warm paper canvas, white record cards) ---- */
+  --bg: #f4f3ef;
+  --bg-grad-a: #f6f5f0;
+  --bg-grad-b: #eceae1;
+  --surface: #ffffff;
+  --surface-2: #f7f6f1;
+  --surface-inset: #efeee7;
+  --border: #e3e1d7;
+  --border-strong: #cfccc0;
+
+  --text: #14171c;
+  --text-muted: #5d616a;
+  --text-faint: #8a8d94;
+
+  --accent: #0c4a45;
+  --accent-soft: #d9e8e4;
+  --accent-contrast: #ffffff;
+  --live: #b5660f;
+  --live-soft: #f6e6d0;
+  --positive: #1e875b;
+  --positive-soft: #d6ecdf;
+  --negative: #c0492f;
+  --negative-soft: #f4ddd6;
+
+  --ring: rgba(12, 74, 69, 0.4);
+
+  /* chrome (nav/sidebar) stays inky in both themes -> "control room" */
+  --chrome: #101317;
+  --chrome-2: #14181d;
+  --chrome-border: rgba(255, 255, 255, 0.07);
+  --chrome-text: #c7ccd3;
+  --chrome-text-faint: #767c86;
+  --chrome-accent: #34b3a3;
+  --chrome-live: #e8912f;
+
+  /* shapes */
+  --radius-card: 14px;
+  --radius-input: 10px;
+  --radius-pill: 999px;
+
+  /* shadows */
+  --shadow-soft: 0 8px 24px -12px rgba(20, 23, 28, 0.18),
+    0 2px 6px -3px rgba(20, 23, 28, 0.1);
+  --shadow-lift: 0 18px 50px -18px rgba(20, 23, 28, 0.28),
+    0 6px 16px -8px rgba(20, 23, 28, 0.14);
+
+  color-scheme: light;
+}
+
+.dark {
+  /* ---- DARK THEME (ink canvas, accents glow) — demo default ---- */
+  --bg: #0a0c10;
+  --bg-grad-a: #0d1015;
+  --bg-grad-b: #07090c;
+  --surface: #14181d;
+  --surface-2: #1a1f26;
+  --surface-inset: #0e1116;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --text: #f1f0ea;
+  --text-muted: #99a0aa;
+  --text-faint: #687079;
+
+  --accent: #34b3a3;
+  --accent-soft: rgba(52, 179, 163, 0.14);
+  --accent-contrast: #04211d;
+  --live: #ec9a3c;
+  --live-soft: rgba(236, 154, 60, 0.15);
+  --positive: #34c08a;
+  --positive-soft: rgba(52, 192, 138, 0.16);
+  --negative: #e2674c;
+  --negative-soft: rgba(226, 103, 76, 0.16);
+
+  --ring: rgba(52, 179, 163, 0.55);
+
+  --chrome: #07090c;
+  --chrome-2: #0b0e12;
+  --chrome-border: rgba(255, 255, 255, 0.06);
+  --chrome-text: #c7ccd3;
+  --chrome-text-faint: #6b7079;
+
+  --shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.6),
+    0 2px 6px -3px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 24px 60px -20px rgba(0, 0, 0, 0.7),
+    0 8px 20px -8px rgba(0, 0, 0, 0.5);
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   Tailwind theme bindings
+   ============================================================ */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-inset: var(--surface-inset);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+
+  --color-petrol: var(--petrol);
+  --color-amber: var(--amber);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-live: var(--live);
+  --color-live-soft: var(--live-soft);
+  --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
+  --color-negative: var(--negative);
+  --color-negative-soft: var(--negative-soft);
+
+  --color-chrome: var(--chrome);
+  --color-chrome-2: var(--chrome-2);
+  --color-chrome-border: var(--chrome-border);
+  --color-chrome-text: var(--chrome-text);
+  --color-chrome-text-faint: var(--chrome-text-faint);
+
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
+  --font-sans: var(--font-hanken), "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
+
+  --radius-input: 10px;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-lift: var(--shadow-lift);
+
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+* {
+  border-color: var(--border);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 32%, transparent);
+  color: var(--text);
+}
+
+/* focus rings — visible by design (accessibility) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* numerals: tabular for data alignment */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+  background-clip: content-box;
+}
+
+/* ============================================================
+   Reusable component classes
+   ============================================================ */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.glass {
+  background: color-mix(in oklab, var(--surface) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* the inky chrome surface (nav, top bar) */
+.chrome {
+  background: var(--chrome);
+  color: var(--chrome-text);
+}
+
+/* score badge ring base */
+.score-ring {
+  background: conic-gradient(
+    var(--ring-color, var(--accent)) calc(var(--score, 0) * 1%),
+    color-mix(in oklab, var(--border-strong) 60%, transparent) 0
+  );
+}
+
+/* the "AI is acting" amber pulse dot */
+.live-dot {
+  position: relative;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 1.5px solid var(--live);
+  opacity: 0;
+  animation: livePulse 2s ease-out infinite;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+@keyframes livePulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--text) 8%, transparent),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+/* background-position shimmer (analytics NL-query loading) */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-inset) 0%,
+    var(--surface-2) 50%,
+    var(--surface-inset) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerBg 1.2s ease-in-out infinite;
+}
+@keyframes shimmerBg {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* the commit "petrol scan-line" sweep */
+@keyframes scanSweep {
+  0% {
+    background-position: -140% 0;
+  }
+  100% {
+    background-position: 240% 0;
+  }
+}
+.scan-sweep {
+  background-image: linear-gradient(
+    100deg,
+    transparent 38%,
+    color-mix(in oklab, var(--accent) 35%, transparent) 50%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  animation: scanSweep 0.85s ease-out;
+}
+
+@keyframes gridDrift {
+  to {
+    background-position: 40px 40px;
+  }
+}
+
+/* reduced motion: kill the loops, keep end states */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
