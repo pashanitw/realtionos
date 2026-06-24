@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 /tmp/docx.py)",
+      "Bash(grep -iE \"^\\(linkedin|newspaper|external-link|badge-check|wallet|landmark\\)\\\\.js$\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/lucide-react/package.json'\\).version\\)\")",
+      "Bash(node -e \"const l=require\\('lucide-react'\\); ['ShieldCheck','Sparkles','FileWarning','TrendingDown','Percent','Snowflake','ReceiptText','CircleDollarSign','ArrowUpRight','Hourglass','Receipt','BadgePercent','Coins'].forEach\\(n=>console.log\\(n, n in l ? 'OK' : 'MISSING'\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const l=require\\('lucide-react'\\); ['Workflow','GitBranch','Wand2','Sparkles','Zap','Bot','Send','MessageCircle','ListChecks','CheckCircle2','Circle','CircleDot','Clock','ArrowRight','ChevronRight','Plus','Play','Pause','Power','Filter','TriangleAlert','Users','Check','X'].forEach\\(n=>{ if\\(!l[n]\\) console.log\\('MISSING:',n\\); }\\); console.log\\('checked'\\);\")",
+      "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"LayoutDashboard\",\"LogOut\",\"Home\",\"Mail\",\"Lock\",\"ShieldCheck\",\"ArrowLeft\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')",
+      "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"ListTodo\",\"ClipboardCheck\",\"ClipboardList\",\"CheckSquare\",\"Flame\",\"Thermometer\",\"Snowflake\",\"TrendingUp\",\"TrendingDown\",\"Scale\",\"Timer\",\"Gauge\",\"Percent\",\"Trophy\",\"Target\",\"BookOpen\",\"Lightbulb\",\"CalendarRange\",\"Newspaper\",\"CircleSlash\",\"XCircle\",\"ThumbsDown\",\"Hourglass\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')",
+      "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"UserPlus\",\"Trash2\",\"Bell\",\"BellRing\",\"Phone\",\"Plus\",\"Car\",\"IdCard\",\"CircleUser\",\"UserRound\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')"
+    ]
+  }
+}

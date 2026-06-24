@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Phone, MessageCircle, TrendingUp, UserPlus, CalendarCheck, KeyRound, Inbox } from "lucide-react";
-import { useStore } from "@/lib/store";
+import { useClientActivity } from "@/lib/roles";
 import { relativeTime } from "@/lib/utils";
 import { StatusDot } from "./ui/primitives";
 import type { ActivityKind } from "@/lib/data/types";
@@ -18,7 +18,7 @@ const ICON: Record<ActivityKind, typeof Phone> = {
 };
 
 export function ActivityPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const activity = useStore((s) => s.activity);
+  const activity = useClientActivity();
 
   return (
     <AnimatePresence>

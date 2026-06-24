@@ -57,7 +57,7 @@ function LandingNav() {
         </nav>
         <div className="flex items-center gap-2">
           <Link href="/onboarding" className="hidden h-9 items-center rounded-[10px] border border-border px-3.5 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text sm:flex">Connect sources</Link>
-          <Link href="/worklist" className="flex h-9 items-center gap-1.5 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.03] active:scale-95">Launch demo <ArrowRight size={15} /></Link>
+          <Link href="/login" className="flex h-9 items-center gap-1.5 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.03] active:scale-95">Launch demo <ArrowRight size={15} /></Link>
         </div>
       </div>
     </header>
@@ -88,7 +88,7 @@ function Hero() {
         </p>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link href="/worklist" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-accent px-6 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+          <Link href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-accent px-6 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
             Launch the live demo <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link href="/onboarding" className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-border-strong px-6 text-[15px] font-medium text-text transition-colors hover:bg-surface">
@@ -151,7 +151,7 @@ function LiveTransform() {
       <div aria-hidden className="absolute -inset-4 -z-10 rounded-[28px] opacity-60 blur-2xl" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--accent) 22%, transparent), transparent)" }} />
       <div className="overflow-hidden rounded-[18px] border border-border bg-surface shadow-[var(--shadow-lift)]">
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-text-faint"><RadioTower size={13} className="text-accent" /> Customer AI Concierge</div>
+          <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-text-faint"><RadioTower size={13} className="text-accent" /> AI Inbox</div>
           <button onClick={play} className="rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-text-faint transition-colors hover:bg-surface-2 hover:text-text-muted">Replay</button>
         </div>
 
@@ -376,10 +376,10 @@ function OmniMerge() {
 const SCREENS = [
   { href: "/worklist", icon: ListChecks, name: "Worklist", blurb: "The day, ranked. Opens on which buyers to call — re-ranks live." },
   { href: "/buyers/b1", icon: Building2, name: "Buyer 360", blurb: "One timeline across every channel, with matched units from inventory." },
-  { href: "/concierge", icon: Bot, name: "Customer AI Concierge", blurb: "The AI that qualifies and books site visits on WhatsApp, 24×7." },
+  { href: "/concierge", icon: Bot, name: "AI Inbox", blurb: "The AI that qualifies and books site visits on WhatsApp, 24×7." },
   { href: "/inventory", icon: Building2, name: "Inventory", blurb: "Projects & units the AI quotes from — match-highlighted to a buyer." },
   { href: "/pipeline", icon: Columns3, name: "Pipeline", blurb: "Enquiry → site visit → booking → registration. It maintains itself." },
-  { href: "/dashboard", icon: BarChart3, name: "Owner dashboard", blurb: "Which portal actually books flats — numbers, not promises." },
+  { href: "/analytics", icon: BarChart3, name: "Analytics", blurb: "Which portal actually books flats — numbers, not promises." },
 ];
 
 function Screens() {
@@ -445,7 +445,7 @@ function FinalCta() {
             press <Kbd>⌘K</Kbd> to talk to it, or <Kbd>⌘J</Kbd> to watch the concierge book a visit live.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/worklist" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-accent px-7 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+            <Link href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-accent px-7 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
               Launch the live demo <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link href="/onboarding" className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-border-strong px-7 text-[15px] font-medium text-text transition-colors hover:bg-surface-2">

@@ -214,6 +214,23 @@ body {
   background-clip: content-box;
 }
 
+/* native <select> popup — match the theme (no white dropdown in dark mode) */
+select {
+  color-scheme: inherit;
+}
+.dark select {
+  color-scheme: dark;
+}
+option,
+optgroup {
+  background-color: var(--surface);
+  color: var(--text);
+}
+optgroup {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
 /* ============================================================
    Reusable component classes
    ============================================================ */

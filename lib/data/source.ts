@@ -1,5 +1,5 @@
 import { createSeed, type SeedData } from "./seed";
-import type { Buyer, Message, Unit } from "./types";
+import type { Buyer, Message, Unit, Client, OrgUser } from "./types";
 
 /**
  * The single seam every screen reads through.
@@ -11,6 +11,8 @@ export interface DataSource {
   getBuyer(id: string): Buyer | undefined;
   getConversation(buyerId: string): Message[];
   getUnit(id: string): Unit | undefined;
+  getClient(id: string): Client | undefined;
+  getUser(id: string): OrgUser | undefined;
 }
 
 let cache: SeedData | null = null;
@@ -27,4 +29,6 @@ export const mockDataSource: DataSource = {
       .messages.filter((m) => m.buyerId === buyerId)
       .sort((a, b) => a.timestamp - b.timestamp),
   getUnit: (id) => data().units.find((u) => u.id === id),
+  getClient: (id) => data().clients.find((c) => c.id === id),
+  getUser: (id) => data().users.find((u) => u.id === id),
 };

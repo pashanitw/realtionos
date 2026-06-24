@@ -14,6 +14,7 @@ import {
   Radio,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useScopedConcierge, useClientUnits, useClientProjects } from "@/lib/roles";
 import { conductConciergeLead } from "@/lib/conductor";
 import { toast } from "sonner";
 import { PageContainer, PageHeader } from "@/components/ui/page";
@@ -23,9 +24,12 @@ import {
   ScoreBadge,
   StatusDot,
   Label,
+  ChannelIcon,
 } from "@/components/ui/primitives";
 import {
   SOURCE_LABEL,
+  CHANNEL_LABEL,
+  type Channel,
   type ConciergeChat,
   type ConciergeStatus,
   type Unit,
@@ -58,14 +62,20 @@ const STAT_ORDER: { status: ConciergeStatus; short: string }[] = [
 ];
 
 export default function ConciergePage() {
-  const chats = useStore((s) => s.concierge);
-  const [selectedId, setSelectedId] = useState<string | null>(chats[0]?.id ?? null);
+  const chats = useScopedConcierge();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [channelFilter, setChannelFilter] = useState<Channel | "all">("all");
   const detailRef = useRef<HTMLDivElement>(null);
 
-  // Keep a valid selection even as new chats arrive / list changes.
+  const channels = useMemo(() => Array.from(new Set(chats.map((c) => c.channel))), [chats]);
+  const visible = useMemo(
+    () => (channelFilter === "all" ? chats : chats.filter((c) => c.channel === channelFilter)),
+    [chats, channelFilter],
+  );
+  // Keep a valid selection even as the filter / list changes.
   const selected = useMemo(
-    () => chats.find((c) => c.id === selectedId) ?? chats[0],
-    [chats, selectedId],
+    () => visible.find((c) => c.id === selectedId) ?? visible[0],
+    [visible, selectedId],
   );
 
   const counts = useMemo(() => {
@@ -93,8 +103,8 @@ export default function ConciergePage() {
     <PageContainer>
       <PageHeader
         kicker="The AI-native moment"
-        title="Customer AI Concierge"
-        description="A live view of the buyer conversations the AI is handling on WhatsApp — qualifying, quoting units, booking site visits. Take over any chat in one tap."
+        title="AI Inbox"
+        description="A live view of every buyer conversation the AI is handling — across WhatsApp, calls and email — qualifying, quoting units and booking visits. Jump into any one in a tap."
         actions={
           <button
             onClick={() => conductConciergeLead()}
@@ -108,8 +118,23 @@ export default function ConciergePage() {
 
       <StatStrip counts={counts} total={chats.length} />
 
+      {/* Omni-channel filter */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <ChannelChip active={channelFilter === "all"} onClick={() => setChannelFilter("all")} label="All channels" count={chats.length} />
+        {channels.map((ch) => (
+          <ChannelChip
+            key={ch}
+            active={channelFilter === ch}
+            onClick={() => setChannelFilter(ch)}
+            label={CHANNEL_LABEL[ch]}
+            count={chats.filter((c) => c.channel === ch).length}
+            icon={<ChannelIcon channel={ch} size={13} />}
+          />
+        ))}
+      </div>
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[340px_1fr]">
-        {/* LEFT — live chat list */}
+        {/* LEFT — live conversation list */}
         <div className="min-w-0">
           <div className="mb-3 flex items-center gap-2">
             <Radio size={14} className="text-live" />
@@ -117,7 +142,7 @@ export default function ConciergePage() {
           </div>
           <div className="space-y-2.5 lg:max-h-[calc(100vh-15rem)] lg:overflow-y-auto lg:pr-1">
             <AnimatePresence initial={false}>
-              {chats.map((chat) => (
+              {visible.map((chat) => (
                 <ChatListItem
                   key={chat.id}
                   chat={chat}
@@ -126,6 +151,11 @@ export default function ConciergePage() {
                 />
               ))}
             </AnimatePresence>
+            {visible.length === 0 && (
+              <div className="rounded-[14px] border border-dashed border-border p-6 text-center text-sm text-text-faint">
+                No conversations on this channel.
+              </div>
+            )}
           </div>
         </div>
 
@@ -190,6 +220,32 @@ function StatStrip({
   );
 }
 
+/* ---------------- Channel filter chip ---------------- */
+function ChannelChip({
+  active, onClick, label, count, icon,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  count: number;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex h-8 shrink-0 items-center gap-1.5 rounded-pill border px-3 text-xs font-medium transition-colors",
+        active ? "border-accent bg-accent-soft text-accent" : "border-border bg-surface text-text-muted hover:border-border-strong hover:text-text",
+      )}
+    >
+      {icon}
+      {label}
+      <span className={cn("tabular rounded-pill px-1.5 text-[10px]", active ? "bg-accent/15 text-accent" : "bg-surface-2 text-text-faint")}>{count}</span>
+    </button>
+  );
+}
+
 /* ============================================================
    LEFT — a single chat in the list
    ============================================================ */
@@ -224,7 +280,10 @@ function ChatListItem({
         <Avatar name={chat.buyerName} hue={chat.hue} size={38} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <span className="truncate text-sm font-semibold text-text">{chat.buyerName}</span>
+            <span className="flex min-w-0 items-center gap-1.5">
+              <ChannelIcon channel={chat.channel} size={13} />
+              <span className="truncate text-sm font-semibold text-text">{chat.buyerName}</span>
+            </span>
             <Pill variant={meta.pill} className="shrink-0">
               <StatusDot color={meta.dot} pulse={meta.pulse} size={6} />
               {meta.label}
@@ -250,10 +309,11 @@ function ChatListItem({
    ============================================================ */
 function ChatDetail({ chat }: { chat: ConciergeChat }) {
   const takeOverChat = useStore((s) => s.takeOverChat);
-  const units = useStore((s) => s.units);
-  const projects = useStore((s) => s.projects);
+  const units = useClientUnits();
+  const projects = useClientProjects();
   const meta = STATUS_META[chat.status];
   const handedOff = chat.status === "handed-off";
+  const takeLabel = handedOff ? "Handed off to you" : chat.channel === "call" ? "Join the call" : chat.channel === "email" ? "Reply" : "Take over";
 
   const offered = useMemo(
     () =>
@@ -295,6 +355,10 @@ function ChatDetail({ chat }: { chat: ConciergeChat }) {
                 </Pill>
               </div>
               <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-muted">
+                <span className="inline-flex items-center gap-1 font-medium text-text-muted">
+                  <ChannelIcon channel={chat.channel} size={12} /> {CHANNEL_LABEL[chat.channel]}
+                </span>
+                <span className="text-text-faint">·</span>
                 <span className="inline-flex items-center gap-1">
                   <Phone size={12} /> {chat.phone}
                 </span>
@@ -313,19 +377,23 @@ function ChatDetail({ chat }: { chat: ConciergeChat }) {
                 : "bg-accent text-accent-contrast shadow-[var(--shadow-soft)] hover:scale-[1.02] active:scale-95",
             )}
           >
-            <Headset size={15} />
-            {handedOff ? "Handed off to you" : "Take over"}
+            {chat.channel === "call" ? <Phone size={15} /> : <Headset size={15} />}
+            {takeLabel}
           </button>
         </div>
 
-        {/* Conversation bubbles */}
+        {/* Conversation — rendered per channel */}
         <div className="space-y-3 bg-surface-inset/40 p-4 sm:p-5">
+          <div className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wide text-text-faint">
+            <ChannelIcon channel={chat.channel} size={11} />
+            {chat.channel === "call" ? "AI voice call · transcript" : chat.channel === "email" ? "Email thread" : `${CHANNEL_LABEL[chat.channel]} conversation`}
+          </div>
           <AnimatePresence initial={false}>
             {chat.messages.map((m, i) => (
               <Bubble key={`${chat.id}-${i}`} from={m.from} text={m.text} index={i} />
             ))}
           </AnimatePresence>
-          {chat.status === "qualifying" && <TypingIndicator />}
+          {chat.status === "qualifying" && (chat.channel === "whatsapp" || chat.channel === "sms") && <TypingIndicator />}
         </div>
 
         {/* Units the AI offered */}

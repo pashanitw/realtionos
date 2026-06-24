@@ -14,8 +14,9 @@ import {
   Ruler,
   Hash,
   ShieldCheck,
+  ChevronDown,
 } from "lucide-react";
-import { useStore } from "@/lib/store";
+import { useClientProjects, useClientUnits, useScopedBuyers } from "@/lib/roles";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { Pill, Label } from "@/components/ui/primitives";
 import {
@@ -62,9 +63,9 @@ function unitFits(unit: Unit, buyer: Buyer, project: Project | undefined): boole
 }
 
 export default function InventoryPage() {
-  const projects = useStore((s) => s.projects);
-  const units = useStore((s) => s.units);
-  const buyers = useStore((s) => s.buyers);
+  const projects = useClientProjects();
+  const units = useClientUnits();
+  const buyers = useScopedBuyers();
 
   const [projectId, setProjectId] = useState<string | "all">("all");
   const [config, setConfig] = useState<Config | "all">("all");
@@ -216,15 +217,21 @@ export default function InventoryPage() {
 
           {/* Filters bar */}
           <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <Chip active={config === "all"} onClick={() => setConfig("all")}>
-                All configs
-              </Chip>
-              {presentConfigs.map((c) => (
-                <Chip key={c} active={config === c} onClick={() => setConfig(c)}>
-                  {c}
-                </Chip>
-              ))}
+            <div className="relative flex h-9 shrink-0 items-center rounded-[10px] border border-border bg-surface">
+              <select
+                value={config}
+                onChange={(e) => setConfig(e.target.value as Config | "all")}
+                className={cn(
+                  "h-full cursor-pointer appearance-none bg-transparent pl-3 pr-9 text-sm font-medium outline-none",
+                  config === "all" ? "text-text-muted" : "text-text",
+                )}
+              >
+                <option value="all">All configs</option>
+                {presentConfigs.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+              <ChevronDown size={15} className="pointer-events-none absolute right-2.5 text-text-faint" />
             </div>
 
             <div className="flex items-center gap-2.5">

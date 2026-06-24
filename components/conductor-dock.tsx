@@ -17,7 +17,7 @@ const BEATS = [
     },
   },
   {
-    label: "Concierge books a visit",
+    label: "AI Inbox books a visit",
     hint: "new scored buyer appears live",
     icon: CalendarCheck,
     run: async (go: (id: string) => void) => {

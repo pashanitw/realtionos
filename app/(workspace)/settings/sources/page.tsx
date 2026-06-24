@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import {
   Plug,
-  SlidersHorizontal,
   Building2,
   MessageCircle,
   PhoneIncoming,
@@ -141,7 +140,6 @@ export default function SourcesPage() {
 function TabNav() {
   const tabs = [
     { href: "/settings/sources", label: "Sources", icon: Plug, active: true },
-    { href: "/settings/autonomy", label: "Autonomy", icon: SlidersHorizontal, active: false },
   ] as const;
 
   return (

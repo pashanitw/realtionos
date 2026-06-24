@@ -2,6 +2,7 @@
 
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/lib/theme";
+import { ConfirmProvider } from "./ui/confirm";
 import { CommandPalette } from "./command-palette";
 import { ConductorDock } from "./conductor-dock";
 import { AgentCopilot } from "./agent-copilot";
@@ -9,10 +10,11 @@ import { AgentCopilot } from "./agent-copilot";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      {children}
-      <CommandPalette />
-      <AgentCopilot />
-      <ConductorDock />
+      <ConfirmProvider>
+        {children}
+        <CommandPalette />
+        <AgentCopilot />
+        <ConductorDock />
       <Toaster
         position="bottom-right"
         theme="system"
@@ -26,6 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           },
         }}
       />
+      </ConfirmProvider>
     </ThemeProvider>
   );
 }

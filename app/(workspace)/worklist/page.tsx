@@ -3,32 +3,80 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { ChevronRight, Zap, TriangleAlert, Search, CalendarCheck } from "lucide-react";
+import { ChevronRight, Zap, TriangleAlert, Search, CalendarCheck, Clock } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useScopedBuyers, useCurrentUser, useActiveClientId } from "@/lib/roles";
 import { conductBuyerReply } from "@/lib/conductor";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { ScoreBadge, Avatar, ChannelIcon, Pill } from "@/components/ui/primitives";
 import { CONFIGS, SOURCE_LABEL, type Config, type Source } from "@/lib/data/types";
 import { rupeeRange, relativeTime, cn, SEED_NOW } from "@/lib/utils";
 
+const DAY = 86_400_000;
+type DateMode = "all" | "overdue" | "today" | "yesterday" | "week" | "custom";
+const DATE_LABEL: Record<Exclude<DateMode, "custom">, string> = {
+  all: "Any time", overdue: "Overdue", today: "Today", yesterday: "Yesterday", week: "Next 7 days",
+};
+const startOfDay = (t: number) => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+
 export default function WorklistPage() {
-  const buyers = useStore((s) => s.buyers);
+  const buyers = useScopedBuyers();
   const recentlyRescored = useStore((s) => s.recentlyRescored);
   const sources = useMemo(() => Array.from(new Set(buyers.map((b) => b.source))), [buyers]);
+
+  // Agent-wise filter (PRD §2.2) — managers/telecallers can narrow to one team member.
+  const me = useCurrentUser();
+  const activeClientId = useActiveClientId();
+  const allUsers = useStore((s) => s.users);
+  const teamAgents = useMemo(
+    () => allUsers.filter((u) => u.role === "agent" && u.clientId === activeClientId),
+    [allUsers, activeClientId],
+  );
+  const canFilterAgent = me.role !== "agent" && teamAgents.length > 0;
 
   const [query, setQuery] = useState("");
   const [source, setSource] = useState<Source | "all">("all");
   const [config, setConfig] = useState<Config | "all">("all");
   const [visitsOnly, setVisitsOnly] = useState(false);
+  const [dateMode, setDateMode] = useState<DateMode>("all");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const [agentFilter, setAgentFilter] = useState<string>("all");
+
+  const overdueCount = useMemo(
+    () => buyers.filter((b) => b.followUpAt != null && b.followUpAt < SEED_NOW).length,
+    [buyers],
+  );
+
+  const matchesDate = (fu: number | undefined) => {
+    if (dateMode === "all") return true;
+    if (fu == null) return false;
+    const dayStart = startOfDay(SEED_NOW);
+    switch (dateMode) {
+      case "overdue": return fu < SEED_NOW;
+      case "today": return fu >= dayStart && fu < dayStart + DAY;
+      case "yesterday": return fu >= dayStart - DAY && fu < dayStart;
+      case "week": return fu >= SEED_NOW && fu < SEED_NOW + 7 * DAY;
+      case "custom": {
+        if (!customFrom && !customTo) return true;
+        const from = customFrom ? startOfDay(new Date(`${customFrom}T00:00`).getTime()) : -Infinity;
+        const to = customTo ? startOfDay(new Date(`${customTo}T00:00`).getTime()) + DAY : Infinity; // inclusive of the 'to' day
+        return fu >= from && fu < to;
+      }
+    }
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return buyers
+      .filter((b) => (agentFilter === "all" ? true : b.agentId === agentFilter))
       .filter((b) => (source === "all" ? true : b.source === source))
       .filter((b) => (config === "all" ? true : b.config === config))
       .filter((b) => (visitsOnly ? !!b.siteVisitDue : true))
+      .filter((b) => matchesDate(b.followUpAt))
       .filter((b) => (q ? b.name.toLowerCase().includes(q) || b.localityPrefs.join(" ").toLowerCase().includes(q) : true));
-  }, [buyers, query, source, config, visitsOnly]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyers, query, source, config, visitsOnly, dateMode, customFrom, customTo, agentFilter]);
 
   return (
     <PageContainer>
@@ -47,14 +95,15 @@ export default function WorklistPage() {
       />
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          <FilterChip active={source === "all"} onClick={() => setSource("all")}>All sources</FilterChip>
-          {sources.map((s) => (
-            <FilterChip key={s} active={source === s} onClick={() => setSource(s)}>{SOURCE_LABEL[s]}</FilterChip>
-          ))}
-          <span className="mx-1 h-5 w-px bg-border" />
+        <div className="flex items-center gap-2">
           <FilterChip active={visitsOnly} onClick={() => setVisitsOnly((v) => !v)}>
             <CalendarCheck size={13} /> Visits due
+          </FilterChip>
+          <FilterChip active={dateMode === "overdue"} onClick={() => setDateMode((m) => (m === "overdue" ? "all" : "overdue"))}>
+            <Clock size={13} /> Overdue
+            {overdueCount > 0 && (
+              <span className="tabular ml-0.5 rounded-pill bg-negative-soft px-1.5 text-[10px] font-semibold text-negative">{overdueCount}</span>
+            )}
           </FilterChip>
         </div>
 
@@ -68,6 +117,52 @@ export default function WorklistPage() {
               className="w-32 bg-transparent text-sm outline-none placeholder:text-text-faint sm:w-44"
             />
           </div>
+          {canFilterAgent && (
+            <select
+              value={agentFilter}
+              onChange={(e) => setAgentFilter(e.target.value)}
+              className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+              title="Assigned agent"
+            >
+              <option value="all">All agents</option>
+              {teamAgents.map((a) => (<option key={a.id} value={a.id}>{a.name}</option>))}
+            </select>
+          )}
+          <select
+            value={source}
+            onChange={(e) => setSource(e.target.value as Source | "all")}
+            className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+            title="Lead source"
+          >
+            <option value="all">All sources</option>
+            {sources.map((s) => (<option key={s} value={s}>{SOURCE_LABEL[s]}</option>))}
+          </select>
+          <select
+            value={dateMode === "custom" ? "custom" : dateMode}
+            onChange={(e) => { const v = e.target.value as DateMode; setDateMode(v); if (v !== "custom") { setCustomFrom(""); setCustomTo(""); } }}
+            className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+            title="Follow-up date"
+          >
+            {(Object.keys(DATE_LABEL) as (keyof typeof DATE_LABEL)[]).map((k) => (
+              <option key={k} value={k}>{DATE_LABEL[k]}</option>
+            ))}
+            <option value="custom">Custom range…</option>
+          </select>
+          {dateMode === "custom" && (
+            <div className="flex h-9 items-center gap-1.5 rounded-[10px] border border-border bg-surface px-2.5">
+              <input
+                type="date" value={customFrom} max={customTo || undefined}
+                onChange={(e) => setCustomFrom(e.target.value)}
+                className="bg-transparent text-sm text-text outline-none [color-scheme:inherit]" title="From"
+              />
+              <span className="text-text-faint">–</span>
+              <input
+                type="date" value={customTo} min={customFrom || undefined}
+                onChange={(e) => setCustomTo(e.target.value)}
+                className="bg-transparent text-sm text-text outline-none [color-scheme:inherit]" title="To"
+              />
+            </div>
+          )}
           <select
             value={config}
             onChange={(e) => setConfig(e.target.value as Config | "all")}
@@ -102,7 +197,7 @@ export default function WorklistPage() {
           <div className="px-6 py-16 text-center">
             <p className="text-sm text-text-muted">No buyers match these filters.</p>
             <button
-              onClick={() => { setQuery(""); setSource("all"); setConfig("all"); setVisitsOnly(false); }}
+              onClick={() => { setQuery(""); setSource("all"); setConfig("all"); setVisitsOnly(false); setDateMode("all"); setCustomFrom(""); setCustomTo(""); setAgentFilter("all"); }}
               className="mt-2 text-sm font-medium text-accent"
             >
               Clear filters
@@ -141,6 +236,15 @@ function BuyerRow({
   const stalledDays = Math.max(1, Math.round((SEED_NOW - buyer.lastTouch) / 86_400_000));
   const visitInDays = buyer.siteVisitDue ? Math.round((buyer.siteVisitDue - SEED_NOW) / 86_400_000) : null;
 
+  const fu = buyer.followUpAt;
+  const overdue = fu != null && fu < SEED_NOW && !buyer.siteVisitDue;
+  const slaH = fu != null ? Math.round(Math.abs(fu - SEED_NOW) / 3_600_000) : 0;
+  const slaText = slaH < 24 ? `${slaH}h` : `${Math.round(slaH / 24)}d`;
+  const fuClock = fu != null && !buyer.siteVisitDue
+    ? new Date(fu).toLocaleString("en-GB", { weekday: "short", hour: "2-digit", minute: "2-digit", hour12: true })
+    : null;
+  const dueSoon = fu != null && !overdue && !buyer.siteVisitDue && fu - SEED_NOW < DAY;
+
   return (
     <motion.div
       layout
@@ -169,13 +273,22 @@ function BuyerRow({
               {visitInDays !== null && (
                 <Pill variant="live"><CalendarCheck size={11} /> Visit {visitInDays <= 0 ? "today" : `in ${visitInDays}d`}</Pill>
               )}
-              {buyer.stalled && !visitInDays && (
+              {overdue && (
+                <Pill variant="negative"><Clock size={11} /> Overdue {slaText}</Pill>
+              )}
+              {dueSoon && (
+                <Pill variant="live" className="hidden sm:inline-flex"><Clock size={11} /> Follow-up {slaText}</Pill>
+              )}
+              {buyer.stalled && !visitInDays && !overdue && (
                 <Pill variant="negative" className="hidden sm:inline-flex"><TriangleAlert size={11} /> Stalled {stalledDays}d</Pill>
               )}
             </div>
             <div className="truncate text-sm text-text-muted">
               {buyer.config} · {buyer.localityPrefs[0]} · {rupeeRange(buyer.budgetMin, buyer.budgetMax)}
               <span className="ml-2 font-mono text-[11px] text-text-faint">{SOURCE_LABEL[buyer.source]}</span>
+              {fuClock && (
+                <span className={cn("ml-2 font-mono text-[11px]", overdue ? "text-negative" : "text-text-faint")}>· F/U {fuClock}</span>
+              )}
             </div>
           </div>
         </div>

@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   BarChart3,
   Plug,
-  SlidersHorizontal,
   MessageCircle,
   PhoneIncoming,
   CalendarCheck,
@@ -22,6 +21,7 @@ import {
   Search,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useScopedBuyers } from "@/lib/roles";
 import { conductBuyerReply, conductConciergeLead, conductMissedCall } from "@/lib/conductor";
 import { CommitCard, parseSentence } from "./commit-card";
 import { Avatar } from "./ui/primitives";
@@ -29,18 +29,17 @@ import { rupeeRange } from "@/lib/utils";
 
 const NAV = [
   { label: "Go to Worklist", href: "/worklist", icon: ListChecks },
-  { label: "Go to Concierge", href: "/concierge", icon: Bot },
+  { label: "Go to AI Inbox", href: "/concierge", icon: Bot },
   { label: "Go to Inventory", href: "/inventory", icon: Building2 },
   { label: "Go to Pipeline", href: "/pipeline", icon: Columns3 },
-  { label: "Go to Review queue", href: "/review", icon: ShieldCheck },
-  { label: "Go to Dashboard", href: "/dashboard", icon: BarChart3 },
+  { label: "Go to Approvals", href: "/approvals", icon: ShieldCheck },
+  { label: "Go to Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Go to Sources", href: "/settings/sources", icon: Plug },
-  { label: "Go to Autonomy", href: "/settings/autonomy", icon: SlidersHorizontal },
 ];
 
 export function CommandPalette() {
   const router = useRouter();
-  const buyers = useStore((s) => s.buyers);
+  const buyers = useScopedBuyers();
   const commitField = useStore((s) => s.commitField);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -175,7 +174,7 @@ export function CommandPalette() {
                     </Item>
                     <Item value="conduct-concierge" onSelect={() => { close(); conductConciergeLead(); }}>
                       <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent-soft text-accent"><CalendarCheck size={15} /></span>
-                      <span className="flex-1 text-sm text-text">Concierge qualifies + books a visit</span>
+                      <span className="flex-1 text-sm text-text">AI Inbox qualifies + books a visit</span>
                     </Item>
                     <Item value="conduct-call" onSelect={() => { close(); conductMissedCall(); }}>
                       <span className="grid h-8 w-8 place-items-center rounded-lg bg-live-soft text-live"><PhoneIncoming size={15} /></span>
