@@ -8,7 +8,7 @@ const ThemeCtx = createContext<{
   theme: Theme;
   toggle: () => void;
   setTheme: (t: Theme) => void;
-}>({ theme: "dark", toggle: () => {}, setTheme: () => {} });
+}>({ theme: "light", toggle: () => {}, setTheme: () => {} });
 
 /**
  * Lightweight theme provider. The no-flash class is applied by THEME_INIT
@@ -17,7 +17,7 @@ const ThemeCtx = createContext<{
  * under React 19.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
@@ -44,5 +44,5 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export const useTheme = () => useContext(ThemeCtx);
 
-/** Runs before paint to set the theme class — defaults to dark. */
-export const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark', t!=='light');}catch(e){document.documentElement.classList.add('dark');}})();`;
+/** Runs before paint to set the theme class — defaults to light. */
+export const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme');document.documentElement.classList.toggle('dark', t==='dark');}catch(e){}})();`;

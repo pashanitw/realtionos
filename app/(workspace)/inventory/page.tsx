@@ -70,6 +70,8 @@ export default function InventoryPage() {
   const [projectId, setProjectId] = useState<string | "all">("all");
   const [config, setConfig] = useState<Config | "all">("all");
   const [avail, setAvail] = useState<AvailFilter>("all");
+  const [tower, setTower] = useState<string | "all">("all");
+  const [facing, setFacing] = useState<string | "all">("all");
   const [buyerId, setBuyerId] = useState<string | "">("");
 
   const projectById = useMemo(
@@ -98,12 +100,20 @@ export default function InventoryPage() {
     return CONFIGS.filter((c) => set.has(c));
   }, [units]);
 
+  const presentTowers = useMemo(() => {
+    const scope = units.filter((u) => (projectId === "all" ? true : u.projectId === projectId));
+    return Array.from(new Set(scope.map((u) => u.tower))).sort();
+  }, [units, projectId]);
+  const presentFacings = useMemo(() => Array.from(new Set(units.map((u) => u.facing))).sort(), [units]);
+
   // The filtered + match-annotated + sorted unit list -----------------------
   const view = useMemo(() => {
     const annotated = units
       .filter((u) => (projectId === "all" ? true : u.projectId === projectId))
       .filter((u) => (config === "all" ? true : u.config === config))
       .filter((u) => (avail === "all" ? true : u.availability === avail))
+      .filter((u) => (tower === "all" ? true : u.tower === tower))
+      .filter((u) => (facing === "all" ? true : u.facing === facing))
       .map((u) => ({
         unit: u,
         project: projectById[u.projectId],
@@ -119,19 +129,29 @@ export default function InventoryPage() {
       if (oa !== ob) return oa - ob;
       return a.unit.priceInr - b.unit.priceInr;
     });
-  }, [units, projectId, config, avail, activeBuyer, projectById]);
+  }, [units, projectId, config, avail, tower, facing, activeBuyer, projectById]);
 
   const fitCount = useMemo(() => view.filter((v) => v.fit).length, [view]);
 
-  // Summary strip totals (respect the project filter, ignore config/avail) ---
-  const summary = useMemo(() => {
-    const scope = units.filter((u) =>
-      projectId === "all" ? true : u.projectId === projectId,
-    );
+  // Inventory-health stats (respect the project filter; ignore config/avail/tower) ---
+  const health = useMemo(() => {
+    const scope = units.filter((u) => (projectId === "all" ? true : u.projectId === projectId));
+    const by: Record<Availability, number> = { available: 0, blocked: 0, booked: 0, sold: 0 };
+    let minP = Infinity, maxP = 0, psqftSum = 0;
+    for (const u of scope) {
+      by[u.availability] += 1;
+      if (u.priceInr < minP) minP = u.priceInr;
+      if (u.priceInr > maxP) maxP = u.priceInr;
+      psqftSum += u.priceInr / u.carpetAreaSqft;
+    }
+    const total = scope.length;
     return {
-      total: scope.length,
-      available: scope.filter((u) => u.availability === "available").length,
-      booked: scope.filter((u) => u.availability === "booked").length,
+      total, available: by.available, blocked: by.blocked, booked: by.booked, sold: by.sold,
+      availablePct: total ? Math.round((by.available / total) * 100) : 0,
+      sellThrough: total ? Math.round(((by.booked + by.sold) / total) * 100) : 0,
+      minP: minP === Infinity ? 0 : minP,
+      maxP,
+      avgPsqft: total ? Math.round(psqftSum / total) : 0,
       projects: projectId === "all" ? projects.length : 1,
     };
   }, [units, projectId, projects.length]);
@@ -142,8 +162,9 @@ export default function InventoryPage() {
         kicker="What the AI matches against"
         title="Inventory"
         description="Projects, towers and units — with live availability. The AI quotes from the same source of truth the agent sees."
-        actions={<SummaryStrip {...summary} />}
       />
+
+      <InventoryHealth {...health} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
         {/* PROJECT RAIL ---------------------------------------------------- */}
@@ -171,6 +192,10 @@ export default function InventoryPage() {
 
         {/* MAIN ------------------------------------------------------------ */}
         <main className="min-w-0">
+          {projectId !== "all" && projectById[projectId] && (
+            <ProjectHero project={projectById[projectId]} units={units.filter((u) => u.projectId === projectId)} />
+          )}
+
           {/* Buyer-match banner */}
           <AnimatePresence initial={false}>
             {activeBuyer && (
@@ -217,21 +242,10 @@ export default function InventoryPage() {
 
           {/* Filters bar */}
           <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="relative flex h-9 shrink-0 items-center rounded-[10px] border border-border bg-surface">
-              <select
-                value={config}
-                onChange={(e) => setConfig(e.target.value as Config | "all")}
-                className={cn(
-                  "h-full cursor-pointer appearance-none bg-transparent pl-3 pr-9 text-sm font-medium outline-none",
-                  config === "all" ? "text-text-muted" : "text-text",
-                )}
-              >
-                <option value="all">All configs</option>
-                {presentConfigs.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-              <ChevronDown size={15} className="pointer-events-none absolute right-2.5 text-text-faint" />
+            <div className="flex flex-wrap items-center gap-2">
+              <FilterSelect value={config} onChange={(v) => setConfig(v as Config | "all")} allLabel="All configs" options={presentConfigs} active={config !== "all"} />
+              {presentTowers.length > 1 && <FilterSelect value={tower} onChange={setTower} allLabel="All towers" options={presentTowers} active={tower !== "all"} />}
+              {presentFacings.length > 1 && <FilterSelect value={facing} onChange={setFacing} allLabel="All facings" options={presentFacings} active={facing !== "all"} />}
             </div>
 
             <div className="flex items-center gap-2.5">
@@ -307,6 +321,8 @@ export default function InventoryPage() {
                   setConfig("all");
                   setAvail("all");
                   setProjectId("all");
+                  setTower("all");
+                  setFacing("all");
                 }}
                 className="mt-2 text-sm font-medium text-accent"
               >
@@ -320,35 +336,140 @@ export default function InventoryPage() {
   );
 }
 
-/* ---------------- Summary strip (header actions) ---------------- */
-function SummaryStrip({
-  total,
-  available,
-  booked,
-  projects,
+/* ---------------- Inventory health strip ---------------- */
+function InventoryHealth({
+  total, available, blocked, booked, sold, availablePct, sellThrough, minP, maxP, avgPsqft, projects,
 }: {
-  total: number;
-  available: number;
-  booked: number;
-  projects: number;
+  total: number; available: number; blocked: number; booked: number; sold: number;
+  availablePct: number; sellThrough: number; minP: number; maxP: number; avgPsqft: number; projects: number;
 }) {
-  const items = [
-    { label: "Units", value: total, color: "var(--text)" },
-    { label: "Available", value: available, color: "var(--positive)" },
-    { label: "Booked", value: booked, color: "var(--accent)" },
-    { label: "Projects", value: projects, color: "var(--text)" },
+  const seg = [
+    { label: "Available", n: available, color: "var(--positive)" },
+    { label: "Blocked", n: blocked, color: "var(--live)" },
+    { label: "Booked", n: booked, color: "var(--accent)" },
+    { label: "Sold", n: sold, color: "var(--text-faint)" },
   ];
   return (
-    <div className="flex items-stretch divide-x divide-border overflow-hidden rounded-[12px] border border-border bg-surface shadow-[var(--shadow-soft)]">
-      {items.map((it) => (
-        <div key={it.label} className="px-3.5 py-2 sm:px-4">
-          <div className="tabular text-lg font-bold leading-none" style={{ color: it.color }}>
-            {it.value}
-          </div>
-          <div className="label mt-1 text-[9px]">{it.label}</div>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mb-5 grid gap-5 rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5 lg:grid-cols-[1.4fr_1fr]"
+    >
+      {/* counts + availability bar */}
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-end gap-x-7 gap-y-3">
+          <HealthStat label="Total units" value={total} sub={`${projects} project${projects === 1 ? "" : "s"}`} />
+          <HealthStat label="Available" value={available} sub={`${availablePct}% of stock`} color="var(--positive)" />
+          <HealthStat label="Sell-through" value={`${sellThrough}%`} sub="booked + sold" color="var(--accent)" />
         </div>
-      ))}
+        <div className="mt-4 flex h-2.5 overflow-hidden rounded-full bg-surface-inset">
+          {seg.map((s) => (s.n > 0 ? (
+            <motion.div key={s.label} initial={{ width: 0 }} animate={{ width: `${total ? (s.n / total) * 100 : 0}%` }} transition={{ duration: 0.6, ease: "easeOut" }} style={{ background: s.color }} className="h-full" />
+          ) : null))}
+        </div>
+        <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+          {seg.map((s) => (
+            <span key={s.label} className="flex items-center gap-1.5 text-[11px] text-text-muted">
+              <span className="h-2 w-2 rounded-full" style={{ background: s.color }} /> {s.label} <span className="tabular font-mono text-text-faint">{s.n}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* price intelligence */}
+      <div className="grid grid-cols-2 gap-3 lg:border-l lg:border-border lg:pl-5">
+        <PriceStat label="Price range" value={minP ? `${rupees(minP)} – ${rupees(maxP)}` : "—"} />
+        <PriceStat label="Avg / sq.ft" value={avgPsqft ? `₹${avgPsqft.toLocaleString("en-IN")}` : "—"} />
+      </div>
+    </motion.div>
+  );
+}
+
+function HealthStat({ label, value, sub, color }: { label: string; value: React.ReactNode; sub: string; color?: string }) {
+  return (
+    <div>
+      <div className="tabular font-display text-2xl font-bold leading-none" style={{ color: color ?? "var(--text)" }}>{value}</div>
+      <div className="mt-1.5 font-mono text-[10px] uppercase tracking-wide text-text-faint">{label}</div>
+      <div className="text-[11px] text-text-muted">{sub}</div>
     </div>
+  );
+}
+
+function PriceStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[12px] border border-border bg-surface-inset/50 p-3">
+      <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{label}</div>
+      <div className="tabular mt-1.5 font-display text-base font-bold text-text">{value}</div>
+    </div>
+  );
+}
+
+/* ---------------- Filter select ---------------- */
+function FilterSelect({ value, onChange, allLabel, options, active }: { value: string; onChange: (v: string) => void; allLabel: string; options: string[]; active: boolean }) {
+  return (
+    <div className="relative flex h-9 shrink-0 items-center rounded-[10px] border border-border bg-surface">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn("h-full cursor-pointer appearance-none bg-transparent pl-3 pr-9 text-sm font-medium outline-none", active ? "text-text" : "text-text-muted")}
+      >
+        <option value="all">{allLabel}</option>
+        {options.map((o) => (<option key={o} value={o}>{o}</option>))}
+      </select>
+      <ChevronDown size={15} className="pointer-events-none absolute right-2.5 text-text-faint" />
+    </div>
+  );
+}
+
+/* ---------------- Project hero band ---------------- */
+function ProjectHero({ project, units }: { project: Project; units: Unit[] }) {
+  const total = units.length;
+  const avail = units.filter((u) => u.availability === "available").length;
+  const pct = total ? Math.round((avail / total) * 100) : 0;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+      className="mb-4 overflow-hidden rounded-[16px] border border-[#2e5599] bg-[linear-gradient(135deg,#1f3f74_0%,#122244_55%,#0a1a30_100%)] p-5 text-white shadow-[var(--shadow-soft)]"
+    >
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-display text-xl font-bold tracking-tight">{project.name}</h2>
+            <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-[#d1dff2]">{project.status === "ready" ? "Ready to move" : "Under construction"}</span>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#8baedd]">
+            <span className="inline-flex items-center gap-1"><Building2 size={12} /> {project.builder}</span>
+            <span className="inline-flex items-center gap-1"><MapPin size={12} /> {project.locality}</span>
+            <span className="inline-flex items-center gap-1"><CalendarClock size={12} /> {project.possessionDate}</span>
+            <span className="inline-flex items-center gap-1"><ShieldCheck size={12} /> RERA {project.reraNo}</span>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {project.amenities.map((a) => (
+              <span key={a} className="rounded-pill border border-[rgba(255,255,255,0.16)] px-2 py-0.5 text-[11px] text-[#d1dff2]">{a}</span>
+            ))}
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-3.5">
+          <Ring pct={pct} />
+          <div>
+            <div className="font-display text-2xl font-bold leading-none">{avail}<span className="text-base font-medium text-[#8baedd]"> / {total}</span></div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-[#8baedd]">units available</div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function Ring({ pct }: { pct: number }) {
+  const r = 24, c = 2 * Math.PI * r;
+  return (
+    <svg width="58" height="58" viewBox="0 0 58 58" className="shrink-0">
+      <circle cx="29" cy="29" r={r} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="5" />
+      <motion.circle cx="29" cy="29" r={r} fill="none" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round" strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c - (pct / 100) * c }} transition={{ duration: 0.8, ease: "easeOut" }} transform="rotate(-90 29 29)" />
+      <text x="29" y="33" textAnchor="middle" className="fill-white font-display text-[14px] font-bold">{pct}%</text>
+    </svg>
   );
 }
 

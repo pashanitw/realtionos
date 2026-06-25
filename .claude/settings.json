@@ -9,7 +9,11 @@
       "Bash(node -e \"const l=require\\('lucide-react'\\); ['Workflow','GitBranch','Wand2','Sparkles','Zap','Bot','Send','MessageCircle','ListChecks','CheckCircle2','Circle','CircleDot','Clock','ArrowRight','ChevronRight','Plus','Play','Pause','Power','Filter','TriangleAlert','Users','Check','X'].forEach\\(n=>{ if\\(!l[n]\\) console.log\\('MISSING:',n\\); }\\); console.log\\('checked'\\);\")",
       "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"LayoutDashboard\",\"LogOut\",\"Home\",\"Mail\",\"Lock\",\"ShieldCheck\",\"ArrowLeft\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')",
       "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"ListTodo\",\"ClipboardCheck\",\"ClipboardList\",\"CheckSquare\",\"Flame\",\"Thermometer\",\"Snowflake\",\"TrendingUp\",\"TrendingDown\",\"Scale\",\"Timer\",\"Gauge\",\"Percent\",\"Trophy\",\"Target\",\"BookOpen\",\"Lightbulb\",\"CalendarRange\",\"Newspaper\",\"CircleSlash\",\"XCircle\",\"ThumbsDown\",\"Hourglass\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')",
-      "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"UserPlus\",\"Trash2\",\"Bell\",\"BellRing\",\"Phone\",\"Plus\",\"Car\",\"IdCard\",\"CircleUser\",\"UserRound\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')"
+      "Bash(node -e 'const L=require\\(\"lucide-react\"\\);console.log\\([\"UserPlus\",\"Trash2\",\"Bell\",\"BellRing\",\"Phone\",\"Plus\",\"Car\",\"IdCard\",\"CircleUser\",\"UserRound\"].map\\(n=>n+\":\"+\\(L[n]?\"Y\":\"—\"\\)\\).join\\(\"  \"\\)\\)')",
+      "Bash(ls MEMORY.md)",
+      "Bash(grep -n \"brand-palette\" MEMORY.md)",
+      "Bash(node -e \"const i=require\\('lucide-react'\\); ['LayoutGrid','Table','Table2','Rows3','Columns3','Download','ChevronUp','ChevronDown','ArrowUpDown','ArrowDownUp','Wallet','TrendingUp','CalendarClock','Gauge','Target','Layers'].forEach\\(n=>console.log\\(n, !!i[n]\\)\\)\")",
+      "Bash(grep -n \"function SummaryStrip\\\\|function Chip\\\\|function ProjectCard\\\\|buyer-match selector\\\\|</div>\\\\s*$\\\\|presentConfigs\\\\|UnitCard\\\\|grid.*sm:grid-cols-2\" \"app/\\(workspace\\)/inventory/page.tsx\")"
     ]
   }
 }

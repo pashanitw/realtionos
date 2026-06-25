@@ -22,7 +22,7 @@ const CH_COLOR: Record<Channel, string> = {
   whatsapp: "var(--positive)",
   call: "var(--live)",
   email: "var(--accent)",
-  web: "#4f86d6",
+  web: "#4a78c4",
   sms: "var(--text-faint)",
 };
 
@@ -38,6 +38,78 @@ function hash(s: string): number {
     h = Math.imul(h, 16777619);
   }
   return ((h >>> 0) % 100000) / 100000;
+}
+
+/* ---------------- Hero command band — navy, the page's signature ---------------- */
+function HeroBand({ hero, bookingTrend, clientName }: { hero: { pipelineValue: number; bookings: number; v2b: number; aiHandled: number }; bookingTrend: { week: string; bookings: number; visits: number }[]; clientName: string }) {
+  const kpis = [
+    { Icon: CircleDollarSign, label: "Pipeline value", value: rupees(hero.pipelineValue), hint: "open deal value", accent: false },
+    { Icon: Trophy, label: "Flats booked", value: hero.bookings, hint: "this period", accent: true },
+    { Icon: Target, label: "Visit → booking", value: `${hero.v2b}%`, hint: "site visit converts", accent: false },
+    { Icon: Sparkles, label: "AI-handled", value: `${hero.aiHandled}%`, hint: "of conversations", accent: false },
+  ];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: EASE_OUT }}
+      className="overflow-hidden rounded-[20px] border border-[#2e5599] bg-[linear-gradient(135deg,#1f3f74_0%,#122244_52%,#0a1a30_100%)] text-white shadow-[var(--shadow-lift)]"
+    >
+      <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1.7fr_1fr] lg:items-center">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#8baedd]">
+            <span className="relative inline-flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent)] opacity-60" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--accent)]" /></span>
+            Live · {clientName}
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+            {kpis.map((k) => (
+              <div key={k.label} className="min-w-0">
+                <k.Icon size={15} className={k.accent ? "text-[#ec8560]" : "text-[#8baedd]"} />
+                <div className={cn("tabular mt-2 font-display text-[26px] font-bold leading-none", k.accent ? "text-[#ec8560]" : "text-white")}>
+                  {typeof k.value === "number" ? <AnimatedNumber value={k.value} /> : k.value}
+                </div>
+                <div className="mt-1.5 font-mono text-[10px] uppercase tracking-wide text-[#8baedd]">{k.label}</div>
+                <div className="text-[11px] text-[#8baedd]">{k.hint}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[14px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] p-4">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-[#8baedd]">Bookings · last {bookingTrend.length} wks</span>
+            <span className="font-display text-lg font-bold text-white">{bookingTrend[bookingTrend.length - 1]?.bookings ?? 0}</span>
+          </div>
+          <AreaSpark points={bookingTrend.map((t) => t.bookings)} />
+          <div className="mt-1.5 flex justify-between font-mono text-[9px] text-[#8baedd]">
+            {bookingTrend.map((t) => (<span key={t.week}>{t.week}</span>))}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function AreaSpark({ points }: { points: number[] }) {
+  const w = 260, h = 58;
+  const max = Math.max(...points, 1), min = Math.min(...points, 0);
+  const xs = (i: number) => (points.length > 1 ? (i / (points.length - 1)) * w : w / 2);
+  const ys = (v: number) => h - ((v - min) / (max - min || 1)) * (h - 6) - 3;
+  const line = points.map((p, i) => `${i === 0 ? "M" : "L"}${xs(i).toFixed(1)},${ys(p).toFixed(1)}`).join(" ");
+  const area = `${line} L${w},${h} L0,${h} Z`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="mt-3 h-14 w-full">
+      <defs>
+        <linearGradient id="heroArea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <motion.path d={area} fill="url(#heroArea)" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} />
+      <motion.path d={line} fill="none" stroke="var(--accent)" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9, ease: "easeOut" }} />
+      {points.map((p, i) => (<circle key={i} cx={xs(i)} cy={ys(p)} r="2" fill="var(--accent)" />))}
+    </svg>
+  );
 }
 
 export default function AnalyticsPage() {
@@ -62,11 +134,22 @@ export default function AnalyticsPage() {
       .sort((a, b) => b.count - a.count);
   }, [messages]);
 
+  const hero = useMemo(() => {
+    const pipelineValue = deals.reduce((s, d) => s + d.valueInr, 0);
+    const bookings = agents.reduce((s, a) => s + a.bookings, 0);
+    const visits = agents.reduce((s, a) => s + a.visits, 0);
+    return { pipelineValue, bookings, v2b: visits ? Math.round((bookings / visits) * 100) : 0, aiHandled: health.aiHandledShare };
+  }, [deals, agents, health]);
+
   return (
     <PageContainer>
       <PageHeader title="Analytics" description="Your command centre — how the business is performing, what's working, where money leaks, and which deals to act on. Each card explains what it shows." />
 
-      <NLQueryBox sourceROI={sourceROI} funnel={funnel} captureMix={captureMix} />
+      <HeroBand hero={hero} bookingTrend={bookingTrend} clientName="Aurum Realty" />
+
+      <div className="mt-3">
+        <NLQueryBox sourceROI={sourceROI} funnel={funnel} captureMix={captureMix} />
+      </div>
 
       <div className="mt-3">
         <WeeklyBriefCard funnel={funnel} bookingTrend={bookingTrend} sourceROI={sourceROI} />
@@ -404,24 +487,51 @@ function FunnelCard({ funnel }: { funnel: { stage: string; count: number }[] }) 
    Capture mix · conversations by channel
    ============================================================ */
 function CaptureMixCard({ mix }: { mix: { channel: Channel; label: string; count: number; pct: number }[] }) {
-  const max = Math.max(...mix.map((m) => m.pct), 1);
+  const total = mix.reduce((s, m) => s + m.count, 0);
   return (
     <Card delay={0.1}>
       <CardHead icon={<MessageSquare size={15} className="text-accent" />} title="Capture mix · last 7 days" caption="Which channels buyers actually reach you on, so you invest where they are." />
-      <div className="space-y-3">
-        {mix.map((m, i) => (
-          <motion.div key={m.channel} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.06 * i }} className="flex items-center gap-3">
-            <span className="flex w-28 shrink-0 items-center gap-2 text-sm font-medium text-text">
-              <ChannelIcon channel={m.channel} size={13} withBg /> {m.label}
-            </span>
-            <div className="h-3 flex-1 overflow-hidden rounded-pill bg-surface-inset">
-              <motion.div className="h-full rounded-pill" style={{ background: CH_COLOR[m.channel] }} initial={{ width: 0 }} animate={{ width: `${(m.pct / max) * 100}%` }} transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.06 * i + 0.1 }} />
+      <div className="flex items-center gap-5">
+        <Donut data={mix.map((m) => ({ value: m.count, color: CH_COLOR[m.channel] }))} centerTop={`${total}`} centerSub="convos" />
+        <div className="min-w-0 flex-1 space-y-2.5">
+          {mix.map((m) => (
+            <div key={m.channel} className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: CH_COLOR[m.channel] }} />
+              <ChannelIcon channel={m.channel} size={13} />
+              <span className="min-w-0 flex-1 truncate text-sm text-text">{m.label}</span>
+              <span className="tabular font-mono text-sm font-semibold text-text">{m.pct}%</span>
             </div>
-            <span className="w-10 shrink-0 text-right font-mono text-sm font-semibold text-text tabular">{m.pct}%</span>
-          </motion.div>
-        ))}
+          ))}
+        </div>
       </div>
     </Card>
+  );
+}
+
+/* ---------------- Donut chart ---------------- */
+function Donut({ data, centerTop, centerSub }: { data: { value: number; color: string }[]; centerTop: string; centerSub: string }) {
+  const size = 124, stroke = 16, r = (size - stroke) / 2 - 2, c = 2 * Math.PI * r;
+  const total = data.reduce((s, d) => s + d.value, 0) || 1;
+  let offset = 0;
+  const arcs = data.map((d, i) => {
+    const len = (d.value / total) * c;
+    const node = (
+      <motion.circle
+        key={i} cx={size / 2} cy={size / 2} r={r} fill="none" stroke={d.color} strokeWidth={stroke}
+        strokeDasharray={`${len} ${c - len}`} strokeDashoffset={-offset}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.08 * i }}
+      />
+    );
+    offset += len;
+    return node;
+  });
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="shrink-0">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-inset)" strokeWidth={stroke} />
+      <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>{arcs}</g>
+      <text x="50%" y="47%" textAnchor="middle" dominantBaseline="middle" className="fill-[var(--text)] font-display text-[22px] font-bold">{centerTop}</text>
+      <text x="50%" y="63%" textAnchor="middle" className="fill-[var(--text-faint)] font-mono text-[9px] uppercase tracking-wide">{centerSub}</text>
+    </svg>
   );
 }
 

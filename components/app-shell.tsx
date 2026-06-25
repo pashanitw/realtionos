@@ -56,7 +56,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
 function Brand() {
   return (
     <Link href="/home" className="flex items-center gap-2.5 px-1">
-      <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#34b3a3] to-[#0c4a45] text-white shadow-[0_0_18px_-4px_rgba(52,179,163,0.6)]">
+      <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white shadow-[0_0_18px_-4px_rgba(226,97,45,0.5)]">
         <Sparkles size={17} strokeWidth={2.4} />
       </div>
       <div className="leading-tight">
@@ -88,9 +88,9 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
                   const active = pathname.startsWith(item.href);
                   const Icon = item.icon;
                   return (
-                    <Link key={item.href} href={item.href} onClick={onNavigate} className={cn("group relative flex items-center gap-3 rounded-[10px] px-3 py-2 text-sm font-medium transition-colors", active ? "text-white" : "text-chrome-text hover:text-white")}>
-                      {active && <motion.span layoutId="nav-active" className="absolute inset-0 rounded-[10px] border border-[rgba(52,179,163,0.25)] bg-[rgba(52,179,163,0.12)]" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
-                      <Icon size={17} strokeWidth={2.1} className={cn("relative z-10 shrink-0", active && "text-[#43c9b8]")} />
+                    <Link key={item.href} href={item.href} onClick={onNavigate} className={cn("group relative flex items-center gap-3 rounded-[10px] px-3 py-2 text-sm font-medium transition-colors", active ? "text-chrome-text" : "text-chrome-text-faint hover:text-chrome-text")}>
+                      {active && <motion.span layoutId="nav-active" className="absolute inset-0 rounded-[10px] border border-[rgba(226,97,45,0.3)] bg-[rgba(226,97,45,0.14)]" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
+                      <Icon size={17} strokeWidth={2.1} className={cn("relative z-10 shrink-0", active && "text-accent")} />
                       <span className="relative z-10 flex-1">{item.label}</span>
                       {item.badge && badgeCount(item.badge) > 0 && (
                         <span className="relative z-10 grid h-5 min-w-5 place-items-center rounded-full bg-live px-1.5 text-[11px] font-bold text-white tabular">{badgeCount(item.badge)}</span>
@@ -112,10 +112,10 @@ function SidebarInner({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex h-full flex-col gap-6 p-4">
       <div className="pt-1"><Brand /></div>
       <NavItems onNavigate={onNavigate} />
-      <div className="rounded-[12px] border border-chrome-border bg-[rgba(255,255,255,0.03)] p-3">
-        <div className="flex items-center gap-2 text-[12px] font-semibold text-chrome-text"><StatusDot color="#ec9a3c" pulse size={7} /> Live capture on</div>
+      <div className="rounded-[12px] border border-chrome-border bg-chrome-2 p-3">
+        <div className="flex items-center gap-2 text-[12px] font-semibold text-chrome-text"><StatusDot color="var(--live)" pulse size={7} /> Live capture on</div>
         <p className="mt-1.5 text-[11px] leading-relaxed text-chrome-text-faint">
-          Press <kbd className="rounded bg-[rgba(255,255,255,0.08)] px-1 font-mono text-[10px]">⌘K</kbd> to talk to the CRM, or <kbd className="rounded bg-[rgba(255,255,255,0.08)] px-1 font-mono text-[10px]">⌘J</kbd> for the demo conductor.
+          Press <kbd className="rounded bg-chrome-2 px-1 font-mono text-[10px]">⌘K</kbd> to talk to the CRM, or <kbd className="rounded bg-chrome-2 px-1 font-mono text-[10px]">⌘J</kbd> for the demo conductor.
         </p>
       </div>
     </div>
@@ -264,7 +264,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <>
             <motion.div className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawer(false)} />
             <motion.aside className="chrome fixed inset-y-0 left-0 z-50 w-[270px] border-r border-chrome-border lg:hidden" initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }} transition={{ type: "spring", stiffness: 400, damping: 38 }}>
-              <button onClick={() => setDrawer(false)} className="absolute right-3 top-4 grid h-8 w-8 place-items-center rounded-lg text-chrome-text-faint hover:text-white" aria-label="Close menu"><X size={18} /></button>
+              <button onClick={() => setDrawer(false)} className="absolute right-3 top-4 grid h-8 w-8 place-items-center rounded-lg text-chrome-text-faint hover:text-chrome-text" aria-label="Close menu"><X size={18} /></button>
               <SidebarInner onNavigate={() => setDrawer(false)} />
             </motion.aside>
           </>

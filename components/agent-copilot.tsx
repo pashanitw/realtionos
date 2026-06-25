@@ -217,7 +217,7 @@ export function AgentCopilot() {
           >
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <div className="flex items-center gap-2.5">
-                <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#34b3a3] to-[#0c4a45] text-white"><Bot size={17} /></span>
+                <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white"><Bot size={17} /></span>
                 <div>
                   <h3 className="font-display text-base font-bold">Agent Copilot</h3>
                   <p className="text-xs text-text-muted">Ask about your book · {buyers.length} contracts</p>

@@ -71,13 +71,13 @@ function MorningBrief({ brief, count }: { brief: MorningBrief; count: number }) 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden rounded-[18px] border border-chrome-border p-6 text-white shadow-[var(--shadow-lift)] md:p-7"
-      style={{ background: "linear-gradient(125deg, #0c4a45 0%, #082c27 52%, #0a0d11 100%)" }}
+      style={{ background: "linear-gradient(125deg, #1f3f74 0%, #122244 52%, #0a1a30 100%)" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ background: "radial-gradient(540px 240px at 88% -20%, color-mix(in oklab, var(--live) 30%, transparent), transparent 70%)" }} />
       <div className="relative">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
-            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[rgba(255,255,255,0.1)] text-[#ec9a3c]"><Moon size={19} /></span>
+            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[rgba(255,255,255,0.1)] text-[#ec8560]"><Moon size={19} /></span>
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-display text-xl font-bold">Good morning, Maya</h2>
@@ -104,7 +104,7 @@ function MorningBrief({ brief, count }: { brief: MorningBrief; count: number }) 
             <div key={s.label}>
               <div className="font-display text-3xl font-bold leading-none tabular"><AnimatedNumber value={s.n} /></div>
               <div className="mt-1.5 text-[13px] font-medium text-white/85">{s.label}</div>
-              <div className="font-mono text-[11px] text-[#f0b271]">{s.sub}</div>
+              <div className="font-mono text-[11px] text-[#f3af96]">{s.sub}</div>
             </div>
           ))}
         </div>

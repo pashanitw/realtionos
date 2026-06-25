@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { Sparkles, ArrowRight, Mail, Lock, ArrowLeft, ChevronRight } from "lucide-react";
+import { Sparkles, ArrowLeft, ChevronRight, Lock } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { Avatar } from "@/components/ui/primitives";
 import { ROLE_LABEL, type OrgUser } from "@/lib/data/types";
@@ -19,13 +18,15 @@ export default function LoginPage() {
   const authed = useStore((s) => s.authed);
   const restoreSession = useStore((s) => s.restoreSession);
 
-  // already signed in? skip the form
+  // already signed in? skip the picker
   useEffect(() => { restoreSession(); }, [restoreSession]);
   useEffect(() => { if (authed) router.replace("/home"); }, [authed, router]);
 
   const clientName = clients.find((c) => c.id === activeClientId)?.name ?? "RelationOS";
-  const demo = useMemo(() => {
-    const cu = users.filter((u) => u.clientId === activeClientId && u.email);
+
+  // One demo account per role in the active client.
+  const roles = useMemo(() => {
+    const cu = users.filter((u) => u.clientId === activeClientId);
     return [
       cu.find((u) => u.role === "manager"),
       cu.find((u) => u.role === "agent"),
@@ -33,18 +34,7 @@ export default function LoginPage() {
     ].filter(Boolean) as OrgUser[];
   }, [users, activeClientId]);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const enter = (u: OrgUser) => { login(u.id); router.push("/home"); };
-  const pick = (u: OrgUser) => { setEmail(u.email ?? ""); setPassword("demo1234"); enter(u); };
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const u = users.find((x) => x.email && x.email.toLowerCase() === email.trim().toLowerCase());
-    if (!u) return toast.error("No account for that email — try a demo account below.");
-    if (!password.trim()) return toast.error("Enter your password.");
-    enter(u);
-  };
 
   return (
     <div className="relative grid min-h-screen place-items-center overflow-hidden px-4 py-10">
@@ -62,7 +52,7 @@ export default function LoginPage() {
       >
         {/* brand */}
         <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-[11px] bg-gradient-to-br from-[#34b3a3] to-[#0c4a45] text-white shadow-[0_0_18px_-4px_rgba(52,179,163,0.6)]">
+          <div className="grid h-9 w-9 place-items-center rounded-[11px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white shadow-[0_0_18px_-4px_rgba(226,97,45,0.5)]">
             <Sparkles size={18} strokeWidth={2.4} />
           </div>
           <div className="leading-tight">
@@ -71,61 +61,33 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <h1 className="mt-6 font-display text-[22px] font-bold tracking-tight text-text">Sign in</h1>
-        <p className="mt-1 text-sm text-text-muted">Welcome back to <span className="text-text">{clientName}</span> — real-estate sales on autopilot.</p>
+        <h1 className="mt-6 font-display text-[22px] font-bold tracking-tight text-text">Choose a role</h1>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-3">
-          <label className="block">
-            <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-text-faint">Email</span>
-            <div className="flex h-11 items-center gap-2 rounded-[11px] border border-border bg-surface-2 px-3 focus-within:border-border-strong">
-              <Mail size={15} className="shrink-0 text-text-faint" />
-              <input
-                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.in" autoComplete="username"
-                className="w-full bg-transparent text-sm text-text outline-none placeholder:text-text-faint"
-              />
-            </div>
-          </label>
-          <label className="block">
-            <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-text-faint">Password</span>
-            <div className="flex h-11 items-center gap-2 rounded-[11px] border border-border bg-surface-2 px-3 focus-within:border-border-strong">
-              <Lock size={15} className="shrink-0 text-text-faint" />
-              <input
-                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••" autoComplete="current-password"
-                className="w-full bg-transparent text-sm text-text outline-none placeholder:text-text-faint"
-              />
-            </div>
-          </label>
-          <button
-            type="submit"
-            className="flex h-11 w-full items-center justify-center gap-1.5 rounded-[11px] bg-accent text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.01] active:scale-95"
-          >
-            Sign in <ArrowRight size={16} />
-          </button>
-        </form>
-
-        {/* demo accounts */}
-        <div className="my-5 flex items-center gap-3">
-          <span className="h-px flex-1 bg-border" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-faint">or continue as</span>
-          <span className="h-px flex-1 bg-border" />
+        {/* demo-environment note — real auth comes later */}
+        <div className="mt-3 flex items-start gap-2.5 rounded-[12px] border border-border bg-surface-2 px-3.5 py-3 text-sm text-text-muted">
+          <Lock size={16} className="mt-0.5 shrink-0 text-accent" />
+          <p>
+            Real logins will be added later — this is a <span className="font-medium text-text">demo environment</span>.
+            Pick a role below to explore <span className="text-text">{clientName}</span>.
+          </p>
         </div>
-        <div className="space-y-2">
-          {demo.map((u) => (
+
+        {/* role pickers */}
+        <div className="mt-5 space-y-2">
+          {roles.map((u) => (
             <button
               key={u.id}
               type="button"
-              onClick={() => pick(u)}
+              onClick={() => enter(u)}
               className="group flex w-full items-center gap-3 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5 text-left transition-colors hover:border-border-strong hover:bg-surface-inset"
             >
               <Avatar name={u.name} hue={u.hue} size={36} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="truncate text-sm font-semibold text-text">{u.name}</span>
                   <span className="rounded-pill bg-accent-soft px-2 py-0.5 font-mono text-[10px] text-accent">{ROLE_LABEL[u.role]}</span>
+                  <span className="truncate text-sm font-semibold text-text">{u.name}</span>
                 </div>
-                <div className="truncate font-mono text-[11px] text-text-faint">{u.email}</div>
+                <div className="mt-0.5 truncate text-[11px] text-text-faint">{u.title}</div>
               </div>
               <ChevronRight size={16} className="shrink-0 text-text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-text" />
             </button>
@@ -136,7 +98,7 @@ export default function LoginPage() {
           <Link href="/" className="inline-flex items-center gap-1 text-xs font-medium text-text-muted transition-colors hover:text-text">
             <ArrowLeft size={13} /> Back to site
           </Link>
-          <span className="font-mono text-[10px] text-text-faint">demo · any password works</span>
+          <span className="font-mono text-[10px] text-text-faint">demo · no password needed</span>
         </div>
       </motion.div>
     </div>

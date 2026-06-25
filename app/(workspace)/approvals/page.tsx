@@ -148,12 +148,12 @@ function SpeakBanner({ count }: { count: number }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="relative overflow-hidden rounded-[16px] border border-chrome-border p-5 text-white shadow-[var(--shadow-lift)]"
-      style={{ background: "linear-gradient(125deg, #0c4a45 0%, #082c27 55%, #0a0d11 100%)" }}
+      style={{ background: "linear-gradient(125deg, #1f3f74 0%, #122244 55%, #0a1a30 100%)" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ background: "radial-gradient(520px 220px at 90% -20%, color-mix(in oklab, var(--live) 28%, transparent), transparent 70%)" }} />
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[rgba(255,255,255,0.1)] text-[#43c9b8]"><Mic size={18} /></span>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[rgba(255,255,255,0.1)] text-[#ec8560]"><Mic size={18} /></span>
           <div>
             <h2 className="font-display text-lg font-bold">Clear the queue by speaking</h2>
             <p className="mt-1 max-w-xl text-sm leading-relaxed text-white/75">
@@ -162,7 +162,7 @@ function SpeakBanner({ count }: { count: number }) {
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
-          <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-3 py-1 font-mono text-[12px] font-semibold text-[#f0b271]">
+          <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-3 py-1 font-mono text-[12px] font-semibold text-[#f3af96]">
             {count} awaiting your nod
           </span>
           <span className="font-mono text-[11px] text-white/55">
@@ -233,7 +233,7 @@ function ApprovalCard({ item, onApprove, onDismiss }: { item: ReviewItem; onAppr
           onClick={onApprove}
           className={cn(
             "flex h-10 items-center justify-center gap-1.5 rounded-[10px] px-5 text-sm font-semibold shadow-[0_0_22px_-8px_var(--accent)] transition-transform hover:scale-[1.015] active:scale-95",
-            isDup ? "bg-live text-[#1b1205]" : "bg-accent text-accent-contrast",
+            isDup ? "bg-live text-[#2a0e03]" : "bg-accent text-accent-contrast",
           )}
         >
           {isDup ? <GitMerge size={15} strokeWidth={2.4} /> : <Check size={15} strokeWidth={2.4} />} {item.cta}

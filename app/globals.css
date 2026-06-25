@@ -9,48 +9,50 @@
    Ink = chrome · Paper = canvas · Green/Red = signal only
    ============================================================ */
 :root {
-  /* brand constants (appendix B) */
-  --petrol: #0c4a45;
-  --amber: #be6f18;
-  --ink: #14171c;
-  --paper: #f4f3ef;
+  /* brand constants — official palette (navy primary · burnt-amber accent) */
+  --navy: #1f3f74;
+  --amber: #e2612d;
+  --coral: #ec8560;
+  --linen: #fae0d4;
+  --ink: #0a1a30;
+  --paper: #f7f8fa;
   --green: #1e875b;
-  --red: #c0492f;
+  --red: #c0392b;
 
-  /* ---- LIGHT THEME (warm paper canvas, white record cards) ---- */
-  --bg: #f4f3ef;
-  --bg-grad-a: #f6f5f0;
-  --bg-grad-b: #eceae1;
+  /* ---- LIGHT THEME (cool cloud canvas, white record cards) ---- */
+  --bg: #f7f8fa;
+  --bg-grad-a: #ffffff;
+  --bg-grad-b: #e8e9ec;
   --surface: #ffffff;
-  --surface-2: #f7f6f1;
-  --surface-inset: #efeee7;
-  --border: #e3e1d7;
-  --border-strong: #cfccc0;
+  --surface-2: #e8e9ec;
+  --surface-inset: #e8e9ec;
+  --border: #e8e9ec;
+  --border-strong: #c4c7ce;
 
-  --text: #14171c;
-  --text-muted: #5d616a;
-  --text-faint: #8a8d94;
+  --text: #111317;
+  --text-muted: #535866;
+  --text-faint: #8c909a;
 
-  --accent: #0c4a45;
-  --accent-soft: #d9e8e4;
+  --accent: #e2612d;
+  --accent-soft: #fae0d4;
   --accent-contrast: #ffffff;
-  --live: #b5660f;
-  --live-soft: #f6e6d0;
+  --live: #b84d1e;
+  --live-soft: #f7e2d6;
   --positive: #1e875b;
   --positive-soft: #d6ecdf;
-  --negative: #c0492f;
-  --negative-soft: #f4ddd6;
+  --negative: #c0392b;
+  --negative-soft: #f6ddd8;
 
-  --ring: rgba(12, 74, 69, 0.4);
+  --ring: rgba(226, 97, 45, 0.4);
 
-  /* chrome (nav/sidebar) stays inky in both themes -> "control room" */
-  --chrome: #101317;
-  --chrome-2: #14181d;
-  --chrome-border: rgba(255, 255, 255, 0.07);
-  --chrome-text: #c7ccd3;
-  --chrome-text-faint: #767c86;
-  --chrome-accent: #34b3a3;
-  --chrome-live: #e8912f;
+  /* chrome (nav/sidebar) — WHITE in light theme */
+  --chrome: #ffffff;
+  --chrome-2: #e8e9ec;
+  --chrome-border: #c4c7ce;
+  --chrome-text: #111317;
+  --chrome-text-faint: #8c909a;
+  --chrome-accent: #e2612d;
+  --chrome-live: #e2612d;
 
   /* shapes */
   --radius-card: 14px;
@@ -67,37 +69,39 @@
 }
 
 .dark {
-  /* ---- DARK THEME (ink canvas, accents glow) — demo default ---- */
-  --bg: #0a0c10;
-  --bg-grad-a: #0d1015;
-  --bg-grad-b: #07090c;
-  --surface: #14181d;
-  --surface-2: #1a1f26;
-  --surface-inset: #0e1116;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.15);
+  /* ---- DARK THEME (deep-navy control room, amber glows) — demo default ---- */
+  --bg: #0a1a30;
+  --bg-grad-a: #122244;
+  --bg-grad-b: #0a1a30;
+  --surface: #122244;
+  --surface-2: #1f3f74;
+  --surface-inset: #0a1a30;
+  --border: rgba(139, 174, 221, 0.14);
+  --border-strong: rgba(139, 174, 221, 0.24);
 
-  --text: #f1f0ea;
-  --text-muted: #99a0aa;
-  --text-faint: #687079;
+  --text: #f7f8fa;
+  --text-muted: #8baedd;
+  --text-faint: #8c909a;
 
-  --accent: #34b3a3;
-  --accent-soft: rgba(52, 179, 163, 0.14);
-  --accent-contrast: #04211d;
-  --live: #ec9a3c;
-  --live-soft: rgba(236, 154, 60, 0.15);
+  --accent: #e2612d;
+  --accent-soft: rgba(226, 97, 45, 0.16);
+  --accent-contrast: #5c2008;
+  --live: #ec8560;
+  --live-soft: rgba(236, 133, 96, 0.16);
   --positive: #34c08a;
   --positive-soft: rgba(52, 192, 138, 0.16);
-  --negative: #e2674c;
-  --negative-soft: rgba(226, 103, 76, 0.16);
+  --negative: #d9483b;
+  --negative-soft: rgba(217, 72, 59, 0.16);
 
-  --ring: rgba(52, 179, 163, 0.55);
+  --ring: rgba(226, 97, 45, 0.5);
 
-  --chrome: #07090c;
-  --chrome-2: #0b0e12;
-  --chrome-border: rgba(255, 255, 255, 0.06);
-  --chrome-text: #c7ccd3;
-  --chrome-text-faint: #6b7079;
+  --chrome: #122244;
+  --chrome-2: #122244;
+  --chrome-border: rgba(139, 174, 221, 0.16);
+  --chrome-text: #d1dff2;
+  --chrome-text-faint: #8baedd;
+  --chrome-accent: #e2612d;
+  --chrome-live: #ec8560;
 
   --shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.6),
     0 2px 6px -3px rgba(0, 0, 0, 0.45);
@@ -122,8 +126,10 @@
   --color-text-muted: var(--text-muted);
   --color-text-faint: var(--text-faint);
 
-  --color-petrol: var(--petrol);
+  --color-navy: var(--navy);
   --color-amber: var(--amber);
+  --color-coral: var(--coral);
+  --color-linen: var(--linen);
   --color-ink: var(--ink);
   --color-paper: var(--paper);
 
@@ -143,9 +149,9 @@
   --color-chrome-text: var(--chrome-text);
   --color-chrome-text-faint: var(--chrome-text-faint);
 
-  --font-display: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
-  --font-sans: var(--font-hanken), "Hanken Grotesk", system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
+  --font-display: var(--font-ubuntu), "Ubuntu", system-ui, sans-serif;
+  --font-sans: var(--font-ubuntu), "Ubuntu", system-ui, sans-serif;
+  --font-mono: var(--font-ubuntu-mono), "Ubuntu Mono", monospace;
 
   --radius-input: 10px;
   --radius-card: 14px;
@@ -258,10 +264,13 @@ optgroup {
   backdrop-filter: blur(14px) saturate(140%);
 }
 
-/* the inky chrome surface (nav, top bar) */
+/* chrome surface (nav/sidebar) — white in light theme, deep-navy gradient in dark */
 .chrome {
   background: var(--chrome);
   color: var(--chrome-text);
+}
+.dark .chrome {
+  background: linear-gradient(180deg, #1f3f74 0%, #122244 48%, #0a1a30 100%);
 }
 
 /* score badge ring base */

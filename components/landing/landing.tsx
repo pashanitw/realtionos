@@ -45,7 +45,7 @@ function LandingNav() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-[color-mix(in_oklab,var(--bg)_72%,transparent)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#34b3a3] to-[#0c4a45] text-white shadow-[0_0_18px_-4px_rgba(52,179,163,0.7)]"><Sparkles size={17} strokeWidth={2.4} /></span>
+          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white shadow-[0_0_18px_-4px_rgba(226,97,45,0.6)]"><Sparkles size={17} strokeWidth={2.4} /></span>
           <span className="font-display text-[16px] font-bold tracking-tight">RelationOS</span>
           <span className="hidden rounded-pill border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-faint sm:inline">Real estate</span>
         </Link>
@@ -467,7 +467,7 @@ function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-4 px-4 py-8 md:flex-row md:px-6">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-[#34b3a3] to-[#0c4a45] text-white"><Sparkles size={14} strokeWidth={2.4} /></span>
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white"><Sparkles size={14} strokeWidth={2.4} /></span>
           <span className="font-display text-sm font-bold">RelationOS</span>
           <span className="font-mono text-[11px] text-text-faint">· real estate · thevertical.ai</span>
         </div>

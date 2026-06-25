@@ -12,6 +12,10 @@ import {
   Headset,
   ArrowDown,
   Radio,
+  Target,
+  Gauge,
+  Layers,
+  ChevronRight,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useScopedConcierge, useClientUnits, useClientProjects } from "@/lib/roles";
@@ -25,6 +29,7 @@ import {
   StatusDot,
   Label,
   ChannelIcon,
+  AnimatedNumber,
 } from "@/components/ui/primitives";
 import {
   SOURCE_LABEL,
@@ -78,17 +83,6 @@ export default function ConciergePage() {
     [visible, selectedId],
   );
 
-  const counts = useMemo(() => {
-    const base: Record<ConciergeStatus, number> = {
-      qualifying: 0,
-      matched: 0,
-      "visit-booked": 0,
-      "handed-off": 0,
-    };
-    for (const c of chats) base[c.status] += 1;
-    return base;
-  }, [chats]);
-
   const handleSelect = (id: string) => {
     setSelectedId(id);
     // On mobile the detail sits below the list — bring it into view.
@@ -116,7 +110,7 @@ export default function ConciergePage() {
         }
       />
 
-      <StatStrip counts={counts} total={chats.length} />
+      <InboxMetrics chats={chats} />
 
       {/* Omni-channel filter */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -177,46 +171,111 @@ export default function ConciergePage() {
 /* ============================================================
    Top stat strip — control-room counters
    ============================================================ */
-function StatStrip({
-  counts,
-  total,
-}: {
-  counts: Record<ConciergeStatus, number>;
-  total: number;
-}) {
+function InboxMetrics({ chats }: { chats: ConciergeChat[] }) {
+  const m = useMemo(() => {
+    const by: Record<ConciergeStatus, number> = { qualifying: 0, matched: 0, "visit-booked": 0, "handed-off": 0 };
+    const chMix: Partial<Record<Channel, number>> = {};
+    let booked = 0, scoreSum = 0, scoreN = 0, unitsOffered = 0, aiMsgs = 0, allMsgs = 0;
+    for (const c of chats) {
+      by[c.status] += 1;
+      if (c.siteVisitAt) booked += 1;
+      if (typeof c.score === "number") { scoreSum += c.score; scoreN += 1; }
+      unitsOffered += c.offeredUnitIds.length;
+      for (const msg of c.messages) { allMsgs += 1; if (msg.from === "ai") aiMsgs += 1; }
+      chMix[c.channel] = (chMix[c.channel] ?? 0) + 1;
+    }
+    const total = chats.length;
+    return {
+      total, by, booked, scoreN, unitsOffered,
+      conversion: total ? Math.round((by["visit-booked"] / total) * 100) : 0,
+      avgScore: scoreN ? Math.round(scoreSum / scoreN) : 0,
+      aiShare: allMsgs ? Math.round((aiMsgs / allMsgs) * 100) : 0,
+      chMix,
+    };
+  }, [chats]);
+
+  const channelsPresent = (Object.keys(m.chMix) as Channel[]).sort((a, b) => (m.chMix[b] ?? 0) - (m.chMix[a] ?? 0));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="flex flex-col gap-4 rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between sm:p-5"
+      className="rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5"
     >
-      <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:items-center sm:gap-7">
-        {STAT_ORDER.map(({ status, short }) => {
-          const meta = STATUS_META[status];
-          return (
-            <div key={status} className="flex items-center gap-2.5">
-              <StatusDot color={meta.dot} pulse={meta.pulse} size={9} />
-              <div className="leading-none">
-                <div className="tabular font-display text-xl font-bold text-text">
-                  {counts[status]}
-                </div>
-                <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">
-                  {short}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      {/* Headline KPIs */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <KpiTile icon={<Radio size={15} />} tone="accent" label="Live conversations" value={<AnimatedNumber value={m.total} />} hint="the AI is handling now" />
+        <KpiTile icon={<Target size={15} />} tone="positive" label="Conversion rate" value={`${m.conversion}%`} hint="conversation → site visit" />
+        <KpiTile icon={<CalendarCheck size={15} />} tone="live" label="Visits booked" value={<AnimatedNumber value={m.booked} />} hint="no agent touched them" />
+        <KpiTile icon={<Gauge size={15} />} tone="accent" label="Avg lead score" value={<AnimatedNumber value={m.avgScore} />} hint={`${m.scoreN} scored leads`} />
       </div>
-      <div className="flex items-center gap-2 border-t border-border pt-3 text-sm text-text-muted sm:border-l sm:border-t-0 sm:pl-7 sm:pt-0">
-        <Bot size={15} className="shrink-0 text-accent" />
-        <span>
-          <span className="tabular font-semibold text-text">{total}</span> chats — the CRM
-          is selling while no one&apos;s watching.
-        </span>
+
+      {/* Funnel + channel mix */}
+      <div className="mt-4 grid gap-5 border-t border-border pt-4 lg:grid-cols-[1.5fr_1fr]">
+        <div className="min-w-0">
+          <Label className="mb-2.5 block">Conversation funnel</Label>
+          <div className="flex items-stretch gap-1.5">
+            {STAT_ORDER.map(({ status, short }, i) => (
+              <FunnelSeg key={status} meta={STATUS_META[status]} short={short} count={m.by[status]} last={i === STAT_ORDER.length - 1} />
+            ))}
+          </div>
+          <div className="mt-2.5 flex items-center gap-1.5 text-xs text-text-muted">
+            <Layers size={12} className="shrink-0 text-accent" />
+            <span><span className="font-semibold text-text">{m.unitsOffered}</span> units quoted · <span className="font-semibold text-text">{m.aiShare}%</span> of messages sent by the AI</span>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <Label className="mb-2.5 block">By channel</Label>
+          <div className="space-y-2">
+            {channelsPresent.map((ch) => {
+              const n = m.chMix[ch] ?? 0;
+              return (
+                <div key={ch} className="flex items-center gap-2">
+                  <ChannelIcon channel={ch} size={13} />
+                  <span className="w-16 shrink-0 truncate text-xs text-text-muted">{CHANNEL_LABEL[ch]}</span>
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-inset">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${m.total ? Math.round((n / m.total) * 100) : 0}%` }} transition={{ duration: 0.6, ease: "easeOut" }} className="h-full rounded-full bg-accent" />
+                  </div>
+                  <span className="tabular w-5 shrink-0 text-right font-mono text-xs text-text-faint">{n}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </motion.div>
+  );
+}
+
+/* ---------------- Metric tile + funnel segment ---------------- */
+function KpiTile({ icon, tone, label, value, hint }: { icon: React.ReactNode; tone: "accent" | "positive" | "live"; label: string; value: React.ReactNode; hint: string }) {
+  const fg = tone === "positive" ? "text-positive" : tone === "live" ? "text-live" : "text-accent";
+  const bg = tone === "positive" ? "bg-positive-soft" : tone === "live" ? "bg-live-soft" : "bg-accent-soft";
+  return (
+    <div className="rounded-[12px] border border-border bg-surface-inset/50 p-3.5">
+      <div className="flex items-center gap-2">
+        <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-lg", bg, fg)}>{icon}</span>
+        <span className="font-mono text-[10px] uppercase leading-tight tracking-wide text-text-faint">{label}</span>
+      </div>
+      <div className="tabular mt-2.5 font-display text-2xl font-bold text-text">{value}</div>
+      <div className="mt-0.5 text-[11px] text-text-muted">{hint}</div>
+    </div>
+  );
+}
+
+function FunnelSeg({ meta, short, count, last }: { meta: StatusMeta; short: string; count: number; last: boolean }) {
+  return (
+    <>
+      <div className="min-w-0 flex-1 rounded-[10px] border border-border bg-surface-inset/40 px-1.5 py-2 text-center">
+        <div className="tabular font-display text-lg font-bold leading-none text-text">{count}</div>
+        <div className="mt-1 flex items-center justify-center gap-1 font-mono text-[9px] uppercase tracking-wide text-text-faint">
+          <StatusDot color={meta.dot} pulse={meta.pulse} size={5} /> <span className="truncate">{short}</span>
+        </div>
+      </div>
+      {!last && <ChevronRight size={14} className="shrink-0 self-center text-text-faint" />}
+    </>
   );
 }
 
