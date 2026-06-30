@@ -45,7 +45,7 @@ function LandingNav() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-[color-mix(in_oklab,var(--bg)_72%,transparent)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1180px] items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white shadow-[0_0_18px_-4px_rgba(226,97,45,0.6)]"><Sparkles size={17} strokeWidth={2.4} /></span>
+          <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-gradient-to-br from-[#fe772c] to-[#0a2152] text-white shadow-[0_0_18px_-4px_rgba(254,119,44,0.6)]"><Sparkles size={17} strokeWidth={2.4} /></span>
           <span className="font-display text-[16px] font-bold tracking-tight">RelationOS</span>
           <span className="hidden rounded-pill border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-faint sm:inline">Real estate</span>
         </Link>
@@ -56,8 +56,8 @@ function LandingNav() {
           <a href="#honest" className="transition-colors hover:text-text">The honest part</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/onboarding" className="hidden h-9 items-center rounded-[10px] border border-border px-3.5 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text sm:flex">Connect sources</Link>
-          <Link href="/login" className="flex h-9 items-center gap-1.5 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.03] active:scale-95">Launch demo <ArrowRight size={15} /></Link>
+          <Link href="/onboarding" className="hidden h-9 items-center rounded-[5px] border border-border px-3.5 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text sm:flex">Connect sources</Link>
+          <Link href="/login" className="flex h-9 items-center gap-1.5 rounded-[5px] bg-accent px-3.5 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.03] active:scale-95">Launch demo <ArrowRight size={15} /></Link>
         </div>
       </div>
     </header>
@@ -88,10 +88,10 @@ function Hero() {
         </p>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-accent px-6 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+          <Link href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[6px] bg-accent px-6 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
             Launch the live demo <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <Link href="/onboarding" className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-border-strong px-6 text-[15px] font-medium text-text transition-colors hover:bg-surface">
+          <Link href="/onboarding" className="inline-flex h-12 items-center justify-center gap-2 rounded-[6px] border border-border-strong px-6 text-[15px] font-medium text-text transition-colors hover:bg-surface">
             Connect your sources
           </Link>
         </div>
@@ -149,15 +149,15 @@ function LiveTransform() {
   return (
     <motion.div initial={{ opacity: 0, y: 18, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.6, delay: 0.15 }} className="relative">
       <div aria-hidden className="absolute -inset-4 -z-10 rounded-[28px] opacity-60 blur-2xl" style={{ background: "radial-gradient(closest-side, color-mix(in oklab, var(--accent) 22%, transparent), transparent)" }} />
-      <div className="overflow-hidden rounded-[18px] border border-border bg-surface shadow-[var(--shadow-lift)]">
+      <div className="overflow-hidden rounded-[5px] border border-border bg-surface shadow-[var(--shadow-lift)]">
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-text-faint"><RadioTower size={13} className="text-accent" /> AI Inbox</div>
-          <button onClick={play} className="rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-text-faint transition-colors hover:bg-surface-2 hover:text-text-muted">Replay</button>
+          <button onClick={play} className="rounded-[4px] px-2 py-1 font-mono text-[10px] uppercase tracking-wide text-text-faint transition-colors hover:bg-surface-2 hover:text-text-muted">Replay</button>
         </div>
 
         <div className="border-b border-border p-4">
           <div className="mb-2 flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-positive-soft text-positive"><MessageCircle size={15} strokeWidth={2.2} /></span>
+            <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-positive-soft text-positive"><MessageCircle size={15} strokeWidth={2.2} /></span>
             <div>
               <div className="text-sm font-semibold">WhatsApp · 99acres buyer</div>
               <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">AI replying live</div>
@@ -193,7 +193,7 @@ function LiveTransform() {
             {TRANSFORM_FIELDS.map((f, i) => (
               <AnimatePresence key={f.label}>
                 {phase >= 2 && (
-                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1, type: "spring", stiffness: 400, damping: 28 }} className="rounded-[10px] border border-border bg-surface-2 px-3 py-2">
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1, type: "spring", stiffness: 400, damping: 28 }} className="rounded-[5px] border border-border bg-surface-2 px-3 py-2">
                     <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{f.label}</div>
                     <div className="truncate text-sm font-medium text-text">{f.value}</div>
                     <div className="mt-0.5 flex items-center gap-1 font-mono text-[9px] uppercase tracking-wide text-accent"><ScanSearch size={9} /> {f.tag}</div>
@@ -201,7 +201,7 @@ function LiveTransform() {
                 )}
               </AnimatePresence>
             ))}
-            {phase < 2 && [0, 1, 2, 3].map((i) => <div key={i} className="h-[58px] rounded-[10px] border border-dashed border-border" />)}
+            {phase < 2 && [0, 1, 2, 3].map((i) => <div key={i} className="h-[58px] rounded-[5px] border border-dashed border-border" />)}
           </div>
         </div>
       </div>
@@ -253,11 +253,11 @@ function Claims() {
 
 function ClaimCard({ icon: Icon, title, body, children }: { icon: typeof RadioTower; title: string; body: string; children: React.ReactNode }) {
   return (
-    <div className="flex h-full flex-col rounded-[16px] border border-border bg-surface p-6 transition-colors hover:border-border-strong">
-      <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-accent-soft text-accent"><Icon size={19} strokeWidth={2.1} /></span>
+    <div className="flex h-full flex-col rounded-[6px] border border-border bg-surface p-6 transition-colors hover:border-border-strong">
+      <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-accent-soft text-accent"><Icon size={19} strokeWidth={2.1} /></span>
       <h3 className="mt-4 font-display text-xl font-bold">{title}</h3>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-text-muted">{body}</p>
-      <div className="mt-5 rounded-[12px] border border-border bg-surface-inset/60 p-4">{children}</div>
+      <div className="mt-5 rounded-[6px] border border-border bg-surface-inset/60 p-4">{children}</div>
     </div>
   );
 }
@@ -273,7 +273,7 @@ function DriveProof() {
     <div className="space-y-1.5">
       <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">Worklist · re-ranks itself</div>
       {rows.map((r) => (
-        <motion.div key={r.n} layout transition={{ type: "spring", stiffness: 420, damping: 34 }} className={cn("flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm", r.hot ? "bg-accent-soft" : "bg-surface-2")}>
+        <motion.div key={r.n} layout transition={{ type: "spring", stiffness: 420, damping: 34 }} className={cn("flex items-center justify-between rounded-[6px] px-2.5 py-1.5 text-sm", r.hot ? "bg-accent-soft" : "bg-surface-2")}>
           <span className={cn("font-medium", r.hot && "text-accent")}>{r.n}</span>
           <span className="font-mono tabular text-text-muted">{r.s}</span>
         </motion.div>
@@ -295,7 +295,7 @@ function ChannelsProof() {
       <div className="mb-2 font-mono text-[10px] uppercase tracking-wide text-text-faint">Portals + WhatsApp + calls</div>
       <div className="flex items-center justify-between gap-1">
         {CH.map(({ icon: Icon, c }, i) => (
-          <span key={i} className="grid h-8 w-8 place-items-center rounded-lg" style={{ background: `color-mix(in oklab, ${c} 16%, transparent)`, color: c }}><Icon size={15} strokeWidth={2.2} /></span>
+          <span key={i} className="grid h-8 w-8 place-items-center rounded-[6px]" style={{ background: `color-mix(in oklab, ${c} 16%, transparent)`, color: c }}><Icon size={15} strokeWidth={2.2} /></span>
         ))}
       </div>
       <div className="mt-2.5 flex items-center gap-2">
@@ -340,8 +340,8 @@ function OmniMerge() {
           <div className="mt-12 grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-1">
               {streams.map(({ icon: Icon, label }, i) => (
-                <div key={label} className="flex items-center gap-3 rounded-[12px] border border-border bg-surface px-4 py-3">
-                  <span className="grid h-9 w-9 place-items-center rounded-lg bg-surface-2 text-text-muted"><Icon size={16} strokeWidth={2.1} /></span>
+                <div key={label} className="flex items-center gap-3 rounded-[6px] border border-border bg-surface px-4 py-3">
+                  <span className="grid h-9 w-9 place-items-center rounded-[6px] bg-surface-2 text-text-muted"><Icon size={16} strokeWidth={2.1} /></span>
                   <span className="text-sm font-medium">{label}</span>
                   {i === 2 && <span className="ml-auto rounded-pill bg-positive-soft px-2 py-0.5 text-[10px] font-semibold text-positive">live</span>}
                 </div>
@@ -350,7 +350,7 @@ function OmniMerge() {
             <div className="hidden place-items-center lg:grid">
               <motion.div animate={{ x: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="text-accent"><ArrowRight size={28} /></motion.div>
             </div>
-            <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+            <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
               <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.12em] text-text-faint">Rohan Mehta · one timeline</div>
               <div className="space-y-2.5">
                 {[
@@ -359,7 +359,7 @@ function OmniMerge() {
                   { icon: MessageCircle, t: "“can we visit Saturday?”", s: "2h" },
                 ].map(({ icon: Icon, t, s }, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent"><Icon size={13} strokeWidth={2.2} /></span>
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><Icon size={13} strokeWidth={2.2} /></span>
                     <span className="flex-1 truncate text-sm text-text-muted">{t}</span>
                     <span className="font-mono text-[11px] text-text-faint">{s}</span>
                   </div>
@@ -389,8 +389,8 @@ function Screens() {
       <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SCREENS.map((s, i) => (
           <Reveal key={s.href} delay={(i % 3) * 0.06}>
-            <Link href={s.href} className="group flex h-full items-start gap-4 rounded-[16px] border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[var(--shadow-soft)]">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px] bg-accent-soft text-accent"><s.icon size={19} strokeWidth={2.1} /></span>
+            <Link href={s.href} className="group flex h-full items-start gap-4 rounded-[6px] border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[var(--shadow-soft)]">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><s.icon size={19} strokeWidth={2.1} /></span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5"><h3 className="font-display text-[17px] font-bold">{s.name}</h3><ArrowUpRight size={15} className="text-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-accent" /></div>
                 <p className="mt-1 text-sm leading-relaxed text-text-muted">{s.blurb}</p>
@@ -415,7 +415,7 @@ function Honest() {
       <div className="mx-auto max-w-[1180px] px-4 py-16 md:px-6 lg:py-24">
         <Reveal><SectionHead kicker="Straight talk" title="What we fake. What we promise." blurb="Technical buyers can smell vaporware. So, plainly: you're looking at the real product's front end. The intelligence underneath is what we build next." /></Reveal>
         <Reveal delay={0.1}>
-          <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-[16px] border border-border bg-surface">
+          <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-[6px] border border-border bg-surface">
             <div className="grid grid-cols-2 border-b border-border bg-surface-2/60 px-5 py-3">
               <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-faint">In the demo it&apos;s…</div>
               <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-accent">The honest position</div>
@@ -445,10 +445,10 @@ function FinalCta() {
             press <Kbd>⌘K</Kbd> to talk to it, or <Kbd>⌘J</Kbd> to watch the concierge book a visit live.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[12px] bg-accent px-7 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+            <Link href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-[6px] bg-accent px-7 text-[15px] font-semibold text-accent-contrast shadow-[0_0_30px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
               Launch the live demo <ArrowRight size={17} className="transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link href="/onboarding" className="inline-flex h-12 items-center justify-center gap-2 rounded-[12px] border border-border-strong px-7 text-[15px] font-medium text-text transition-colors hover:bg-surface-2">
+            <Link href="/onboarding" className="inline-flex h-12 items-center justify-center gap-2 rounded-[6px] border border-border-strong px-7 text-[15px] font-medium text-text transition-colors hover:bg-surface-2">
               <CalendarCheck size={16} /> Connect your sources first
             </Link>
           </div>
@@ -467,7 +467,7 @@ function Footer() {
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-4 px-4 py-8 md:flex-row md:px-6">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white"><Sparkles size={14} strokeWidth={2.4} /></span>
+          <span className="grid h-7 w-7 place-items-center rounded-[6px] bg-gradient-to-br from-[#fe772c] to-[#0a2152] text-white"><Sparkles size={14} strokeWidth={2.4} /></span>
           <span className="font-display text-sm font-bold">RelationOS</span>
           <span className="font-mono text-[11px] text-text-faint">· real estate · thevertical.ai</span>
         </div>

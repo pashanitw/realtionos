@@ -44,9 +44,9 @@ function FlowNodeCard({ node, index }: { node: WorkflowNode; index: number }) {
       initial={{ opacity: 0, y: 10, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 360, damping: 30, delay: index * 0.09 }}
-      className="flex w-full items-center gap-3 rounded-[14px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)] sm:w-[210px] sm:flex-col sm:items-start sm:gap-2.5"
+      className="flex w-full items-center gap-3 rounded-[6px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)] sm:w-[210px] sm:flex-col sm:items-start sm:gap-2.5"
     >
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px]" style={{ background: `color-mix(in oklab, ${meta.color} 16%, transparent)`, color: meta.color }}>
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px]" style={{ background: `color-mix(in oklab, ${meta.color} 16%, transparent)`, color: meta.color }}>
         <Icon size={19} strokeWidth={2.2} />
       </span>
       <div className="min-w-0 flex-1">
@@ -161,9 +161,9 @@ export default function AutomationsPage() {
       />
 
       {/* ---------- NL builder ---------- */}
-      <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+      <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
         <div className="mb-3 flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-accent-soft text-accent"><Wand2 size={16} strokeWidth={2.2} /></span>
+          <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-accent-soft text-accent"><Wand2 size={16} strokeWidth={2.2} /></span>
           <div>
             <Label>Workflow builder</Label>
             <div className="font-display text-[15px] font-bold leading-tight text-text">Describe it, we build it</div>
@@ -175,9 +175,9 @@ export default function AutomationsPage() {
             value={input} onChange={(e) => setInput(e.target.value)}
             placeholder="Describe a workflow… e.g. Create a collections workflow for overdue accounts"
             rows={2}
-            className="min-h-[64px] flex-1 resize-none rounded-[12px] border border-border bg-surface-2 px-3.5 py-3 text-sm leading-relaxed text-text placeholder:text-text-faint focus:border-border-strong"
+            className="min-h-[64px] flex-1 resize-none rounded-[6px] border border-border bg-surface-2 px-3.5 py-3 text-sm leading-relaxed text-text placeholder:text-text-faint focus:border-border-strong"
           />
-          <button type="button" onClick={runGenerate} disabled={generating} className="flex h-[44px] shrink-0 items-center justify-center gap-1.5 self-end rounded-[10px] bg-accent px-5 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:hover:scale-100 sm:h-auto">
+          <button type="button" onClick={runGenerate} disabled={generating} className="flex h-[44px] shrink-0 items-center justify-center gap-1.5 self-end rounded-[5px] bg-accent px-5 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:hover:scale-100 sm:h-auto">
             <Sparkles size={16} strokeWidth={2.4} />{generating ? "Generating…" : "Generate"}
           </button>
         </div>
@@ -191,18 +191,18 @@ export default function AutomationsPage() {
 
         <AnimatePresence mode="wait">
           {generating && (
-            <motion.div key="building" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 flex items-center gap-2 rounded-[12px] border border-dashed border-border bg-surface-2 px-4 py-5 text-sm text-text-muted">
+            <motion.div key="building" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 flex items-center gap-2 rounded-[6px] border border-dashed border-border bg-surface-2 px-4 py-5 text-sm text-text-muted">
               <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }} className="text-accent"><Sparkles size={16} /></motion.span>
               Building your automation…
             </motion.div>
           )}
           {!generating && flow && (
-            <motion.div key="result" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 rounded-[14px] border border-border bg-surface-2 p-4">
+            <motion.div key="result" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-5 rounded-[6px] border border-border bg-surface-2 p-4">
               <div className="mb-3.5 flex flex-wrap items-center gap-2">
                 <Workflow size={15} className="text-accent" />
                 <span className="font-display text-[15px] font-bold tracking-tight text-text">{flow.name}</span>
                 <Pill variant="accent" mono className="ml-1">{flow.nodes.length} steps</Pill>
-                <button type="button" onClick={saveAutomation} className="ml-auto flex h-9 items-center gap-1.5 rounded-[10px] bg-accent px-3.5 text-[13px] font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95">
+                <button type="button" onClick={saveAutomation} className="ml-auto flex h-9 items-center gap-1.5 rounded-[5px] bg-accent px-3.5 text-[13px] font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95">
                   <Power size={14} strokeWidth={2.4} /> Save &amp; activate
                 </button>
               </div>
@@ -222,10 +222,10 @@ export default function AutomationsPage() {
       <div className="grid gap-3 lg:grid-cols-2">
         <AnimatePresence initial={false}>
           {workflows.map((wf, i) => (
-            <motion.div key={wf.id} layout initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ type: "spring", stiffness: 340, damping: 32, delay: i * 0.03 }} className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+            <motion.div key={wf.id} layout initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ type: "spring", stiffness: 340, damping: 32, delay: i * 0.03 }} className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2.5">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px]" style={{ background: wf.active ? "color-mix(in oklab, var(--positive) 16%, transparent)" : "var(--surface-inset)", color: wf.active ? "var(--positive)" : "var(--text-faint)" }}>
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px]" style={{ background: wf.active ? "color-mix(in oklab, var(--positive) 16%, transparent)" : "var(--surface-inset)", color: wf.active ? "var(--positive)" : "var(--text-faint)" }}>
                     <Workflow size={19} strokeWidth={2.1} />
                   </span>
                   <div className="min-w-0">
@@ -250,7 +250,7 @@ export default function AutomationsPage() {
                   type="button"
                   disabled={!wf.active}
                   onClick={() => { runWorkflow(wf.id); toast.success(`${wf.name} ran — posted to Activity${/send|message|reminder|welcome|re-engage|reschedule|payment/i.test(wf.nodes.map((n) => n.label).join(" ")) ? " + drafted into Approvals" : ""}`); }}
-                  className="ml-auto flex items-center gap-1.5 rounded-[8px] border border-border bg-surface-2 px-2.5 py-1 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset disabled:opacity-40 disabled:hover:bg-surface-2"
+                  className="ml-auto flex items-center gap-1.5 rounded-[5px] border border-border bg-surface-2 px-2.5 py-1 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset disabled:opacity-40 disabled:hover:bg-surface-2"
                 >
                   <Play size={12} /> Run now
                 </button>

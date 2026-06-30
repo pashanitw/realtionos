@@ -259,9 +259,9 @@ export default function TasksPage() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="mb-6 flex items-center gap-3 rounded-[16px] border border-border bg-accent-soft px-5 py-4"
+        className="mb-6 flex items-center gap-3 rounded-[6px] border border-border bg-accent-soft px-5 py-4"
       >
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-accent text-accent-contrast">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[5px] bg-accent text-accent-contrast">
           <Sparkles size={18} strokeWidth={2.2} />
         </span>
         <p className="text-sm font-medium text-text">
@@ -281,7 +281,7 @@ export default function TasksPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: i * 0.04 }}
-            className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
+            className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
           >
             <Label>{k.label}</Label>
             <div
@@ -351,7 +351,7 @@ export default function TasksPage() {
                 <Link
                   href={`/buyers/${t.buyer.id}`}
                   className={cn(
-                    "group flex items-start gap-3.5 rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] transition-colors hover:border-border-strong sm:items-center sm:p-5",
+                    "group flex items-start gap-3.5 rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] transition-colors hover:border-border-strong sm:items-center sm:p-5",
                     d && "opacity-60",
                   )}
                 >
@@ -361,7 +361,7 @@ export default function TasksPage() {
                     aria-label={d ? "Mark as not done" : "Mark as done"}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(t); }}
                     className={cn(
-                      "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[8px] border transition-colors sm:mt-0",
+                      "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[5px] border transition-colors sm:mt-0",
                       d
                         ? "border-positive bg-positive-soft text-positive"
                         : "border-border-strong text-text-faint hover:border-accent hover:text-accent",
@@ -435,7 +435,7 @@ export default function TasksPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid place-items-center gap-2 rounded-[16px] border border-dashed border-border bg-surface px-6 py-14 text-center"
+            className="grid place-items-center gap-2 rounded-[6px] border border-dashed border-border bg-surface px-6 py-14 text-center"
           >
             <span className="grid h-11 w-11 place-items-center rounded-[13px] bg-surface-2 text-text-faint">
               {filter === "Done" ? <ClipboardCheck size={20} /> : <CheckCircle2 size={20} />}

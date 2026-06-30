@@ -41,7 +41,7 @@ export default function LeadsPage() {
             </AnimatePresence>
           </div>
           {leads.length === 0 && (
-            <div className="grid place-items-center rounded-[16px] border border-dashed border-border py-16 text-center">
+            <div className="grid place-items-center rounded-[6px] border border-dashed border-border py-16 text-center">
               <Sunrise size={26} className="mb-2 text-accent" />
               <p className="text-sm font-medium text-text">All caught up.</p>
               <p className="text-sm text-text-muted">Every overnight lead has been triaged. Have a good morning.</p>
@@ -70,14 +70,14 @@ function MorningBrief({ brief, count }: { brief: MorningBrief; count: number }) 
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[18px] border border-chrome-border p-6 text-white shadow-[var(--shadow-lift)] md:p-7"
-      style={{ background: "linear-gradient(125deg, #1f3f74 0%, #122244 52%, #0a1a30 100%)" }}
+      className="relative overflow-hidden rounded-[5px] border border-chrome-border p-6 text-white shadow-[var(--shadow-lift)] md:p-7"
+      style={{ background: "linear-gradient(125deg, #0a2152 0%, #071636 52%, #051234 100%)" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ background: "radial-gradient(540px 240px at 88% -20%, color-mix(in oklab, var(--live) 30%, transparent), transparent 70%)" }} />
       <div className="relative">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
-            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[rgba(255,255,255,0.1)] text-[#ec8560]"><Moon size={19} /></span>
+            <span className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-[rgba(255,255,255,0.1)] text-[#fe772c]"><Moon size={19} /></span>
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-display text-xl font-bold">Good morning, Maya</h2>
@@ -93,7 +93,7 @@ function MorningBrief({ brief, count }: { brief: MorningBrief; count: number }) 
           </div>
           <button
             onClick={() => toast("Reading your morning brief…", { description: `${count} leads · ${brief.needNod} need your nod · ${brief.visitsBooked} visits booked` })}
-            className="inline-flex h-9 shrink-0 items-center gap-2 self-start rounded-[10px] bg-[rgba(255,255,255,0.12)] px-3.5 text-sm font-semibold text-white transition-colors hover:bg-[rgba(255,255,255,0.2)]"
+            className="inline-flex h-9 shrink-0 items-center gap-2 self-start rounded-[5px] bg-[rgba(255,255,255,0.12)] px-3.5 text-sm font-semibold text-white transition-colors hover:bg-[rgba(255,255,255,0.2)]"
           >
             <Volume2 size={15} /> Brief me out loud
           </button>
@@ -104,7 +104,7 @@ function MorningBrief({ brief, count }: { brief: MorningBrief; count: number }) 
             <div key={s.label}>
               <div className="font-display text-3xl font-bold leading-none tabular"><AnimatedNumber value={s.n} /></div>
               <div className="mt-1.5 text-[13px] font-medium text-white/85">{s.label}</div>
-              <div className="font-mono text-[11px] text-[#f3af96]">{s.sub}</div>
+              <div className="font-mono text-[11px] text-[#ffc7a3]">{s.sub}</div>
             </div>
           ))}
         </div>
@@ -145,7 +145,7 @@ function OvernightCard({ lead }: { lead: OvernightLead }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, height: 0, marginBottom: 0 }}
       transition={{ type: "spring", stiffness: 380, damping: 32 }}
-      className="overflow-hidden rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
+      className="overflow-hidden rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <div className="flex items-center gap-3 sm:flex-col sm:items-center sm:gap-2">
@@ -170,7 +170,7 @@ function OvernightCard({ lead }: { lead: OvernightLead }) {
 
           <div className="mt-1 text-sm text-text-muted">{lead.requirement}</div>
 
-          <div className="mt-2 flex items-start gap-2 rounded-[10px] bg-accent-soft px-3 py-2 text-sm text-accent">
+          <div className="mt-2 flex items-start gap-2 rounded-[5px] bg-accent-soft px-3 py-2 text-sm text-accent">
             <Bot size={14} className="mt-0.5 shrink-0" />
             <span><span className="font-semibold">AI Inbox</span> · {lead.aiSummary}</span>
           </div>
@@ -187,19 +187,19 @@ function OvernightCard({ lead }: { lead: OvernightLead }) {
         <div className="flex shrink-0 flex-col items-stretch gap-2 sm:w-52">
           <button
             onClick={handleAccept}
-            className="flex min-h-9 items-center justify-center gap-1.5 rounded-[10px] bg-accent px-3 py-1.5 text-center text-sm font-semibold leading-tight text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
+            className="flex min-h-9 items-center justify-center gap-1.5 rounded-[5px] bg-accent px-3 py-1.5 text-center text-sm font-semibold leading-tight text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
           >
             <Check size={15} className="shrink-0" /> {lead.action}
           </button>
           <Link
             href={`/buyers/${lead.buyerId}`}
-            className="flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-border bg-surface text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-2"
+            className="flex h-9 items-center justify-center gap-1.5 rounded-[5px] border border-border bg-surface text-sm font-medium text-text transition-colors hover:border-border-strong hover:bg-surface-2"
           >
             Open record <ArrowUpRight size={14} />
           </Link>
           <button
             onClick={() => dismiss(lead.id)}
-            className="flex h-8 items-center justify-center gap-1.5 rounded-[10px] text-xs font-medium text-text-faint transition-colors hover:text-negative"
+            className="flex h-8 items-center justify-center gap-1.5 rounded-[5px] text-xs font-medium text-text-faint transition-colors hover:text-negative"
           >
             <X size={13} /> Dismiss
           </button>
@@ -240,9 +240,9 @@ function NeedsYourNod() {
 
   return (
     <div className="space-y-4 lg:sticky lg:top-20">
-      <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+      <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
         <div className="mb-1 flex items-center gap-2">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-accent-soft text-accent"><Sparkles size={15} /></span>
+          <span className="grid h-7 w-7 place-items-center rounded-[6px] bg-accent-soft text-accent"><Sparkles size={15} /></span>
           <Label>Just needs your nod</Label>
         </div>
         <p className="mb-3 text-sm font-semibold text-text">{items.length} AI actions queued</p>
@@ -258,10 +258,10 @@ function NeedsYourNod() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden rounded-[12px] border border-border bg-surface-2 p-3"
+                  className="overflow-hidden rounded-[6px] border border-border bg-surface-2 p-3"
                 >
                   <div className="flex items-start gap-2.5">
-                    <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent"><Icon size={14} /></span>
+                    <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><Icon size={14} /></span>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium text-text">{item.title}</div>
                       <div className="truncate text-xs text-text-faint">{item.buyerName} · {SOURCE_LABEL[item.source]}</div>
@@ -270,13 +270,13 @@ function NeedsYourNod() {
                   <div className="mt-2.5 flex items-center gap-2">
                     <button
                       onClick={() => handleApprove(item)}
-                      className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-[8px] bg-accent text-xs font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
+                      className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-[5px] bg-accent text-xs font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
                     >
                       <Check size={13} /> Approve
                     </button>
                     <button
                       onClick={() => dismiss(item.id)}
-                      className="grid h-8 w-8 place-items-center rounded-[8px] border border-border text-text-faint hover:text-negative"
+                      className="grid h-8 w-8 place-items-center rounded-[5px] border border-border text-text-faint hover:text-negative"
                       aria-label="Dismiss"
                     >
                       <X size={14} />
@@ -295,7 +295,7 @@ function NeedsYourNod() {
       </div>
 
       {/* legend */}
-      <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+      <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
         <Label className="mb-3 block">Worklist legend</Label>
         <div className="space-y-2.5">
           {[

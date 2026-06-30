@@ -87,7 +87,7 @@ function ScoreHeader({ buyer }: { buyer: Buyer }) {
         <span aria-hidden className="text-base leading-none">&larr;</span>
         Back to {buyer.name.split(" ")[0]}
       </Link>
-      <div className="flex flex-col gap-4 rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center">
         <Avatar name={buyer.name} hue={buyer.hue} size={52} />
         <div className="min-w-0 flex-1">
           <div className="mb-1 font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
@@ -166,7 +166,7 @@ function SignalRadar({ buyer }: { buyer: Buyer }) {
   const rings = [0.25, 0.5, 0.75, 1];
 
   return (
-    <section className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <section className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="mb-1 flex items-center justify-between gap-2">
         <Label>Signal radar · five real-estate dimensions</Label>
         <Pill variant="accent">live</Pill>
@@ -276,7 +276,7 @@ function SignalRadar({ buyer }: { buyer: Buyer }) {
           {SIGNAL_CATEGORIES.map((cat) => (
             <div
               key={cat}
-              className="flex items-center justify-between gap-3 rounded-[10px] border border-border bg-surface-2 px-3 py-2"
+              className="flex items-center justify-between gap-3 rounded-[5px] border border-border bg-surface-2 px-3 py-2"
             >
               <span className="min-w-0 truncate text-sm text-text">{cat}</span>
               <span className="shrink-0 tabular font-mono text-sm font-semibold text-accent">
@@ -298,7 +298,7 @@ function SignalChips({ buyer }: { buyer: Buyer }) {
   const negatives = buyer.scoreReasons.filter((r) => r.polarity === "negative");
 
   return (
-    <section className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <section className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <Label className="mb-3 block">Signal chips · full provenance</Label>
       <div className="grid gap-4 sm:grid-cols-2">
         <ChipColumn
@@ -343,7 +343,7 @@ function ChipColumn({
       </div>
       <div className="space-y-2">
         {reasons.length === 0 && (
-          <p className="rounded-[10px] border border-dashed border-border px-3 py-2 text-xs text-text-faint">
+          <p className="rounded-[5px] border border-dashed border-border px-3 py-2 text-xs text-text-faint">
             Nothing here yet.
           </p>
         )}
@@ -353,7 +353,7 @@ function ChipColumn({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, ease: EASE }}
-            className="rounded-[12px] border border-border bg-surface-2 p-3"
+            className="rounded-[6px] border border-border bg-surface-2 p-3"
           >
             <div className="flex items-start gap-2.5">
               <span
@@ -393,7 +393,7 @@ function ScoreHistoryCard({ buyer }: { buyer: Buyer }) {
   const trend = last - first;
 
   return (
-    <section className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <section className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="mb-3 flex items-center justify-between gap-2">
         <Label>Score history</Label>
         {points.length > 1 && (
@@ -448,13 +448,13 @@ function WeightTuner({ buyer }: { buyer: Buyer }) {
 
   return (
     <div className="lg:sticky lg:top-20">
-      <section className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+      <section className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
         <Label className="mb-1 block">Weight tuner</Label>
         <p className="mb-4 text-sm text-text-muted">
           You decide what a ready buyer means.
         </p>
 
-        <div className="mb-5 flex items-end gap-3 rounded-[12px] border border-accent/30 bg-accent-soft px-4 py-3">
+        <div className="mb-5 flex items-end gap-3 rounded-[6px] border border-accent/30 bg-accent-soft px-4 py-3">
           <AnimatedNumber
             value={liveScore}
             className="font-display text-5xl font-bold leading-none text-accent"
@@ -506,7 +506,7 @@ function WeightTuner({ buyer }: { buyer: Buyer }) {
           onClick={reset}
           disabled={isDefault}
           className={cn(
-            "mt-5 w-full rounded-[10px] border px-3 py-2 text-sm font-semibold transition-colors",
+            "mt-5 w-full rounded-[5px] border px-3 py-2 text-sm font-semibold transition-colors",
             isDefault
               ? "cursor-default border-border text-text-faint"
               : "border-border-strong text-text hover:bg-surface-2",

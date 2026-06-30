@@ -59,9 +59,9 @@ export default function TeamPage() {
         {clientTeams.map((team) => {
           const teamAgents = agents.filter((a) => a.teamId === team.id);
           return (
-            <section key={team.id} className="rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] md:p-5">
+            <section key={team.id} className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] md:p-5">
               <div className="mb-4 flex items-center gap-2">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent-soft text-accent"><Users size={16} /></span>
+                <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-accent-soft text-accent"><Users size={16} /></span>
                 <div>
                   <h2 className="font-display text-lg font-bold leading-none">{team.name}</h2>
                   <p className="mt-1 text-xs text-text-muted">{teamAgents.length} agents · {teamAgents.reduce((s, a) => s + buyers.filter((b) => b.agentId === a.id).length, 0)} contracts</p>
@@ -80,7 +80,7 @@ export default function TeamPage() {
 
 function Kpi({ label, value, valueText, sub }: { label: string; value?: number; valueText?: string; sub: string }) {
   return (
-    <div className="rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
       <Label>{label}</Label>
       <div className="mt-2 font-display text-2xl font-bold leading-none text-text md:text-[28px]">
         {valueText ?? <AnimatedNumber value={value ?? 0} />}
@@ -97,7 +97,7 @@ function AgentRow({ agent, buyers }: { agent: OrgUser; buyers: Buyer[] }) {
   const targetPct = Math.min(100, Math.round((st.bookings / st.target) * 100));
 
   return (
-    <div className="overflow-hidden rounded-[12px] border border-border bg-surface-2">
+    <div className="overflow-hidden rounded-[6px] border border-border bg-surface-2">
       <button onClick={() => setOpen((o) => !o)} className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-surface-inset/50">
         <Avatar name={agent.name} hue={agent.hue} size={38} />
         <div className="min-w-0 flex-1">
@@ -139,7 +139,7 @@ function AgentRow({ agent, buyers }: { agent: OrgUser; buyers: Buyer[] }) {
               <Label className="mb-1 block">Contracts handled</Label>
               {st.mine.length === 0 && <p className="py-2 text-sm text-text-faint">No contracts assigned.</p>}
               {st.mine.slice(0, 8).map((b) => (
-                <Link key={b.id} href={`/buyers/${b.id}`} className="flex items-center gap-3 rounded-[8px] px-2 py-1.5 transition-colors hover:bg-surface-inset/60">
+                <Link key={b.id} href={`/buyers/${b.id}`} className="flex items-center gap-3 rounded-[5px] px-2 py-1.5 transition-colors hover:bg-surface-inset/60">
                   <ScoreBadge score={b.score} size={30} />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium text-text">{b.name}</div>

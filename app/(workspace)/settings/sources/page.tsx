@@ -189,7 +189,7 @@ function SummaryStrip({ connected, attention }: { connected: number; attention: 
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.05 }}
-      className="mb-5 flex flex-col gap-4 rounded-[14px] border border-border bg-surface px-4 py-3.5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between sm:gap-6"
+      className="mb-5 flex flex-col gap-4 rounded-[6px] border border-border bg-surface px-4 py-3.5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between sm:gap-6"
     >
       <div className="flex items-center gap-5 sm:gap-7">
         <CountStat
@@ -262,7 +262,7 @@ function SourceCard({
       transition={{ ...SPRING, delay: 0.04 * index }}
       whileHover={{ y: -3 }}
       className={cn(
-        "group flex h-full flex-col gap-4 rounded-[14px] border bg-surface p-4 shadow-[var(--shadow-soft)] transition-colors",
+        "group flex h-full flex-col gap-4 rounded-[6px] border bg-surface p-4 shadow-[var(--shadow-soft)] transition-colors",
         "border-border hover:border-border-strong",
       )}
     >
@@ -271,7 +271,7 @@ function SourceCard({
         <motion.span
           layout
           aria-hidden
-          className="grid size-11 shrink-0 place-items-center rounded-[12px]"
+          className="grid size-11 shrink-0 place-items-center rounded-[6px]"
           animate={isConnected ? { scale: [1, 1.14, 1] } : { scale: 1 }}
           transition={isConnected ? { duration: 0.4, ease: "easeOut", delay: 0.05 } : { duration: 0 }}
           style={{
@@ -335,7 +335,7 @@ function ActionButton({
   onConnect: (id: string) => void;
 }) {
   const base =
-    "flex h-9 w-full items-center justify-center gap-1.5 rounded-[10px] text-sm font-semibold transition-all active:scale-[0.98]";
+    "flex h-9 w-full items-center justify-center gap-1.5 rounded-[5px] text-sm font-semibold transition-all active:scale-[0.98]";
 
   switch (connector.status) {
     case "connected":

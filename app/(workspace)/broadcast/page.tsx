@@ -234,7 +234,7 @@ export default function BroadcastPage() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
+          className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
         >
           {/* Audience */}
           <div className="mb-2 flex items-center gap-2">
@@ -262,7 +262,7 @@ export default function BroadcastPage() {
             })}
           </div>
 
-          <div className="mt-4 flex items-end gap-3 rounded-[14px] border border-border bg-surface-inset px-4 py-3.5">
+          <div className="mt-4 flex items-end gap-3 rounded-[6px] border border-border bg-surface-inset px-4 py-3.5">
             <Users size={20} className="mb-1 text-accent" />
             <div>
               <div className="font-display text-[34px] font-bold leading-none text-text">
@@ -296,7 +296,7 @@ export default function BroadcastPage() {
                 key={v}
                 type="button"
                 onClick={() => insertVar(v)}
-                className="rounded-[8px] border border-border bg-surface-2 px-2 py-1 font-mono text-[11px] text-accent transition-colors hover:border-accent hover:bg-accent-soft"
+                className="rounded-[5px] border border-border bg-surface-2 px-2 py-1 font-mono text-[11px] text-accent transition-colors hover:border-accent hover:bg-accent-soft"
               >
                 {v}
               </button>
@@ -308,7 +308,7 @@ export default function BroadcastPage() {
             onChange={(e) => setMessage(e.target.value)}
             rows={5}
             placeholder="Type your broadcast… use {Name}, {Config}, {Locality}, {Budget}, {Offer} to personalize."
-            className="w-full resize-y rounded-[12px] border border-border bg-surface-2 px-3.5 py-3 text-sm leading-relaxed text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none"
+            className="w-full resize-y rounded-[6px] border border-border bg-surface-2 px-3.5 py-3 text-sm leading-relaxed text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none"
           />
 
           {/* Live preview */}
@@ -320,7 +320,7 @@ export default function BroadcastPage() {
             </Pill>
           </div>
           {sampleBuyer ? (
-            <div className="rounded-[14px] border border-border bg-surface-inset p-4">
+            <div className="rounded-[6px] border border-border bg-surface-inset p-4">
               <div className="mb-3 flex items-center gap-2.5">
                 <Avatar name={sampleBuyer.name} hue={sampleBuyer.hue} size={32} />
                 <div className="min-w-0">
@@ -332,7 +332,7 @@ export default function BroadcastPage() {
                 <MessageCircle size={16} className="ml-auto text-positive" />
               </div>
               <div className="flex justify-start">
-                <div className="relative max-w-[88%] rounded-[14px] rounded-tl-[4px] bg-positive-soft px-3.5 py-2.5 text-[13px] leading-relaxed text-text shadow-[var(--shadow-soft)]">
+                <div className="relative max-w-[88%] rounded-[6px] rounded-tl-[4px] bg-positive-soft px-3.5 py-2.5 text-[13px] leading-relaxed text-text shadow-[var(--shadow-soft)]">
                   <span className="whitespace-pre-wrap">{preview}</span>
                   <span className="mt-1 flex items-center justify-end gap-1 font-mono text-[10px] text-text-faint">
                     10:24 <CheckCircle2 size={11} className="text-positive" />
@@ -341,7 +341,7 @@ export default function BroadcastPage() {
               </div>
             </div>
           ) : (
-            <div className="grid min-h-[96px] place-items-center rounded-[14px] border border-dashed border-border text-sm text-text-faint">
+            <div className="grid min-h-[96px] place-items-center rounded-[6px] border border-dashed border-border text-sm text-text-faint">
               No recipients in this segment — pick another audience.
             </div>
           )}
@@ -356,7 +356,7 @@ export default function BroadcastPage() {
               <button
                 type="button"
                 onClick={schedule}
-                className="flex h-10 items-center gap-1.5 rounded-[10px] border border-border bg-surface-2 px-4 text-sm font-semibold text-text-muted transition-colors hover:border-border-strong hover:text-text"
+                className="flex h-10 items-center gap-1.5 rounded-[5px] border border-border bg-surface-2 px-4 text-sm font-semibold text-text-muted transition-colors hover:border-border-strong hover:text-text"
               >
                 <Clock size={15} /> Schedule
               </button>
@@ -364,7 +364,7 @@ export default function BroadcastPage() {
                 type="button"
                 onClick={send}
                 disabled={count === 0}
-                className="flex h-10 items-center gap-1.5 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100"
+                className="flex h-10 items-center gap-1.5 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100"
               >
                 <SendHorizontal size={16} strokeWidth={2.4} /> Send to {count} recipient{count === 1 ? "" : "s"}
               </button>
@@ -389,7 +389,7 @@ export default function BroadcastPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: Math.min(i, 6) * 0.04 }}
-                className="group rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
+                className="group rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
               >
                 <div className="flex items-start gap-2">
                   <div className="min-w-0 flex-1">
@@ -446,7 +446,7 @@ export default function BroadcastPage() {
                     type="button"
                     onClick={() => removeCampaign(c.id)}
                     aria-label="Remove campaign"
-                    className="grid h-7 w-7 place-items-center rounded-lg text-text-faint opacity-0 transition-all hover:bg-negative-soft hover:text-negative group-hover:opacity-100"
+                    className="grid h-7 w-7 place-items-center rounded-[6px] text-text-faint opacity-0 transition-all hover:bg-negative-soft hover:text-negative group-hover:opacity-100"
                   >
                     <Trash2 size={13} />
                   </button>
@@ -454,7 +454,7 @@ export default function BroadcastPage() {
               </motion.div>
             ))}
             {campaigns.length === 0 && (
-              <div className="grid min-h-[120px] place-items-center rounded-[16px] border border-dashed border-border text-sm text-text-faint">
+              <div className="grid min-h-[120px] place-items-center rounded-[6px] border border-dashed border-border text-sm text-text-faint">
                 No campaigns yet — compose one on the left.
               </div>
             )}

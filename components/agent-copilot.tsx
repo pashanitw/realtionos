@@ -217,13 +217,13 @@ export function AgentCopilot() {
           >
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <div className="flex items-center gap-2.5">
-                <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white"><Bot size={17} /></span>
+                <span className="grid h-8 w-8 place-items-center rounded-[5px] bg-gradient-to-br from-[#fe772c] to-[#0a2152] text-white"><Bot size={17} /></span>
                 <div>
                   <h3 className="font-display text-base font-bold">Agent Copilot</h3>
                   <p className="text-xs text-text-muted">Ask about your book · {buyers.length} contracts</p>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-lg text-text-muted hover:bg-surface-2 hover:text-text"><X size={17} /></button>
+              <button onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-[6px] text-text-muted hover:bg-surface-2 hover:text-text"><X size={17} /></button>
             </div>
 
             <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto p-4">
@@ -232,15 +232,15 @@ export function AgentCopilot() {
                 <div className="space-y-1.5 pt-2">
                   <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Try</div>
                   {SUGGESTIONS.map((s) => (
-                    <button key={s} onClick={() => send(s)} className="block w-full rounded-[10px] border border-border bg-surface-2 px-3 py-2 text-left text-sm text-text-muted transition-colors hover:border-border-strong hover:text-text">{s}</button>
+                    <button key={s} onClick={() => send(s)} className="block w-full rounded-[5px] border border-border bg-surface-2 px-3 py-2 text-left text-sm text-text-muted transition-colors hover:border-border-strong hover:text-text">{s}</button>
                   ))}
                 </div>
               )}
             </div>
 
             <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="flex items-center gap-2 border-t border-border p-3">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Message the copilot…" className="h-11 flex-1 rounded-[12px] border border-border bg-surface-2 px-3.5 text-sm outline-none placeholder:text-text-faint focus:border-accent" />
-              <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px] bg-accent text-accent-contrast transition-transform hover:scale-105 active:scale-95" aria-label="Send"><ArrowUp size={18} strokeWidth={2.4} /></button>
+              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Message the copilot…" className="h-11 flex-1 rounded-[6px] border border-border bg-surface-2 px-3.5 text-sm outline-none placeholder:text-text-faint focus:border-accent" />
+              <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-[6px] bg-accent text-accent-contrast transition-transform hover:scale-105 active:scale-95" aria-label="Send"><ArrowUp size={18} strokeWidth={2.4} /></button>
             </form>
           </motion.aside>
         </>
@@ -253,28 +253,28 @@ function Bubble({ m, projects, units, onClose }: { m: Msg; projects: Project[]; 
   if (m.role === "user") {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] rounded-[14px] rounded-br-sm bg-accent px-3.5 py-2 text-sm text-accent-contrast">{m.text}</div>
+        <div className="max-w-[85%] rounded-[6px] rounded-br-sm bg-accent px-3.5 py-2 text-sm text-accent-contrast">{m.text}</div>
       </div>
     );
   }
   if (m.kind === "text") {
     return (
       <div className="flex items-start gap-2">
-        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-accent-soft text-accent"><Sparkles size={12} /></span>
-        <div className="max-w-[85%] rounded-[14px] rounded-tl-sm bg-surface-2 px-3.5 py-2 text-sm text-text">{m.text}</div>
+        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[4px] bg-accent-soft text-accent"><Sparkles size={12} /></span>
+        <div className="max-w-[85%] rounded-[6px] rounded-tl-sm bg-surface-2 px-3.5 py-2 text-sm text-text">{m.text}</div>
       </div>
     );
   }
   if (m.kind === "answer") {
     return (
       <div className="flex items-start gap-2">
-        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-accent-soft text-accent"><TrendingUp size={12} /></span>
+        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[4px] bg-accent-soft text-accent"><TrendingUp size={12} /></span>
         <div className="min-w-0 flex-1 space-y-2">
           <div className="text-sm text-text">{m.text}</div>
           {m.stats && (
             <div className="flex flex-wrap gap-1.5">
               {m.stats.map((s) => (
-                <div key={s.label} className="rounded-[10px] border border-border bg-surface-2 px-2.5 py-1.5">
+                <div key={s.label} className="rounded-[5px] border border-border bg-surface-2 px-2.5 py-1.5">
                   <div className="font-mono text-[9px] uppercase tracking-wide text-text-faint">{s.label}</div>
                   <div className="tabular font-display text-[15px] font-bold leading-tight text-text">{s.value}</div>
                 </div>
@@ -293,9 +293,9 @@ function Bubble({ m, projects, units, onClose }: { m: Msg; projects: Project[]; 
               </>
             );
             return r.href ? (
-              <Link key={i} href={r.href} onClick={onClose} className="flex items-center gap-2.5 rounded-[10px] border border-border bg-surface-2 px-2.5 py-2 transition-colors hover:border-border-strong">{inner}</Link>
+              <Link key={i} href={r.href} onClick={onClose} className="flex items-center gap-2.5 rounded-[5px] border border-border bg-surface-2 px-2.5 py-2 transition-colors hover:border-border-strong">{inner}</Link>
             ) : (
-              <div key={i} className="flex items-center gap-2.5 rounded-[10px] border border-border bg-surface-2 px-2.5 py-2">{inner}</div>
+              <div key={i} className="flex items-center gap-2.5 rounded-[5px] border border-border bg-surface-2 px-2.5 py-2">{inner}</div>
             );
           })}
           {m.href && (
@@ -308,7 +308,7 @@ function Bubble({ m, projects, units, onClose }: { m: Msg; projects: Project[]; 
   // units
   return (
     <div className="flex items-start gap-2">
-      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-md bg-accent-soft text-accent"><Building2 size={12} /></span>
+      <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-[4px] bg-accent-soft text-accent"><Building2 size={12} /></span>
       <div className="min-w-0 flex-1 space-y-2">
         <div className="text-sm text-text">{m.text}</div>
         {m.unitIds.length === 0 && <div className="text-sm text-text-faint">No matching units available right now.</div>}
@@ -317,7 +317,7 @@ function Bubble({ m, projects, units, onClose }: { m: Msg; projects: Project[]; 
           if (!u) return null;
           const p = projects.find((pp) => pp.id === u.projectId);
           return (
-            <div key={uid} className="rounded-[12px] border border-border bg-surface-2 p-3">
+            <div key={uid} className="rounded-[6px] border border-border bg-surface-2 p-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-text">{p?.name}</span>
                 <span className="font-mono text-sm font-semibold text-accent">{rupees(u.priceInr)}</span>

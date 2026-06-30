@@ -146,7 +146,7 @@ export default function ConciergePage() {
               ))}
             </AnimatePresence>
             {visible.length === 0 && (
-              <div className="rounded-[14px] border border-dashed border-border p-6 text-center text-sm text-text-faint">
+              <div className="rounded-[6px] border border-dashed border-border p-6 text-center text-sm text-text-faint">
                 No conversations on this channel.
               </div>
             )}
@@ -158,7 +158,7 @@ export default function ConciergePage() {
           {selected ? (
             <ChatDetail chat={selected} />
           ) : (
-            <div className="grid place-items-center rounded-[16px] border border-border bg-surface py-24 text-center text-text-muted">
+            <div className="grid place-items-center rounded-[6px] border border-border bg-surface py-24 text-center text-text-muted">
               No live conversations right now.
             </div>
           )}
@@ -201,7 +201,7 @@ function InboxMetrics({ chats }: { chats: ConciergeChat[] }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5"
+      className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5"
     >
       {/* Headline KPIs */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -254,9 +254,9 @@ function KpiTile({ icon, tone, label, value, hint }: { icon: React.ReactNode; to
   const fg = tone === "positive" ? "text-positive" : tone === "live" ? "text-live" : "text-accent";
   const bg = tone === "positive" ? "bg-positive-soft" : tone === "live" ? "bg-live-soft" : "bg-accent-soft";
   return (
-    <div className="rounded-[12px] border border-border bg-surface-inset/50 p-3.5">
+    <div className="rounded-[6px] border border-border bg-surface-inset/50 p-3.5">
       <div className="flex items-center gap-2">
-        <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-lg", bg, fg)}>{icon}</span>
+        <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-[6px]", bg, fg)}>{icon}</span>
         <span className="font-mono text-[10px] uppercase leading-tight tracking-wide text-text-faint">{label}</span>
       </div>
       <div className="tabular mt-2.5 font-display text-2xl font-bold text-text">{value}</div>
@@ -268,7 +268,7 @@ function KpiTile({ icon, tone, label, value, hint }: { icon: React.ReactNode; to
 function FunnelSeg({ meta, short, count, last }: { meta: StatusMeta; short: string; count: number; last: boolean }) {
   return (
     <>
-      <div className="min-w-0 flex-1 rounded-[10px] border border-border bg-surface-inset/40 px-1.5 py-2 text-center">
+      <div className="min-w-0 flex-1 rounded-[5px] border border-border bg-surface-inset/40 px-1.5 py-2 text-center">
         <div className="tabular font-display text-lg font-bold leading-none text-text">{count}</div>
         <div className="mt-1 flex items-center justify-center gap-1 font-mono text-[9px] uppercase tracking-wide text-text-faint">
           <StatusDot color={meta.dot} pulse={meta.pulse} size={5} /> <span className="truncate">{short}</span>
@@ -329,7 +329,7 @@ function ChatListItem({
       transition={SPRING}
       onClick={onSelect}
       className={cn(
-        "block w-full rounded-[14px] border p-3.5 text-left transition-colors",
+        "block w-full rounded-[6px] border p-3.5 text-left transition-colors",
         selected
           ? "border-accent bg-accent-soft shadow-[var(--shadow-soft)]"
           : "border-border bg-surface hover:border-border-strong hover:bg-surface-2",
@@ -398,7 +398,7 @@ function ChatDetail({ chat }: { chat: ConciergeChat }) {
       className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start"
     >
       {/* Conversation column */}
-      <div className="min-w-0 overflow-hidden rounded-[16px] border border-border bg-surface shadow-[var(--shadow-soft)]">
+      <div className="min-w-0 overflow-hidden rounded-[6px] border border-border bg-surface shadow-[var(--shadow-soft)]">
         {/* Header */}
         <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div className="flex min-w-0 items-center gap-3">
@@ -477,7 +477,7 @@ function ChatDetail({ chat }: { chat: ConciergeChat }) {
         {/* Site visit banner */}
         {chat.siteVisitAt && (
           <div className="border-t border-border p-4 sm:p-5">
-            <div className="flex items-center gap-3 rounded-[12px] border border-positive/40 bg-positive-soft px-4 py-3">
+            <div className="flex items-center gap-3 rounded-[6px] border border-positive/40 bg-positive-soft px-4 py-3">
               <CalendarCheck size={18} className="shrink-0 text-positive" />
               <p className="text-sm font-medium text-positive">
                 Site visit booked · {chat.siteVisitAt} · with the sales lead
@@ -533,8 +533,8 @@ function Bubble({
           className={cn(
             "px-3.5 py-2.5 text-sm leading-relaxed shadow-[var(--shadow-soft)]",
             isBuyer
-              ? "rounded-[14px] rounded-br-[4px] bg-accent text-accent-contrast"
-              : "rounded-[14px] rounded-bl-[4px] bg-surface-2 text-text",
+              ? "rounded-[6px] rounded-br-[4px] bg-accent text-accent-contrast"
+              : "rounded-[6px] rounded-bl-[4px] bg-surface-2 text-text",
           )}
         >
           {text}
@@ -557,7 +557,7 @@ function TypingIndicator() {
         <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
           <Bot size={13} />
         </span>
-        <div className="flex items-center gap-1.5 rounded-[14px] rounded-bl-[4px] bg-surface-2 px-3.5 py-3">
+        <div className="flex items-center gap-1.5 rounded-[6px] rounded-bl-[4px] bg-surface-2 px-3.5 py-3">
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
@@ -582,7 +582,7 @@ function TypingIndicator() {
 function OfferedUnitCard({ unit, project }: { unit: Unit; project?: Project }) {
   const ready = project?.status === "ready";
   return (
-    <div className="rounded-[12px] border border-accent/30 bg-accent-soft/40 p-3.5">
+    <div className="rounded-[6px] border border-accent/30 bg-accent-soft/40 p-3.5">
       <div className="flex items-start justify-between gap-2">
         <span className="min-w-0 truncate text-sm font-semibold text-text">
           {project?.name ?? "Unit"}
@@ -616,7 +616,7 @@ function LeadCard({ chat }: { chat: ConciergeChat }) {
       initial={{ opacity: 0, scale: 0.96, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={SPRING}
-      className="rounded-[16px] border border-positive/40 bg-surface p-5 shadow-[var(--shadow-lift)]"
+      className="rounded-[6px] border border-positive/40 bg-surface p-5 shadow-[var(--shadow-lift)]"
     >
       <div className="flex items-center gap-2">
         <span className="grid h-7 w-7 place-items-center rounded-full bg-positive-soft text-positive">
@@ -636,7 +636,7 @@ function LeadCard({ chat }: { chat: ConciergeChat }) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-start gap-2 rounded-[12px] border border-border bg-surface-inset px-3 py-2.5">
+      <div className="mt-4 flex items-start gap-2 rounded-[6px] border border-border bg-surface-inset px-3 py-2.5">
         <ArrowDown size={14} className="mt-0.5 shrink-0 -rotate-90 text-accent" />
         <p className="text-xs leading-relaxed text-text-muted">
           On the worklist — no agent touched it.
@@ -649,7 +649,7 @@ function LeadCard({ chat }: { chat: ConciergeChat }) {
 /* ---------------- Placeholder when no lead has crystallized yet ---------------- */
 function PendingLeadCard({ status }: { status: ConciergeStatus }) {
   return (
-    <div className="rounded-[16px] border border-dashed border-border bg-surface p-5">
+    <div className="rounded-[6px] border border-dashed border-border bg-surface p-5">
       <Label>Lead forming…</Label>
       <p className="mt-3 text-sm leading-relaxed text-text-muted">
         {status === "qualifying"

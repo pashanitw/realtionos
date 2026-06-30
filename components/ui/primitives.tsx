@@ -119,7 +119,7 @@ export function ChannelIcon({
   if (withBg) {
     return (
       <span
-        className={cn("grid place-items-center rounded-lg", className)}
+        className={cn("grid place-items-center rounded-[6px]", className)}
         style={{
           width: size * 2,
           height: size * 2,

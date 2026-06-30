@@ -48,7 +48,7 @@ function KpiCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.04 }}
       className={cn(
-        "group relative h-full rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]",
+        "group relative h-full rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]",
         href && "transition-colors hover:border-border-strong",
       )}
     >
@@ -89,7 +89,7 @@ function SectionCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      className={cn("rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]", className)}
+      className={cn("rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]", className)}
     >
       <div className="mb-4 flex items-center gap-2">
         {Icon && <Icon size={15} className="text-accent" />}
@@ -110,7 +110,7 @@ function SectionCard({
 
 function EmptyRow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-[72px] place-items-center rounded-[12px] border border-dashed border-border px-4 text-center text-sm text-text-faint">
+    <div className="grid min-h-[72px] place-items-center rounded-[6px] border border-dashed border-border px-4 text-center text-sm text-text-faint">
       {children}
     </div>
   );
@@ -120,7 +120,7 @@ function RowLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="group flex items-center gap-3 rounded-[12px] border border-transparent px-2.5 py-2.5 transition-colors hover:border-border hover:bg-surface-2"
+      className="group flex items-center gap-3 rounded-[6px] border border-transparent px-2.5 py-2.5 transition-colors hover:border-border hover:bg-surface-2"
     >
       {children}
       <ChevronRight size={15} className="shrink-0 text-text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-text-muted" />
@@ -246,7 +246,7 @@ function ManagerHome() {
                       <span className="tabular shrink-0 font-mono text-[13px] font-semibold text-text">{rupees(t.pipeline)}</span>
                     </div>
                     <div className="mt-1.5">
-                      <Meter value={(t.pipeline / teamMax) * 100} color={`hsl(${t.hue} 55% 48%)`} height={5} />
+                      <Meter value={(t.pipeline / teamMax) * 100} color="var(--accent)" height={5} />
                     </div>
                     <div className="mt-1 font-mono text-[11px] text-text-faint">
                       {t.contracts} contracts · {t.bookings} bookings
@@ -289,7 +289,7 @@ function ManagerHome() {
               </RowLink>
             ))}
             <RowLink href="/approvals">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-live-soft text-live">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] bg-live-soft text-live">
                 <ShieldCheck size={16} />
               </span>
               <div className="min-w-0 flex-1">
@@ -377,7 +377,7 @@ function AgentHome() {
             <div className="space-y-1">
               {visits.map((b) => (
                 <RowLink key={b.id} href={`/buyers/${b.id}`}>
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-live-soft text-live">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] bg-live-soft text-live">
                     <CalendarCheck size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -489,7 +489,7 @@ function TelecallerHome() {
             <div className="space-y-1">
               {needCab.slice(0, 5).map((b) => (
                 <RowLink key={b.id} href={`/logistics`}>
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-accent-soft text-accent">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] bg-accent-soft text-accent">
                     <Car size={16} />
                   </span>
                   <div className="min-w-0 flex-1">

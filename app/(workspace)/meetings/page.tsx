@@ -243,7 +243,7 @@ export default function MeetingsPage() {
           <button
             type="button"
             onClick={() => setUploadOpen(true)}
-            className="flex h-10 items-center gap-1.5 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
+            className="flex h-10 items-center gap-1.5 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
           >
             <Upload size={16} strokeWidth={2.5} /> Upload recording
           </button>
@@ -258,7 +258,7 @@ export default function MeetingsPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: i * 0.04 }}
-            className="rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
+            className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
           >
             <Label>{k.label}</Label>
             <div
@@ -297,13 +297,13 @@ export default function MeetingsPage() {
                     transition={{ type: "spring", stiffness: 360, damping: 32, delay: Math.min(i, 5) * 0.02 }}
                     onClick={() => setActiveId(m.id)}
                     className={cn(
-                      "w-full rounded-[14px] border bg-surface p-3.5 text-left shadow-[var(--shadow-soft)] transition-colors",
+                      "w-full rounded-[6px] border bg-surface p-3.5 text-left shadow-[var(--shadow-soft)] transition-colors",
                       isActive ? "border-accent bg-accent-soft" : "border-border hover:border-border-strong",
                     )}
                   >
                     <div className="flex items-start gap-2.5">
                       <span
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px]"
+                        className="grid h-9 w-9 shrink-0 place-items-center rounded-[5px]"
                         style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)", color: "var(--accent)" }}
                       >
                         <Icon size={16} strokeWidth={2.1} />
@@ -348,7 +348,7 @@ export default function MeetingsPage() {
                 className="flex flex-col gap-4"
               >
                 {/* Header card */}
-                <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+                <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="mb-1 flex items-center gap-2">
@@ -368,7 +368,7 @@ export default function MeetingsPage() {
                   </div>
 
                   {/* faux audio scrubber */}
-                  <div className="mt-4 flex items-center gap-3 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5">
+                  <div className="mt-4 flex items-center gap-3 rounded-[6px] border border-border bg-surface-2 px-3 py-2.5">
                     <button
                       type="button"
                       className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-accent-contrast transition-transform hover:scale-105 active:scale-95"
@@ -387,7 +387,7 @@ export default function MeetingsPage() {
                 </div>
 
                 {/* AI summary */}
-                <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+                <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
                   <div className="mb-2.5 flex items-center gap-2">
                     <Sparkles size={15} className="text-accent" />
                     <Label>AI summary</Label>
@@ -403,7 +403,7 @@ export default function MeetingsPage() {
                 </div>
 
                 {/* Action items */}
-                <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+                <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
                   <div className="mb-3 flex items-center gap-2">
                     <ListChecks size={15} className="text-accent" />
                     <Label>Action items</Label>
@@ -415,7 +415,7 @@ export default function MeetingsPage() {
                         type="button"
                         onClick={() => sendToTasks(active)}
                         disabled={sentToTasks[active.id]}
-                        className="flex h-7 items-center gap-1.5 rounded-[9px] border border-border bg-surface-2 px-2.5 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset disabled:opacity-50"
+                        className="flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-surface-2 px-2.5 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset disabled:opacity-50"
                       >
                         {sentToTasks[active.id] ? <><Check size={12} /> Added to Tasks</> : <><ArrowRight size={12} /> Add to Tasks</>}
                       </button>
@@ -429,7 +429,7 @@ export default function MeetingsPage() {
                           key={it.id}
                           type="button"
                           onClick={() => setToggled((p) => ({ ...p, [it.id]: !done }))}
-                          className="group flex items-center gap-3 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5 text-left transition-colors hover:border-border-strong"
+                          className="group flex items-center gap-3 rounded-[6px] border border-border bg-surface-2 px-3 py-2.5 text-left transition-colors hover:border-border-strong"
                         >
                           <span className="shrink-0" style={{ color: done ? "var(--positive)" : "var(--text-faint)" }}>
                             {done ? <CheckCircle2 size={18} /> : <Circle size={18} />}
@@ -446,7 +446,7 @@ export default function MeetingsPage() {
                 </div>
 
                 {/* Key moments / sentiment */}
-                <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+                <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
                   <div className="mb-3 flex items-center gap-2">
                     <CircleDot size={15} className="text-accent" />
                     <Label>Key moments</Label>
@@ -467,7 +467,7 @@ export default function MeetingsPage() {
                 </div>
 
                 {/* Transcript (collapsible) */}
-                <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+                <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
                   <button
                     type="button"
                     onClick={() => setShowTranscript((v) => !v)}
@@ -558,25 +558,25 @@ function UploadModal({
         role="dialog" aria-modal="true"
         initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={{ type: "spring", stiffness: 440, damping: 30 }}
-        className="relative w-full max-w-[440px] overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
+        className="relative w-full max-w-[440px] overflow-hidden rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-accent-soft text-accent"><Upload size={19} /></span>
+            <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-accent-soft text-accent"><Upload size={19} /></span>
             <div>
               <h3 className="font-display text-lg font-bold leading-tight">Upload recording</h3>
               <p className="text-sm text-text-muted">We&apos;ll transcribe and extract action items.</p>
             </div>
           </div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-[6px] text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
         </div>
 
         {buyers.length === 0 ? (
-          <p className="mt-5 rounded-[12px] border border-dashed border-border p-4 text-center text-sm text-text-muted">No buyers in scope to attach a recording to.</p>
+          <p className="mt-5 rounded-[6px] border border-dashed border-border p-4 text-center text-sm text-text-muted">No buyers in scope to attach a recording to.</p>
         ) : (
           <div className="mt-5 space-y-4">
             <Field label="Buyer">
-              <select value={buyerId} onChange={(e) => setBuyerId(e.target.value)} className="h-10 w-full rounded-[10px] border border-border bg-surface-2 px-3 text-sm text-text">
+              <select value={buyerId} onChange={(e) => setBuyerId(e.target.value)} className="h-10 w-full rounded-[5px] border border-border bg-surface-2 px-3 text-sm text-text">
                 {buyers.map((b) => (
                   <option key={b.id} value={b.id}>{b.name} · {b.config} · {b.localityPrefs[0]}</option>
                 ))}
@@ -593,7 +593,7 @@ function UploadModal({
                       type="button"
                       onClick={() => setKind(k)}
                       className={cn(
-                        "flex h-[58px] flex-col items-center justify-center gap-1 rounded-[10px] border text-xs font-medium transition-colors",
+                        "flex h-[58px] flex-col items-center justify-center gap-1 rounded-[5px] border text-xs font-medium transition-colors",
                         on ? "border-accent bg-accent-soft text-accent" : "border-border bg-surface-2 text-text-muted hover:border-border-strong",
                       )}
                     >
@@ -606,7 +606,7 @@ function UploadModal({
             </Field>
 
             {buyer && (
-              <div className="flex items-center gap-2.5 rounded-[12px] border border-dashed border-border bg-surface-2 px-3 py-2.5">
+              <div className="flex items-center gap-2.5 rounded-[6px] border border-dashed border-border bg-surface-2 px-3 py-2.5">
                 <FileText size={16} className="shrink-0 text-text-faint" />
                 <span className="tabular truncate font-mono text-[12px] text-text-muted">
                   {KIND_HINT[kind].toLowerCase().replace(/\s/g, "-")}-{firstName(buyer.name).toLowerCase()}.m4a
@@ -618,8 +618,8 @@ function UploadModal({
         )}
 
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
-          <button onClick={submit} disabled={!canConfirm} className="flex h-10 items-center gap-1.5 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">
+          <button onClick={onClose} className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
+          <button onClick={submit} disabled={!canConfirm} className="flex h-10 items-center gap-1.5 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">
             Upload &amp; transcribe <ArrowRight size={14} />
           </button>
         </div>

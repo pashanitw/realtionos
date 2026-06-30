@@ -146,7 +146,7 @@ export default function PipelinePage() {
         <select
           value={interest}
           onChange={(e) => setInterest(e.target.value as Interest | "all")}
-          className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+          className="h-9 rounded-[5px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
         >
           <option value="all">All interest</option>
           {INTERESTS.map((it) => (<option key={it} value={it}>{it}</option>))}
@@ -159,7 +159,7 @@ export default function PipelinePage() {
             <span className="mx-1 h-5 w-px bg-border" />
             <button
               onClick={addCustomStage}
-              className="flex h-9 items-center gap-1.5 rounded-[10px] border border-border bg-surface px-3 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text"
+              className="flex h-9 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-3 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text"
             >
               <Plus size={15} /> Custom stage
             </button>
@@ -168,12 +168,12 @@ export default function PipelinePage() {
         {view === "table" && (
           <button
             onClick={() => exportDealsCsv(visible, buyerById, colOf, interestForDeal)}
-            className="flex h-9 items-center gap-1.5 rounded-[10px] border border-border bg-surface px-3 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text"
+            className="flex h-9 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-3 text-sm font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text"
           >
             <Download size={15} /> Export CSV
           </button>
         )}
-        <div className="ml-auto flex items-center gap-0.5 rounded-[10px] border border-border bg-surface p-0.5">
+        <div className="ml-auto flex items-center gap-0.5 rounded-[5px] border border-border bg-surface p-0.5">
           <ViewToggleBtn active={view === "board"} onClick={() => setView("board")} icon={<LayoutGrid size={15} />} label="Board" />
           <ViewToggleBtn active={view === "table"} onClick={() => setView("table")} icon={<Table2 size={15} />} label="Table" />
         </div>
@@ -235,7 +235,7 @@ function ViewToggleBtn({ active, onClick, icon, label }: { active: boolean; onCl
     <button
       onClick={onClick}
       className={cn(
-        "flex h-8 items-center gap-1.5 rounded-[8px] px-2.5 text-sm font-medium transition-colors",
+        "flex h-8 items-center gap-1.5 rounded-[5px] px-2.5 text-sm font-medium transition-colors",
         active ? "bg-accent text-accent-contrast" : "text-text-muted hover:text-text",
       )}
     >
@@ -248,9 +248,9 @@ function PipeStat({ icon, tone, label, value }: { icon: React.ReactNode; tone: "
   const fg = tone === "positive" ? "text-positive" : tone === "live" ? "text-live" : "text-accent";
   const bg = tone === "positive" ? "bg-positive-soft" : tone === "live" ? "bg-live-soft" : "bg-accent-soft";
   return (
-    <div className="rounded-[12px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)]">
       <div className="flex items-center gap-2">
-        <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-lg", bg, fg)}>{icon}</span>
+        <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-[6px]", bg, fg)}>{icon}</span>
         <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{label}</span>
       </div>
       <div className="tabular mt-2 font-display text-lg font-bold text-text">{value}</div>
@@ -274,7 +274,7 @@ function ValueFlow({ deals }: { deals: Deal[] }) {
   const legend = [...flow.arr].sort((a, b) => b.value - a.value).slice(0, 6);
 
   return (
-    <div className="mb-4 rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+    <div className="mb-4 rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
       <div className="mb-2.5 flex items-center justify-between gap-2">
         <Label>Where the value sits</Label>
         {flow.top && <span className="text-xs text-text-muted">Biggest pool · <span className="font-semibold text-text">{rupees(flow.top.value)}</span> in {flow.top.stage}</span>}
@@ -342,11 +342,11 @@ function DealTable({
   const toggle = (key: SortKey) => setSort((s) => (s.key === key ? { key, dir: (s.dir === 1 ? -1 : 1) } : { key, dir: key === "name" || key === "stage" ? 1 : -1 }));
 
   if (deals.length === 0) {
-    return <div className="rounded-[14px] border border-dashed border-border p-10 text-center text-sm text-text-faint">No deals match this filter.</div>;
+    return <div className="rounded-[6px] border border-dashed border-border p-10 text-center text-sm text-text-faint">No deals match this filter.</div>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-[14px] border border-border bg-surface shadow-[var(--shadow-soft)]">
+    <div className="overflow-x-auto rounded-[6px] border border-border bg-surface shadow-[var(--shadow-soft)]">
       <table className="w-full min-w-[940px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-border bg-surface-2/50">
@@ -393,7 +393,7 @@ function DealTable({
                 <td className="tabular px-3 text-right font-mono text-xs text-text-muted">{closeLbl}</td>
                 <td className="py-2.5 pl-3 pr-4 text-right">
                   {isBooked(deal.stage)
-                    ? <button onClick={() => onInvoice(deal)} className="inline-flex items-center gap-1 rounded-[8px] border border-border px-2 py-1 text-xs font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text"><ReceiptText size={12} /> Invoice</button>
+                    ? <button onClick={() => onInvoice(deal)} className="inline-flex items-center gap-1 rounded-[5px] border border-border px-2 py-1 text-xs font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text"><ReceiptText size={12} /> Invoice</button>
                     : <span className="text-text-faint">—</span>}
                 </td>
               </tr>
@@ -471,7 +471,7 @@ function StageColumn({
       <div className="mb-3 mt-3 px-1">
         <div className="flex items-center gap-2">
           {Icon && (
-            <span className="grid h-5 w-5 place-items-center rounded-md" style={{ background: "color-mix(in oklab, var(--positive) 16%, transparent)", color: "var(--positive)" }}>
+            <span className="grid h-5 w-5 place-items-center rounded-[4px]" style={{ background: "color-mix(in oklab, var(--positive) 16%, transparent)", color: "var(--positive)" }}>
               <Icon size={13} strokeWidth={2.2} />
             </span>
           )}
@@ -484,7 +484,7 @@ function StageColumn({
 
       <div
         className={cn(
-          "flex flex-1 flex-col gap-3 rounded-[14px] transition-colors",
+          "flex flex-1 flex-col gap-3 rounded-[6px] transition-colors",
           canDrop && "outline-dashed outline-1 outline-offset-2 outline-border",
           over && "bg-accent-soft/40 outline-accent",
         )}
@@ -496,7 +496,7 @@ function StageColumn({
         </AnimatePresence>
 
         {deals.length === 0 && (
-          <div className="grid min-h-[88px] place-items-center rounded-[14px] border border-dashed border-border text-xs text-text-faint">
+          <div className="grid min-h-[88px] place-items-center rounded-[6px] border border-dashed border-border text-xs text-text-faint">
             {over ? "Drop to move here" : isCustom ? "Drag deals here" : "No deals"}
           </div>
         )}
@@ -546,7 +546,7 @@ function DealCard({
         href={`/buyers/${deal.buyerId}`}
         draggable={false}
         className={cn(
-          "block rounded-[14px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)]",
+          "block rounded-[6px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)]",
           "transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong",
         )}
       >
@@ -577,7 +577,7 @@ function DealCard({
           <button
             type="button"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onInvoice(deal); }}
-            className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-border bg-surface-2 px-3 py-1.5 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset"
+            className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-[5px] border border-border bg-surface-2 px-3 py-1.5 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset"
           >
             <FileText size={12} /> Generate invoice
           </button>
@@ -593,7 +593,7 @@ function DealCard({
               transition={{ duration: 0.3, ease: [0.34, 1.4, 0.5, 1] }}
               className="overflow-hidden"
             >
-              <div className="mt-3 rounded-[10px] bg-live-soft p-2.5 text-live">
+              <div className="mt-3 rounded-[5px] bg-live-soft p-2.5 text-live">
                 <div className="flex items-start gap-1.5 text-[12px] leading-snug">
                   <Sparkles size={13} className="mt-0.5 shrink-0" />
                   <span className="min-w-0">
@@ -605,7 +605,7 @@ function DealCard({
                   type="button"
                   onClick={handleAccept}
                   className={cn(
-                    "mt-2 flex w-full items-center justify-center gap-1.5 rounded-[8px] bg-live px-3 py-1.5",
+                    "mt-2 flex w-full items-center justify-center gap-1.5 rounded-[5px] bg-live px-3 py-1.5",
                     "text-[12px] font-semibold text-accent-contrast",
                     "transition-transform hover:scale-[1.01] active:scale-95",
                   )}
@@ -642,7 +642,7 @@ function RemarksModal({
         role="dialog" aria-modal="true"
         initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={{ type: "spring", stiffness: 440, damping: 30 }}
-        className="relative w-full max-w-[440px] overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
+        className="relative w-full max-w-[440px] overflow-hidden rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
       >
         <div className="flex items-start justify-between">
           <div className="min-w-0">
@@ -652,7 +652,7 @@ function RemarksModal({
             </h3>
             <p className="mt-1 text-sm text-text-muted">Moving from {deal.stage}. Add a remark so the timeline keeps the context.</p>
           </div>
-          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
+          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-[6px] text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
         </div>
 
         <textarea
@@ -661,7 +661,7 @@ function RemarksModal({
           onChange={(e) => setRemarks(e.target.value)}
           rows={3}
           placeholder="e.g. Buyer confirmed booking on call, sending agreement next…"
-          className="mt-4 w-full resize-none rounded-[12px] border border-border bg-surface-2 p-3 text-sm text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none"
+          className="mt-4 w-full resize-none rounded-[6px] border border-border bg-surface-2 p-3 text-sm text-text placeholder:text-text-faint focus:border-border-strong focus:outline-none"
         />
         <div className="mt-2 flex flex-wrap gap-1.5">
           {QUICK.map((q) => (
@@ -670,11 +670,11 @@ function RemarksModal({
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
+          <button onClick={onClose} className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
           <button
             onClick={() => valid && onConfirm(remarks.trim())}
             disabled={!valid}
-            className="h-10 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100"
+            className="h-10 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100"
           >
             Move with remark
           </button>
@@ -705,20 +705,20 @@ function InvoiceModal({ deal, onClose }: { deal: Deal; onClose: () => void }) {
         role="dialog" aria-modal="true"
         initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={{ type: "spring", stiffness: 440, damping: 30 }}
-        className="relative w-full max-w-[440px] overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
+        className="relative w-full max-w-[440px] overflow-hidden rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-accent-soft text-accent"><ReceiptText size={19} /></span>
+            <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-accent-soft text-accent"><ReceiptText size={19} /></span>
             <div>
               <h3 className="font-display text-lg font-bold leading-tight">Invoice draft</h3>
               <p className="tabular font-mono text-[12px] text-text-muted">{invNo} · auto-generated</p>
             </div>
           </div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-[6px] text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
         </div>
 
-        <div className="mt-4 rounded-[12px] border border-border bg-surface-2 p-3.5">
+        <div className="mt-4 rounded-[6px] border border-border bg-surface-2 p-3.5">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-text">{deal.name}</span>
             <Pill variant="neutral">{deal.stage}</Pill>
@@ -736,10 +736,10 @@ function InvoiceModal({ deal, onClose }: { deal: Deal; onClose: () => void }) {
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
+          <button onClick={onClose} className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
           <button
             onClick={() => { toast.success(`${invNo} sent to ${deal.name}`); onClose(); }}
-            className="h-10 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
+            className="h-10 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
           >
             Generate &amp; send
           </button>

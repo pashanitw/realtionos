@@ -48,11 +48,11 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-[420px] rounded-[20px] border border-border bg-surface p-6 shadow-[var(--shadow-lift)] sm:p-8"
+        className="relative w-full max-w-[420px] rounded-[5px] border border-border bg-surface p-6 shadow-[var(--shadow-lift)] sm:p-8"
       >
         {/* brand */}
         <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-[11px] bg-gradient-to-br from-[#e2612d] to-[#1f3f74] text-white shadow-[0_0_18px_-4px_rgba(226,97,45,0.5)]">
+          <div className="grid h-9 w-9 place-items-center rounded-[5px] bg-gradient-to-br from-[#fe772c] to-[#0a2152] text-white shadow-[0_0_18px_-4px_rgba(254,119,44,0.5)]">
             <Sparkles size={18} strokeWidth={2.4} />
           </div>
           <div className="leading-tight">
@@ -64,7 +64,7 @@ export default function LoginPage() {
         <h1 className="mt-6 font-display text-[22px] font-bold tracking-tight text-text">Choose a role</h1>
 
         {/* demo-environment note — real auth comes later */}
-        <div className="mt-3 flex items-start gap-2.5 rounded-[12px] border border-border bg-surface-2 px-3.5 py-3 text-sm text-text-muted">
+        <div className="mt-3 flex items-start gap-2.5 rounded-[6px] border border-border bg-surface-2 px-3.5 py-3 text-sm text-text-muted">
           <Lock size={16} className="mt-0.5 shrink-0 text-accent" />
           <p>
             Real logins will be added later — this is a <span className="font-medium text-text">demo environment</span>.
@@ -79,7 +79,7 @@ export default function LoginPage() {
               key={u.id}
               type="button"
               onClick={() => enter(u)}
-              className="group flex w-full items-center gap-3 rounded-[12px] border border-border bg-surface-2 px-3 py-2.5 text-left transition-colors hover:border-border-strong hover:bg-surface-inset"
+              className="group flex w-full items-center gap-3 rounded-[6px] border border-border bg-surface-2 px-3 py-2.5 text-left transition-colors hover:border-border-strong hover:bg-surface-inset"
             >
               <Avatar name={u.name} hue={u.hue} size={36} />
               <div className="min-w-0 flex-1">

@@ -16,9 +16,10 @@ import {
   ShieldCheck,
   ChevronDown,
 } from "lucide-react";
-import { useClientProjects, useClientUnits, useScopedBuyers } from "@/lib/roles";
+import { useClientProjects, useClientUnits, useScopedBuyers, useCurrentUser } from "@/lib/roles";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { Pill, Label } from "@/components/ui/primitives";
+import { InventoryImport } from "@/components/inventory-import";
 import {
   CONFIGS,
   type Config,
@@ -34,12 +35,13 @@ const SPRING = { type: "spring" as const, stiffness: 380, damping: 30 };
 /* Availability presentation -------------------------------------------------- */
 const AVAIL: Record<
   Availability,
-  { label: string; variant: "positive" | "live" | "accent" | "neutral"; dim: boolean }
+  { label: string; variant: "live" | "positive" | "neutral" | "outline"; dim: boolean }
 > = {
+  // active stock pops in brand colours; closed stock is greyed (booked filled, sold outline)
   available: { label: "Available", variant: "positive", dim: false },
   blocked: { label: "Blocked", variant: "live", dim: false },
-  booked: { label: "Booked", variant: "accent", dim: true },
-  sold: { label: "Sold", variant: "neutral", dim: true },
+  booked: { label: "Booked", variant: "neutral", dim: true },
+  sold: { label: "Sold", variant: "outline", dim: true },
 };
 
 type AvailFilter = Availability | "all";
@@ -66,6 +68,8 @@ export default function InventoryPage() {
   const projects = useClientProjects();
   const units = useClientUnits();
   const buyers = useScopedBuyers();
+  const role = useCurrentUser().role;
+  const isManager = role === "manager" || role === "super-admin";
 
   const [projectId, setProjectId] = useState<string | "all">("all");
   const [config, setConfig] = useState<Config | "all">("all");
@@ -164,6 +168,8 @@ export default function InventoryPage() {
         description="Projects, towers and units — with live availability. The AI quotes from the same source of truth the agent sees."
       />
 
+      {isManager && <InventoryImport />}
+
       <InventoryHealth {...health} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
@@ -207,9 +213,9 @@ export default function InventoryPage() {
                 transition={SPRING}
                 className="mb-4 overflow-hidden"
               >
-                <div className="flex flex-col gap-3 rounded-[14px] border border-accent/40 bg-accent-soft px-4 py-3.5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 rounded-[6px] border border-accent/40 bg-accent-soft px-4 py-3.5 shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-accent/15 text-accent">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[5px] bg-accent/15 text-accent">
                       <Sparkles size={17} />
                     </span>
                     <div className="min-w-0 text-sm">
@@ -262,7 +268,7 @@ export default function InventoryPage() {
               {/* THE buyer-match selector */}
               <div
                 className={cn(
-                  "relative flex h-9 shrink-0 items-center rounded-[10px] border px-1 transition-colors",
+                  "relative flex h-9 shrink-0 items-center rounded-[5px] border px-1 transition-colors",
                   activeBuyer
                     ? "border-accent bg-accent-soft"
                     : "border-border-strong bg-surface",
@@ -314,7 +320,7 @@ export default function InventoryPage() {
           </LayoutGroup>
 
           {view.length === 0 && (
-            <div className="rounded-[14px] border border-border bg-surface px-6 py-16 text-center shadow-[var(--shadow-soft)]">
+            <div className="rounded-[6px] border border-border bg-surface px-6 py-16 text-center shadow-[var(--shadow-soft)]">
               <p className="text-sm text-text-muted">No units match these filters.</p>
               <button
                 onClick={() => {
@@ -346,7 +352,7 @@ function InventoryHealth({
   const seg = [
     { label: "Available", n: available, color: "var(--positive)" },
     { label: "Blocked", n: blocked, color: "var(--live)" },
-    { label: "Booked", n: booked, color: "var(--accent)" },
+    { label: "Booked", n: booked, color: "var(--text-muted)" },
     { label: "Sold", n: sold, color: "var(--text-faint)" },
   ];
   return (
@@ -354,7 +360,7 @@ function InventoryHealth({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="mb-5 grid gap-5 rounded-[16px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5 lg:grid-cols-[1.4fr_1fr]"
+      className="mb-5 grid gap-5 rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5 lg:grid-cols-[1.4fr_1fr]"
     >
       {/* counts + availability bar */}
       <div className="min-w-0">
@@ -398,7 +404,7 @@ function HealthStat({ label, value, sub, color }: { label: string; value: React.
 
 function PriceStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[12px] border border-border bg-surface-inset/50 p-3">
+    <div className="rounded-[6px] border border-border bg-surface-inset/50 p-3">
       <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{label}</div>
       <div className="tabular mt-1.5 font-display text-base font-bold text-text">{value}</div>
     </div>
@@ -408,7 +414,7 @@ function PriceStat({ label, value }: { label: string; value: string }) {
 /* ---------------- Filter select ---------------- */
 function FilterSelect({ value, onChange, allLabel, options, active }: { value: string; onChange: (v: string) => void; allLabel: string; options: string[]; active: boolean }) {
   return (
-    <div className="relative flex h-9 shrink-0 items-center rounded-[10px] border border-border bg-surface">
+    <div className="relative flex h-9 shrink-0 items-center rounded-[5px] border border-border bg-surface">
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -430,15 +436,15 @@ function ProjectHero({ project, units }: { project: Project; units: Unit[] }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-      className="mb-4 overflow-hidden rounded-[16px] border border-[#2e5599] bg-[linear-gradient(135deg,#1f3f74_0%,#122244_55%,#0a1a30_100%)] p-5 text-white shadow-[var(--shadow-soft)]"
+      className="mb-4 overflow-hidden rounded-[6px] border border-[#1466e0] bg-[linear-gradient(135deg,#0a2152_0%,#071636_55%,#051234_100%)] p-5 text-white shadow-[var(--shadow-soft)]"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-xl font-bold tracking-tight">{project.name}</h2>
-            <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-[#d1dff2]">{project.status === "ready" ? "Ready to move" : "Under construction"}</span>
+            <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-[#d6e6fb]">{project.status === "ready" ? "Ready to move" : "Under construction"}</span>
           </div>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#8baedd]">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#93b4e6]">
             <span className="inline-flex items-center gap-1"><Building2 size={12} /> {project.builder}</span>
             <span className="inline-flex items-center gap-1"><MapPin size={12} /> {project.locality}</span>
             <span className="inline-flex items-center gap-1"><CalendarClock size={12} /> {project.possessionDate}</span>
@@ -446,15 +452,15 @@ function ProjectHero({ project, units }: { project: Project; units: Unit[] }) {
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {project.amenities.map((a) => (
-              <span key={a} className="rounded-pill border border-[rgba(255,255,255,0.16)] px-2 py-0.5 text-[11px] text-[#d1dff2]">{a}</span>
+              <span key={a} className="rounded-pill border border-[rgba(255,255,255,0.16)] px-2 py-0.5 text-[11px] text-[#d6e6fb]">{a}</span>
             ))}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-3.5">
           <Ring pct={pct} />
           <div>
-            <div className="font-display text-2xl font-bold leading-none">{avail}<span className="text-base font-medium text-[#8baedd]"> / {total}</span></div>
-            <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-[#8baedd]">units available</div>
+            <div className="font-display text-2xl font-bold leading-none">{avail}<span className="text-base font-medium text-[#93b4e6]"> / {total}</span></div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-[#93b4e6]">units available</div>
           </div>
         </div>
       </div>
@@ -490,7 +496,7 @@ function Chip({
       ? {
           available: "var(--positive)",
           blocked: "var(--live)",
-          booked: "var(--accent)",
+          booked: "var(--text-muted)",
           sold: "var(--text-faint)",
         }[tone]
       : null;
@@ -536,7 +542,7 @@ function ProjectCard({
       <button
         onClick={onClick}
         className={cn(
-          "flex w-[220px] shrink-0 flex-col gap-2 rounded-[14px] border p-3.5 text-left transition-all lg:w-full",
+          "flex w-[220px] shrink-0 flex-col gap-2 rounded-[6px] border p-3.5 text-left transition-all lg:w-full",
           active
             ? "border-accent bg-accent-soft shadow-[var(--shadow-soft)]"
             : "border-border bg-surface hover:border-border-strong",
@@ -545,7 +551,7 @@ function ProjectCard({
         <div className="flex items-center gap-2">
           <span
             className={cn(
-              "grid h-8 w-8 shrink-0 place-items-center rounded-[9px]",
+              "grid h-8 w-8 shrink-0 place-items-center rounded-[5px]",
               active ? "bg-accent/15 text-accent" : "bg-surface-2 text-text-muted",
             )}
           >
@@ -574,7 +580,7 @@ function ProjectCard({
     <button
       onClick={onClick}
       className={cn(
-        "flex w-[240px] shrink-0 flex-col gap-2.5 rounded-[14px] border p-3.5 text-left transition-all lg:w-full",
+        "flex w-[240px] shrink-0 flex-col gap-2.5 rounded-[6px] border p-3.5 text-left transition-all lg:w-full",
         active
           ? "border-accent bg-accent-soft shadow-[var(--shadow-soft)]"
           : "border-border bg-surface hover:border-border-strong",
@@ -663,7 +669,7 @@ function UnitCard({
         y: { duration: 0.35, delay: Math.min(index, 12) * 0.025 },
       }}
       className={cn(
-        "group relative flex flex-col gap-3 rounded-[14px] border bg-surface p-4 shadow-[var(--shadow-soft)] transition-colors",
+        "group relative flex flex-col gap-3 rounded-[6px] border bg-surface p-4 shadow-[var(--shadow-soft)] transition-colors",
         fit ? "border-accent" : "border-border",
         closed && "bg-surface-2",
       )}

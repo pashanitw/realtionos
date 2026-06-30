@@ -73,10 +73,10 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: 8 }}
               transition={{ type: "spring", stiffness: 440, damping: 30 }}
-              className="relative w-full max-w-[420px] overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
+              className="relative w-full max-w-[420px] overflow-hidden rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
             >
               <div className="flex items-start gap-3">
-                <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-[12px]", tone.chip)}>
+                <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-[6px]", tone.chip)}>
                   {opts.tone === "negative" ? <AlertTriangle size={19} /> : <Check size={19} strokeWidth={2.4} />}
                 </span>
                 <div className="min-w-0 pt-0.5">
@@ -89,7 +89,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               <div className="mt-5 flex justify-end gap-2">
                 <button
                   onClick={() => close(false)}
-                  className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2"
+                  className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2"
                 >
                   {opts.cancelLabel ?? "Cancel"}
                 </button>
@@ -97,7 +97,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                   autoFocus
                   onClick={() => close(true)}
                   className={cn(
-                    "h-10 rounded-[10px] px-4 text-sm font-semibold transition-transform hover:scale-[1.02] active:scale-95",
+                    "h-10 rounded-[5px] px-4 text-sm font-semibold transition-transform hover:scale-[1.02] active:scale-95",
                     tone.btn,
                   )}
                 >

@@ -69,7 +69,7 @@ export function ConductorDock() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 380, damping: 30 }}
-            className="chrome fixed bottom-20 right-5 z-[60] w-[300px] overflow-hidden rounded-[16px] border border-chrome-border shadow-[var(--shadow-lift)]"
+            className="chrome fixed bottom-20 right-5 z-[60] w-[300px] overflow-hidden rounded-[6px] border border-chrome-border shadow-[var(--shadow-lift)]"
           >
             <div className="flex items-center justify-between border-b border-chrome-border px-4 py-3">
               <div className="flex items-center gap-2">
@@ -83,9 +83,9 @@ export function ConductorDock() {
                 <button
                   key={b.label}
                   onClick={() => { setOpen(false); b.run((href) => router.push(href)); }}
-                  className="flex w-full items-center gap-3 rounded-[10px] px-2.5 py-2.5 text-left transition-colors hover:bg-chrome-2"
+                  className="flex w-full items-center gap-3 rounded-[5px] px-2.5 py-2.5 text-left transition-colors hover:bg-chrome-2"
                 >
-                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-[rgba(226,97,45,0.16)] text-accent"><b.icon size={15} /></span>
+                  <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-[rgba(254,119,44,0.16)] text-accent"><b.icon size={15} /></span>
                   <div className="flex-1">
                     <div className="text-sm font-medium text-chrome-text">{b.label}</div>
                     <div className="font-mono text-[10px] text-chrome-text-faint">{b.hint}</div>

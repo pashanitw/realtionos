@@ -48,7 +48,7 @@ export function ActivityPanel({ open, onClose }: { open: boolean; onClose: () =>
               </div>
               <button
                 onClick={onClose}
-                className="grid h-8 w-8 place-items-center rounded-lg text-text-muted hover:bg-surface-2 hover:text-text"
+                className="grid h-8 w-8 place-items-center rounded-[6px] text-text-muted hover:bg-surface-2 hover:text-text"
               >
                 <X size={17} />
               </button>
@@ -66,9 +66,9 @@ export function ActivityPanel({ open, onClose }: { open: boolean; onClose: () =>
                       animate={{ opacity: 1, y: 0, height: "auto" }}
                       exit={{ opacity: 0 }}
                       transition={{ type: "spring", stiffness: 400, damping: 34 }}
-                      className="flex gap-3 rounded-[12px] px-3 py-2.5 hover:bg-surface-2"
+                      className="flex gap-3 rounded-[6px] px-3 py-2.5 hover:bg-surface-2"
                     >
-                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
+                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent">
                         <Icon size={15} strokeWidth={2.2} />
                       </span>
                       <div className="min-w-0 flex-1">

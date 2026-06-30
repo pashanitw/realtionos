@@ -78,7 +78,7 @@ export default function LogisticsPage() {
           <button
             type="button"
             onClick={() => setBooking(true)}
-            className="flex h-10 items-center gap-1.5 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
+            className="flex h-10 items-center gap-1.5 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"
           >
             <Plus size={16} strokeWidth={2.5} /> Book a cab
           </button>
@@ -93,7 +93,7 @@ export default function LogisticsPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: i * 0.04 }}
-            className="rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
+            className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
           >
             <Label>{k.label}</Label>
             <div
@@ -145,7 +145,7 @@ export default function LogisticsPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.96 }}
                         transition={{ type: "spring", stiffness: 360, damping: 32 }}
-                        className="rounded-[14px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)]"
+                        className="rounded-[6px] border border-border bg-surface p-3.5 shadow-[var(--shadow-soft)]"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <Link href={`/buyers/${b.buyerId}`} className="min-w-0 truncate font-semibold leading-tight text-text hover:text-accent">
@@ -174,7 +174,7 @@ export default function LogisticsPage() {
                           <button
                             type="button"
                             onClick={() => { advanceBooking(b.id); toast.success(`${b.buyerName} → ${CAB_STATUS_LABEL[CAB_FLOW[idx + 1]]}`); }}
-                            className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-[9px] border border-border bg-surface-2 px-3 py-1.5 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset"
+                            className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-[5px] border border-border bg-surface-2 px-3 py-1.5 text-[12px] font-semibold text-text transition-colors hover:border-border-strong hover:bg-surface-inset"
                           >
                             Advance to {CAB_STATUS_LABEL[CAB_FLOW[idx + 1]]} <ArrowRight size={12} />
                           </button>
@@ -184,7 +184,7 @@ export default function LogisticsPage() {
                   })}
                 </AnimatePresence>
                 {col.length === 0 && (
-                  <div className="grid min-h-[72px] place-items-center rounded-[14px] border border-dashed border-border text-xs text-text-faint">—</div>
+                  <div className="grid min-h-[72px] place-items-center rounded-[6px] border border-dashed border-border text-xs text-text-faint">—</div>
                 )}
               </div>
             </motion.section>
@@ -197,10 +197,10 @@ export default function LogisticsPage() {
         <Car size={15} className="text-accent" />
         <Label>Cab inventory</Label>
         <div className="ml-auto flex items-center gap-2">
-          <button type="button" onClick={() => setAddDriverOpen(true)} className="flex h-8 items-center gap-1.5 rounded-[9px] border border-border bg-surface px-2.5 text-[12px] font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text">
+          <button type="button" onClick={() => setAddDriverOpen(true)} className="flex h-8 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-2.5 text-[12px] font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text">
             <UserPlus size={13} /> Add driver
           </button>
-          <button type="button" onClick={() => setAddCabOpen(true)} className="flex h-8 items-center gap-1.5 rounded-[9px] border border-border bg-surface px-2.5 text-[12px] font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text">
+          <button type="button" onClick={() => setAddCabOpen(true)} className="flex h-8 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-2.5 text-[12px] font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text">
             <Plus size={13} /> Add cab
           </button>
         </div>
@@ -215,9 +215,9 @@ export default function LogisticsPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: i * 0.03 }}
-              className="flex items-center gap-3 rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
+              className="flex items-center gap-3 rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]"
             >
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px]" style={{ background: `color-mix(in oklab, ${Meta.color} 16%, transparent)`, color: Meta.color }}>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[6px]" style={{ background: `color-mix(in oklab, ${Meta.color} 16%, transparent)`, color: Meta.color }}>
                 <Car size={20} strokeWidth={2.1} />
               </span>
               <div className="min-w-0 flex-1">
@@ -237,7 +237,7 @@ export default function LogisticsPage() {
                 <button
                   type="button"
                   onClick={() => { removeCab(cab.id); toast.success(`${cab.model} removed from the fleet`); }}
-                  className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-text-faint transition-colors hover:bg-negative-soft hover:text-negative"
+                  className="grid h-7 w-7 shrink-0 place-items-center rounded-[6px] text-text-faint transition-colors hover:bg-negative-soft hover:text-negative"
                   title="Remove cab"
                 >
                   <Trash2 size={13} />
@@ -290,43 +290,43 @@ function BookingModal({ cabs, onClose }: { cabs: Cab[]; onClose: () => void }) {
         role="dialog" aria-modal="true"
         initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={{ type: "spring", stiffness: 440, damping: 30 }}
-        className="relative w-full max-w-[440px] overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
+        className="relative w-full max-w-[440px] overflow-hidden rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-accent-soft text-accent"><Car size={19} /></span>
+            <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-accent-soft text-accent"><Car size={19} /></span>
             <div><h3 className="font-display text-lg font-bold leading-tight">Book a cab</h3><p className="text-sm text-text-muted">Assign a cab to a site visit.</p></div>
           </div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-[6px] text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
         </div>
 
         {candidates.length === 0 ? (
-          <p className="mt-5 rounded-[12px] border border-dashed border-border p-4 text-center text-sm text-text-muted">No site visits awaiting a cab right now.</p>
+          <p className="mt-5 rounded-[6px] border border-dashed border-border p-4 text-center text-sm text-text-muted">No site visits awaiting a cab right now.</p>
         ) : (
           <div className="mt-5 space-y-4">
             <Field label="Buyer · upcoming visit">
-              <select value={buyerId} onChange={(e) => setBuyerId(e.target.value)} className="h-10 w-full rounded-[10px] border border-border bg-surface-2 px-3 text-sm text-text">
+              <select value={buyerId} onChange={(e) => setBuyerId(e.target.value)} className="h-10 w-full rounded-[5px] border border-border bg-surface-2 px-3 text-sm text-text">
                 {candidates.map((b) => (<option key={b.id} value={b.id}>{b.name} · {b.localityPrefs[0]} · {clock(b.siteVisitDue ?? 0)}</option>))}
               </select>
             </Field>
             <Field label="Cab · available">
               {cabs.length === 0 ? (
-                <p className="rounded-[10px] border border-dashed border-border px-3 py-2.5 text-sm text-text-faint">No idle cabs — all on trips.</p>
+                <p className="rounded-[5px] border border-dashed border-border px-3 py-2.5 text-sm text-text-faint">No idle cabs — all on trips.</p>
               ) : (
-                <select value={cabId} onChange={(e) => setCabId(e.target.value)} className="h-10 w-full rounded-[10px] border border-border bg-surface-2 px-3 text-sm text-text">
+                <select value={cabId} onChange={(e) => setCabId(e.target.value)} className="h-10 w-full rounded-[5px] border border-border bg-surface-2 px-3 text-sm text-text">
                   {cabs.map((c) => (<option key={c.id} value={c.id}>{c.model} · {c.plate} · {c.seats} seats</option>))}
                 </select>
               )}
             </Field>
             <Field label="Pickup point">
-              <input value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder={buyer ? `Residence · ${buyer.localityPrefs[0]}` : "Pickup location"} className="h-10 w-full rounded-[10px] border border-border bg-surface-2 px-3 text-sm text-text placeholder:text-text-faint" />
+              <input value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder={buyer ? `Residence · ${buyer.localityPrefs[0]}` : "Pickup location"} className="h-10 w-full rounded-[5px] border border-border bg-surface-2 px-3 text-sm text-text placeholder:text-text-faint" />
             </Field>
           </div>
         )}
 
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onClose} className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
-          <button onClick={submit} disabled={!canBook || cabs.length === 0} className="h-10 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Assign cab</button>
+          <button onClick={onClose} className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
+          <button onClick={submit} disabled={!canBook || cabs.length === 0} className="h-10 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Assign cab</button>
         </div>
       </motion.div>
     </motion.div>
@@ -346,14 +346,14 @@ function ModalShell({ icon, title, subtitle, onClose, children }: { icon: React.
         role="dialog" aria-modal="true"
         initial={{ opacity: 0, scale: 0.96, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.97, y: 8 }}
         transition={{ type: "spring", stiffness: 440, damping: 30 }}
-        className="relative w-full max-w-[440px] overflow-hidden rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
+        className="relative w-full max-w-[440px] overflow-hidden rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-lift)]"
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-accent-soft text-accent">{icon}</span>
+            <span className="grid h-10 w-10 place-items-center rounded-[6px] bg-accent-soft text-accent">{icon}</span>
             <div><h3 className="font-display text-lg font-bold leading-tight">{title}</h3><p className="text-sm text-text-muted">{subtitle}</p></div>
           </div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
+          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-[6px] text-text-faint hover:bg-surface-2 hover:text-text"><X size={16} /></button>
         </div>
         {children}
       </motion.div>
@@ -361,7 +361,7 @@ function ModalShell({ icon, title, subtitle, onClose, children }: { icon: React.
   );
 }
 
-const FIELD_INPUT = "h-10 w-full rounded-[10px] border border-border bg-surface-2 px-3 text-sm text-text placeholder:text-text-faint";
+const FIELD_INPUT = "h-10 w-full rounded-[5px] border border-border bg-surface-2 px-3 text-sm text-text placeholder:text-text-faint";
 
 /* ---------------- Add driver ---------------- */
 function AddDriverModal({ onClose }: { onClose: () => void }) {
@@ -382,8 +382,8 @@ function AddDriverModal({ onClose }: { onClose: () => void }) {
         <Field label="Phone"><input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 90000 00000" className={FIELD_INPUT} /></Field>
       </div>
       <div className="mt-5 flex justify-end gap-2">
-        <button onClick={onClose} className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
-        <button onClick={submit} disabled={!valid} className="h-10 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Add driver</button>
+        <button onClick={onClose} className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
+        <button onClick={submit} disabled={!valid} className="h-10 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Add driver</button>
       </div>
     </ModalShell>
   );
@@ -406,7 +406,7 @@ function AddCabModal({ drivers, onClose }: { drivers: Driver[]; onClose: () => v
   return (
     <ModalShell icon={<Car size={19} />} title="Add cab" subtitle="Register a vehicle in the fleet." onClose={onClose}>
       {drivers.length === 0 ? (
-        <p className="mt-5 rounded-[12px] border border-dashed border-border p-4 text-center text-sm text-text-muted">Add a driver first, then assign them a cab.</p>
+        <p className="mt-5 rounded-[6px] border border-dashed border-border p-4 text-center text-sm text-text-muted">Add a driver first, then assign them a cab.</p>
       ) : (
         <div className="mt-5 space-y-4">
           <Field label="Model"><input autoFocus value={model} onChange={(e) => setModel(e.target.value)} placeholder="e.g. Toyota Innova" className={FIELD_INPUT} /></Field>
@@ -426,8 +426,8 @@ function AddCabModal({ drivers, onClose }: { drivers: Driver[]; onClose: () => v
         </div>
       )}
       <div className="mt-5 flex justify-end gap-2">
-        <button onClick={onClose} className="h-10 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
-        <button onClick={submit} disabled={!valid} className="h-10 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Add cab</button>
+        <button onClick={onClose} className="h-10 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">Cancel</button>
+        <button onClick={submit} disabled={!valid} className="h-10 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Add cab</button>
       </div>
     </ModalShell>
   );

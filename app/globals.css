@@ -9,55 +9,55 @@
    Ink = chrome · Paper = canvas · Green/Red = signal only
    ============================================================ */
 :root {
-  /* brand constants — official palette (navy primary · burnt-amber accent) */
-  --navy: #1f3f74;
-  --amber: #e2612d;
-  --coral: #ec8560;
-  --linen: #fae0d4;
-  --ink: #0a1a30;
-  --paper: #f7f8fa;
-  --green: #1e875b;
-  --red: #c0392b;
+  /* brand constants — The Vertical AI (Deep Navy · Signal Blue · Ignite Orange) */
+  --navy: #051234;
+  --amber: #0177ff;
+  --coral: #fe772c;
+  --linen: #e3f0ff;
+  --ink: #051234;
+  --paper: #f4f6f9;
+  --green: #0177ff;
+  --red: #e5484d;
 
-  /* ---- LIGHT THEME (cool cloud canvas, white record cards) ---- */
-  --bg: #f7f8fa;
+  /* ---- LIGHT THEME (cool grey canvas, white surfaces) ---- */
+  --bg: #f4f6f9;
   --bg-grad-a: #ffffff;
-  --bg-grad-b: #e8e9ec;
+  --bg-grad-b: #eaeef4;
   --surface: #ffffff;
-  --surface-2: #e8e9ec;
-  --surface-inset: #e8e9ec;
-  --border: #e8e9ec;
-  --border-strong: #c4c7ce;
+  --surface-2: #eef1f6;
+  --surface-inset: #eef1f6;
+  --border: #e2e7ee;
+  --border-strong: #cbd3de;
 
-  --text: #111317;
-  --text-muted: #535866;
-  --text-faint: #8c909a;
+  --text: #0b1524;
+  --text-muted: #586273;
+  --text-faint: #8a94a3;
 
-  --accent: #e2612d;
-  --accent-soft: #fae0d4;
+  --accent: #fe772c;
+  --accent-soft: #ffe9da;
   --accent-contrast: #ffffff;
-  --live: #b84d1e;
-  --live-soft: #f7e2d6;
-  --positive: #1e875b;
-  --positive-soft: #d6ecdf;
-  --negative: #c0392b;
-  --negative-soft: #f6ddd8;
+  --live: #fe772c;
+  --live-soft: #ffe9da;
+  --positive: #0177ff;
+  --positive-soft: #e2efff;
+  --negative: #e5484d;
+  --negative-soft: #fde0e1;
 
-  --ring: rgba(226, 97, 45, 0.4);
+  --ring: rgba(254, 119, 44, 0.4);
 
   /* chrome (nav/sidebar) — WHITE in light theme */
   --chrome: #ffffff;
-  --chrome-2: #e8e9ec;
-  --chrome-border: #c4c7ce;
-  --chrome-text: #111317;
-  --chrome-text-faint: #8c909a;
-  --chrome-accent: #e2612d;
-  --chrome-live: #e2612d;
+  --chrome-2: #eef1f6;
+  --chrome-border: #cbd3de;
+  --chrome-text: #0b1524;
+  --chrome-text-faint: #8a94a3;
+  --chrome-accent: #fe772c;
+  --chrome-live: #fe772c;
 
-  /* shapes */
-  --radius-card: 14px;
-  --radius-input: 10px;
-  --radius-pill: 999px;
+  /* shapes — strict 4–6px radius, no pills */
+  --radius-card: 6px;
+  --radius-input: 4px;
+  --radius-pill: 6px;
 
   /* shadows */
   --shadow-soft: 0 8px 24px -12px rgba(20, 23, 28, 0.18),
@@ -69,39 +69,39 @@
 }
 
 .dark {
-  /* ---- DARK THEME (deep-navy control room, amber glows) — demo default ---- */
-  --bg: #0a1a30;
-  --bg-grad-a: #122244;
-  --bg-grad-b: #0a1a30;
-  --surface: #122244;
-  --surface-2: #1f3f74;
-  --surface-inset: #0a1a30;
-  --border: rgba(139, 174, 221, 0.14);
-  --border-strong: rgba(139, 174, 221, 0.24);
+  /* ---- DARK THEME (Deep Navy anchor, Signal Blue) ---- */
+  --bg: #051234;
+  --bg-grad-a: #08183a;
+  --bg-grad-b: #051234;
+  --surface: #0a1c40;
+  --surface-2: #103060;
+  --surface-inset: #051234;
+  --border: rgba(120, 160, 230, 0.16);
+  --border-strong: rgba(120, 160, 230, 0.28);
 
-  --text: #f7f8fa;
-  --text-muted: #8baedd;
-  --text-faint: #8c909a;
+  --text: #f2f6fc;
+  --text-muted: #9fb4d6;
+  --text-faint: #6b7a93;
 
-  --accent: #e2612d;
-  --accent-soft: rgba(226, 97, 45, 0.16);
-  --accent-contrast: #5c2008;
-  --live: #ec8560;
-  --live-soft: rgba(236, 133, 96, 0.16);
-  --positive: #34c08a;
-  --positive-soft: rgba(52, 192, 138, 0.16);
-  --negative: #d9483b;
-  --negative-soft: rgba(217, 72, 59, 0.16);
+  --accent: #fe772c;
+  --accent-soft: rgba(254, 119, 44, 0.18);
+  --accent-contrast: #ffffff;
+  --live: #fe772c;
+  --live-soft: rgba(254, 119, 44, 0.18);
+  --positive: #2b8bff;
+  --positive-soft: rgba(1, 119, 255, 0.18);
+  --negative: #ff5a5f;
+  --negative-soft: rgba(229, 72, 77, 0.18);
 
-  --ring: rgba(226, 97, 45, 0.5);
+  --ring: rgba(254, 119, 44, 0.55);
 
-  --chrome: #122244;
-  --chrome-2: #122244;
-  --chrome-border: rgba(139, 174, 221, 0.16);
-  --chrome-text: #d1dff2;
-  --chrome-text-faint: #8baedd;
-  --chrome-accent: #e2612d;
-  --chrome-live: #ec8560;
+  --chrome: #051234;
+  --chrome-2: #0a1c40;
+  --chrome-border: rgba(120, 160, 230, 0.16);
+  --chrome-text: #d8e6fb;
+  --chrome-text-faint: #8aa0c5;
+  --chrome-accent: #fe772c;
+  --chrome-live: #fe772c;
 
   --shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.6),
     0 2px 6px -3px rgba(0, 0, 0, 0.45);
@@ -153,9 +153,9 @@
   --font-sans: var(--font-ubuntu), "Ubuntu", system-ui, sans-serif;
   --font-mono: var(--font-ubuntu-mono), "Ubuntu Mono", monospace;
 
-  --radius-input: 10px;
-  --radius-card: 14px;
-  --radius-pill: 999px;
+  --radius-input: 4px;
+  --radius-card: 6px;
+  --radius-pill: 6px;
 
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);
@@ -270,7 +270,7 @@ optgroup {
   color: var(--chrome-text);
 }
 .dark .chrome {
-  background: linear-gradient(180deg, #1f3f74 0%, #122244 48%, #0a1a30 100%);
+  background: linear-gradient(180deg, #0a1c40 0%, #071736 48%, #051234 100%);
 }
 
 /* score badge ring base */

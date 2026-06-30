@@ -172,7 +172,7 @@ export default function OnboardingPage() {
           className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-[12px] bg-accent-soft text-accent shadow-[var(--shadow-soft)] ring-1 ring-inset ring-[var(--border)]">
+            <span className="grid size-10 place-items-center rounded-[6px] bg-accent-soft text-accent shadow-[var(--shadow-soft)] ring-1 ring-inset ring-[var(--border)]">
               <Sparkles size={18} strokeWidth={2.2} />
             </span>
             <div className="leading-tight">
@@ -278,7 +278,7 @@ export default function OnboardingPage() {
               onClick={() => router.push("/worklist")}
               disabled={!anyConnected}
               className={cn(
-                "group inline-flex h-12 items-center gap-2 rounded-[14px] px-6 text-sm font-semibold transition-all",
+                "group inline-flex h-12 items-center gap-2 rounded-[6px] px-6 text-sm font-semibold transition-all",
                 anyConnected
                   ? "bg-accent text-accent-contrast shadow-[0_0_28px_-6px_var(--accent)] hover:scale-[1.02] active:scale-95"
                   : "cursor-not-allowed bg-surface-2 text-text-faint",
@@ -380,7 +380,7 @@ function LiveCounter({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ ...SOFT_SPRING, delay: 0.14 }}
-      className="glass mt-9 overflow-hidden rounded-[14px] border border-border shadow-[var(--shadow-soft)]"
+      className="glass mt-9 overflow-hidden rounded-[6px] border border-border shadow-[var(--shadow-soft)]"
     >
       <div className="flex flex-col gap-3 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
@@ -450,7 +450,7 @@ function SourceTile({
         show: { opacity: 1, y: 0, scale: 1, transition: SPRING },
       }}
       className={cn(
-        "relative flex flex-col gap-3 rounded-[14px] border bg-surface/70 p-4 backdrop-blur-sm transition-colors",
+        "relative flex flex-col gap-3 rounded-[6px] border bg-surface/70 p-4 backdrop-blur-sm transition-colors",
         connected
           ? "border-accent shadow-[0_0_24px_-12px_var(--accent)]"
           : "border-border",
@@ -458,7 +458,7 @@ function SourceTile({
     >
       <div className="flex items-start justify-between">
         <span
-          className="grid size-10 shrink-0 place-items-center rounded-[12px]"
+          className="grid size-10 shrink-0 place-items-center rounded-[6px]"
           style={{
             background: `color-mix(in oklab, ${def.tint} 16%, transparent)`,
             color: def.tint,
@@ -498,7 +498,7 @@ function SourceTile({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-[10px] border border-border-strong bg-surface-2 text-xs font-semibold text-text transition-colors hover:border-accent/60 hover:text-accent active:scale-[0.98]"
+              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-[5px] border border-border-strong bg-surface-2 text-xs font-semibold text-text transition-colors hover:border-accent/60 hover:text-accent active:scale-[0.98]"
             >
               Connect
             </motion.button>
@@ -510,7 +510,7 @@ function SourceTile({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-[10px] bg-surface-inset text-xs font-medium text-text-muted"
+              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-[5px] bg-surface-inset text-xs font-medium text-text-muted"
             >
               <Loader2 size={13} className="animate-spin" />
               Connecting…
@@ -524,7 +524,7 @@ function SourceTile({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={SPRING}
-              className="flex h-9 w-full items-center justify-center gap-2 rounded-[10px] bg-positive-soft text-xs font-semibold text-positive"
+              className="flex h-9 w-full items-center justify-center gap-2 rounded-[5px] bg-positive-soft text-xs font-semibold text-positive"
             >
               <StatusDot color="var(--positive)" pulse size={7} />
               Connected

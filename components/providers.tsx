@@ -22,7 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         toastOptions={{
           classNames: {
             toast:
-              "!bg-surface !text-text !border !border-border !rounded-[14px] !shadow-[var(--shadow-lift)] !font-sans",
+              "!bg-surface !text-text !border !border-border !rounded-[6px] !shadow-[var(--shadow-lift)] !font-sans",
             description: "!text-text-muted",
             title: "!font-semibold !text-text",
           },

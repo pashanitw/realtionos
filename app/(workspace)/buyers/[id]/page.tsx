@@ -172,7 +172,7 @@ function BuyerHeader({ buyer, unitLabel, project, progress }: { buyer: Buyer; un
       </div>
       <BackButton />
 
-      <div className="overflow-hidden rounded-[16px] border border-border bg-surface shadow-[var(--shadow-soft)]">
+      <div className="overflow-hidden rounded-[6px] border border-border bg-surface shadow-[var(--shadow-soft)]">
         <div className="h-1.5 w-full bg-surface-inset">
           <motion.div className="h-full" style={{ background: "linear-gradient(90deg, var(--accent), var(--live))" }} initial={{ width: 0 }} animate={{ width: `${Math.round(progress * 100)}%` }} transition={{ duration: 0.8, ease: [0.34, 1.4, 0.5, 1] }} />
         </div>
@@ -192,11 +192,11 @@ function BuyerHeader({ buyer, unitLabel, project, progress }: { buyer: Buyer; un
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={() => toast("Dialing via Vocalis…", { description: buyer.name })} className="flex h-10 items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+            <button onClick={() => toast("Dialing via Vocalis…", { description: buyer.name })} className="flex h-10 items-center gap-2 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
               <Phone size={15} /> Call via Vocalis
             </button>
-            <button onClick={() => toast("Opening WhatsApp…")} className="flex h-10 items-center gap-2 rounded-[10px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><MessageCircle size={15} className="text-positive" /> WhatsApp</button>
-            <button onClick={() => toast("Composing email…")} className="flex h-10 items-center gap-2 rounded-[10px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><Mail size={15} className="text-accent" /> Email</button>
+            <button onClick={() => toast("Opening WhatsApp…")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><MessageCircle size={15} className="text-positive" /> WhatsApp</button>
+            <button onClick={() => toast("Composing email…")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><Mail size={15} className="text-accent" /> Email</button>
           </div>
         </div>
       </div>
@@ -224,13 +224,13 @@ function MessageCard({ message, buyer, isLatestInbound }: { message: Message; bu
     <motion.div ref={ref} layout initial={message.isLive ? { opacity: 0, y: 14 } : { opacity: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 360, damping: 30 }} className="relative flex gap-3 pl-1">
       <div className="relative z-10 mt-1 shrink-0"><ChannelIcon channel={message.channel} size={15} withBg /></div>
 
-      <div className={cn("min-w-0 flex-1 rounded-[14px] border bg-surface p-4 transition-all duration-300", isTarget ? "border-accent shadow-[0_0_0_3px_var(--accent-soft)]" : "border-border", message.isLive && "ring-1 ring-live/40")}>
+      <div className={cn("min-w-0 flex-1 rounded-[6px] border bg-surface p-4 transition-all duration-300", isTarget ? "border-accent shadow-[0_0_0_3px_var(--accent-soft)]" : "border-border", message.isLive && "ring-1 ring-live/40")}>
         <div className="mb-2 flex items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold text-text">
               {message.direction === "outbound" ? `${buyer.agent.split(" ")[0]} ▸ ${buyer.name.split(" ")[0]}` : buyer.name}
             </span>
-            <span className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+            <span className="rounded-[4px] bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">
               {CHANNEL_LABEL[message.channel]} · {message.direction}
             </span>
             {message.durationSec ? <span className="font-mono text-[10px] text-text-faint">⏱ {Math.floor(message.durationSec / 60)}:{String(message.durationSec % 60).padStart(2, "0")}</span> : null}
@@ -240,7 +240,7 @@ function MessageCard({ message, buyer, isLatestInbound }: { message: Message; bu
         </div>
 
         {message.channel === "call" ? (
-          <button onClick={() => setOpen((o) => !o)} className="mb-2 flex w-full items-center gap-2.5 rounded-[10px] border border-border bg-surface-2 px-3 py-2 text-left">
+          <button onClick={() => setOpen((o) => !o)} className="mb-2 flex w-full items-center gap-2.5 rounded-[5px] border border-border bg-surface-2 px-3 py-2 text-left">
             <Headphones size={15} className="text-text-muted" />
             <span className="flex-1 text-sm text-text-muted">Call recording · speaker-diarised transcript</span>
             <ChevronDown size={15} className={cn("text-text-faint transition-transform", open && "rotate-180")} />
@@ -253,11 +253,11 @@ function MessageCard({ message, buyer, isLatestInbound }: { message: Message; bu
 
         <AnimatePresence>
           {message.transcript && open && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mb-2 space-y-1.5 overflow-hidden rounded-[10px] border border-border bg-surface-inset p-3">
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mb-2 space-y-1.5 overflow-hidden rounded-[5px] border border-border bg-surface-inset p-3">
               {message.transcript.map((line) => {
                 const lit = isTarget && active.quote === line.text;
                 return (
-                  <div key={line.id} className={cn("flex gap-2 rounded-md px-2 py-1 text-sm transition-colors", lit && "bg-accent-soft")}>
+                  <div key={line.id} className={cn("flex gap-2 rounded-[4px] px-2 py-1 text-sm transition-colors", lit && "bg-accent-soft")}>
                     <span className="w-9 shrink-0 font-mono text-[11px] text-text-faint">{line.t}</span>
                     <span className={cn("font-semibold", line.speaker === "agent" ? "text-text-faint" : "text-accent")}>{line.speaker === "agent" ? "Agent" : line.speaker === "ai" ? "AI" : "Buyer"}</span>
                     <span className={cn("flex-1", lit ? "text-text" : "text-text-muted")}>{line.text}</span>
@@ -273,7 +273,7 @@ function MessageCard({ message, buyer, isLatestInbound }: { message: Message; bu
 
         {/* auditor on calls */}
         {auditor && (
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[10px] bg-surface-inset px-3 py-2 text-xs">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[5px] bg-surface-inset px-3 py-2 text-xs">
             <span className="inline-flex items-center gap-1.5 font-semibold text-text"><Gauge size={13} className="text-accent" /> Auditor AI <span className="font-mono text-accent">{auditor.score}/100</span></span>
             <span className="text-text-muted">Strong objection handling · talk-ratio {auditor.talk}%</span>
             <span className="font-mono text-[10px] text-text-faint">visible to you + manager</span>
@@ -286,7 +286,7 @@ function MessageCard({ message, buyer, isLatestInbound }: { message: Message; bu
 
 function CaptureBox({ capture }: { capture: NonNullable<Capture> }) {
   return (
-    <div className="rounded-[12px] border border-accent/15 bg-accent-soft/40 p-3">
+    <div className="rounded-[6px] border border-accent/15 bg-accent-soft/40 p-3">
       <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-accent"><Sparkles size={13} /> AI summary</div>
       <dl className="space-y-1 text-sm">
         <Row k="Said" v={capture.said} />
@@ -296,7 +296,7 @@ function CaptureBox({ capture }: { capture: NonNullable<Capture> }) {
       {capture.chips.length > 0 && (
         <div className="mt-2.5 flex flex-wrap gap-1.5">
           {capture.chips.map((c, i) => (
-            <span key={i} className="inline-flex items-center gap-2 rounded-[8px] border border-border bg-surface px-2.5 py-1 text-xs">
+            <span key={i} className="inline-flex items-center gap-2 rounded-[5px] border border-border bg-surface px-2.5 py-1 text-xs">
               <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{c.label}</span>
               <span className="font-medium text-text">{c.value}</span>
               <ConfBar v={c.confidence} />
@@ -338,7 +338,7 @@ function LeadScore({ buyer, messages }: { buyer: Buyer; messages: Message[] }) {
   const srcLabel = (mid: string) => { const m = messages.find((x) => x.id === mid); return m ? `${CHANNEL_LABEL[m.channel]} · ${shortDate(m.timestamp)}` : "captured"; };
 
   return (
-    <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="flex items-center gap-4">
         <ScoreBadge score={buyer.score} size={64} />
         <div>
@@ -353,7 +353,7 @@ function LeadScore({ buyer, messages }: { buyer: Buyer; messages: Message[] }) {
       <div className="mt-3"><Sparkline points={buyer.scoreHistory.map((p) => p.score)} width={300} height={32} /></div>
       <div className="mt-3 space-y-2 border-t border-border pt-3">
         {buyer.scoreReasons.map((r) => (
-          <button key={r.id} onMouseEnter={() => set({ msgId: r.sourceMessageId, quote: r.sourceQuote })} onMouseLeave={() => set({ msgId: null, quote: null })} className="flex w-full items-start gap-2 rounded-[8px] px-1.5 py-1.5 text-left transition-colors hover:bg-surface-2">
+          <button key={r.id} onMouseEnter={() => set({ msgId: r.sourceMessageId, quote: r.sourceQuote })} onMouseLeave={() => set({ msgId: null, quote: null })} className="flex w-full items-start gap-2 rounded-[5px] px-1.5 py-1.5 text-left transition-colors hover:bg-surface-2">
             <TrendingUp size={13} className={cn("mt-0.5 shrink-0", r.polarity === "positive" ? "text-positive" : "rotate-180 text-negative")} />
             <span className="min-w-0 flex-1">
               <span className="block text-sm leading-snug text-text">{r.text}</span>
@@ -384,17 +384,17 @@ function DraftedAction({ buyer, unitLabel }: { buyer: Buyer; unitLabel: string }
     setDismissed(true);
   };
   return (
-    <div className="overflow-hidden rounded-[16px] border border-live/30 bg-live-soft/40 p-5">
+    <div className="overflow-hidden rounded-[6px] border border-live/30 bg-live-soft/40 p-5">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-live"><Sparkles size={14} /> AI drafted</span>
         <span className="inline-flex items-center gap-1 rounded-pill bg-surface px-2 py-0.5 font-mono text-[10px] text-text-muted"><ShieldCheck size={11} className="text-positive" /> Guardian-cleared · needs your nod</span>
       </div>
       <div className="text-sm font-semibold text-text">{a.cta}</div>
-      <p className="mt-2 rounded-[10px] border border-border bg-surface p-3 text-sm leading-relaxed text-text-muted">{a.body(buyer, unitLabel)}</p>
+      <p className="mt-2 rounded-[5px] border border-border bg-surface p-3 text-sm leading-relaxed text-text-muted">{a.body(buyer, unitLabel)}</p>
       <div className="mt-3 flex items-center gap-2">
-        <button onClick={send} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-[10px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"><Check size={15} /> Approve &amp; send</button>
-        <button onClick={() => toast("Editing draft…")} className="flex h-9 items-center gap-1.5 rounded-[10px] border border-border bg-surface px-3 text-sm font-medium text-text hover:bg-surface-2"><Pencil size={14} /> Edit</button>
-        <button onClick={() => setDismissed(true)} className="grid h-9 w-9 place-items-center rounded-[10px] border border-border text-text-faint hover:text-negative" aria-label="Dismiss"><X size={15} /></button>
+        <button onClick={send} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-[5px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95"><Check size={15} /> Approve &amp; send</button>
+        <button onClick={() => toast("Editing draft…")} className="flex h-9 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-3 text-sm font-medium text-text hover:bg-surface-2"><Pencil size={14} /> Edit</button>
+        <button onClick={() => setDismissed(true)} className="grid h-9 w-9 place-items-center rounded-[5px] border border-border text-text-faint hover:text-negative" aria-label="Dismiss"><X size={15} /></button>
       </div>
     </div>
   );
@@ -410,7 +410,7 @@ function AutoFilledFields({ buyer, unit }: { buyer: Buyer; unit?: ReturnType<typ
   const seen = new Set<string>();
   const rows = raw.filter((r) => (seen.has(r.label) ? false : (seen.add(r.label), true)));
   return (
-    <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="mb-3 flex items-center justify-between">
         <Label>Auto-filled fields</Label>
         <span className="inline-flex items-center gap-1 rounded-pill bg-positive-soft px-2 py-0.5 font-mono text-[10px] text-positive"><Sparkles size={10} /> no manual entry</span>
@@ -421,7 +421,7 @@ function AutoFilledFields({ buyer, unit }: { buyer: Buyer; unit?: ReturnType<typ
             <span className="w-24 shrink-0 text-xs text-text-faint">{r.label}</span>
             <span className="flex-1 truncate text-sm font-medium capitalize text-text">{r.value}</span>
             {r.manual ? (
-              <span className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-text-faint">manual</span>
+              <span className="rounded-[4px] bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-text-faint">manual</span>
             ) : (
               <ConfBar v={r.confidence} />
             )}
@@ -435,7 +435,7 @@ function AutoFilledFields({ buyer, unit }: { buyer: Buyer; unit?: ReturnType<typ
 function Milestones({ buyer, done, messages }: { buyer: Buyer; done: number; messages: Message[] }) {
   const firstWa = messages.find((m) => m.channel === "whatsapp");
   return (
-    <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="mb-2 flex items-center justify-between">
         <Label>Milestones · real estate pack</Label>
         <span className="font-mono text-xs font-semibold text-text">{done}/{MILESTONES.length}</span>
@@ -453,7 +453,7 @@ function Milestones({ buyer, done, messages }: { buyer: Buyer; done: number; mes
                   : state === "now" ? <CircleDot size={16} className="shrink-0 text-live" />
                   : <Circle size={16} className="shrink-0 text-text-faint/50" />}
                 <span className={cn("flex-1 text-sm", state === "todo" ? "text-text-faint" : "font-medium text-text")}>{m}</span>
-                {state === "done" && <span className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-text-faint">+auto</span>}
+                {state === "done" && <span className="rounded-[4px] bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-text-faint">+auto</span>}
                 {state === "now" && <span className="rounded-pill bg-live-soft px-2 py-0.5 font-mono text-[10px] font-semibold text-live">now</span>}
               </div>
               {m === "Loan Sanction" && state !== "done" && (
@@ -491,28 +491,28 @@ function Enrichment({ buyer }: { buyer: Buyer }) {
   const locality = buyer.localityPrefs[0] ?? "the area";
 
   return (
-    <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="mb-3 flex items-center justify-between">
         <Label>Enrichment · sourced</Label>
         <Pill variant="positive" mono><BadgeCheck size={11} /> verified</Pill>
       </div>
       <div className="space-y-2.5">
-        <a href="#" onClick={(e) => e.preventDefault()} className="group flex items-start gap-2.5 rounded-[10px] border border-border bg-surface-2 px-3 py-2 transition-colors hover:border-border-strong">
+        <a href="#" onClick={(e) => e.preventDefault()} className="group flex items-start gap-2.5 rounded-[5px] border border-border bg-surface-2 px-3 py-2 transition-colors hover:border-border-strong">
           <Link2 size={15} className="mt-0.5 shrink-0 text-accent" />
           <span className="min-w-0 flex-1">
             <span className="flex items-center gap-1 text-sm font-medium text-text">{title} · {company} <ExternalLink size={11} className="text-text-faint transition-colors group-hover:text-accent" /></span>
             <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">LinkedIn</span>
           </span>
         </a>
-        <div className="flex items-start gap-2.5 rounded-[10px] border border-border bg-surface-2 px-3 py-2">
+        <div className="flex items-start gap-2.5 rounded-[5px] border border-border bg-surface-2 px-3 py-2">
           <Building2 size={15} className="mt-0.5 shrink-0 text-text-muted" />
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-medium text-text">{industry} · {size}</span>
             <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Company · web</span>
           </span>
-          <span className="rounded-md bg-surface px-1.5 py-0.5 font-mono text-[10px] text-text-faint">source</span>
+          <span className="rounded-[4px] bg-surface px-1.5 py-0.5 font-mono text-[10px] text-text-faint">source</span>
         </div>
-        <div className="flex items-start gap-2.5 rounded-[10px] border border-border bg-surface-2 px-3 py-2">
+        <div className="flex items-start gap-2.5 rounded-[5px] border border-border bg-surface-2 px-3 py-2">
           <Newspaper size={15} className="mt-0.5 shrink-0 text-live" />
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-medium text-text">{news}</span>
@@ -520,7 +520,7 @@ function Enrichment({ buyer }: { buyer: Buyer }) {
           </span>
         </div>
       </div>
-      <div className="mt-3 flex items-start gap-2 rounded-[12px] border border-accent/15 bg-accent-soft/40 p-3">
+      <div className="mt-3 flex items-start gap-2 rounded-[6px] border border-accent/15 bg-accent-soft/40 p-3">
         <Sparkles size={14} className="mt-0.5 shrink-0 text-accent" />
         <p className="text-sm leading-relaxed text-text">
           {news.includes("Sales") ? "They just hired a Head of Sales" : "Their company just hit a growth milestone"} — a good moment to re-engage on the {buyer.config} in {locality}.
@@ -559,7 +559,7 @@ function LoanEligibility({ buyer }: { buyer: Buyer }) {
   const status = LOAN_STATUS_PILL[buyer.loanStatus];
 
   return (
-    <div className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
       <div className="mb-3 flex items-center justify-between gap-2">
         <Label>Loan eligibility</Label>
         <Pill variant={status.variant}><Landmark size={11} /> {status.label}</Pill>
@@ -570,7 +570,7 @@ function LoanEligibility({ buyer }: { buyer: Buyer }) {
         <LoanRow k="Loan needed · 80%" v={rupees(loanNeeded)} strong />
         <LoanRow k="Est. EMI / month" v={`${rupees(monthlyEmi)}`} hint="8.5% · 20 yr" />
       </div>
-      <div className="mt-3 rounded-[12px] border border-border bg-surface-2 p-3">
+      <div className="mt-3 rounded-[6px] border border-border bg-surface-2 p-3">
         <div className="mb-1.5 flex items-center justify-between gap-2">
           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-text"><Wallet size={14} className="text-accent" /> Eligible amount</span>
           <span className="tabular text-sm font-bold text-text">{rupees(eligible)}</span>
@@ -667,7 +667,7 @@ function SalesPlaybook({ buyer }: { buyer: Buyer }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-[16px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
+      className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]"
     >
       <div className="mb-3 flex items-center justify-between gap-2">
         <Label>Playbook · what wins deals like this</Label>
@@ -675,7 +675,7 @@ function SalesPlaybook({ buyer }: { buyer: Buyer }) {
       </div>
 
       {/* recommended playbook */}
-      <div className="flex items-start gap-2.5 rounded-[12px] border border-accent/15 bg-accent-soft/40 p-3">
+      <div className="flex items-start gap-2.5 rounded-[6px] border border-accent/15 bg-accent-soft/40 p-3">
         <Lightbulb size={16} className="mt-0.5 shrink-0 text-accent" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 text-sm font-bold text-text">

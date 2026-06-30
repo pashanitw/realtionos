@@ -96,7 +96,7 @@ export default function ApprovalsPage() {
 
       {/* tabs + approve all */}
       <div className="mb-4 mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex h-9 w-full items-center rounded-[10px] border border-border bg-surface sm:w-auto">
+        <div className="relative flex h-9 w-full items-center rounded-[5px] border border-border bg-surface sm:w-auto">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as ReviewKind | "all")}
@@ -112,7 +112,7 @@ export default function ApprovalsPage() {
         <button
           onClick={approveAllSafe}
           disabled={safeCount === 0}
-          className="flex h-9 shrink-0 items-center gap-1.5 rounded-[10px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:border-border-strong disabled:opacity-40"
+          className="flex h-9 shrink-0 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:border-border-strong disabled:opacity-40"
         >
           <Zap size={14} className="text-accent" /> Approve all safe
           {safeCount > 0 && <span className="font-mono text-xs text-text-faint">({safeCount})</span>}
@@ -147,13 +147,13 @@ function SpeakBanner({ count }: { count: number }) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[16px] border border-chrome-border p-5 text-white shadow-[var(--shadow-lift)]"
-      style={{ background: "linear-gradient(125deg, #1f3f74 0%, #122244 55%, #0a1a30 100%)" }}
+      className="relative overflow-hidden rounded-[6px] border border-chrome-border p-5 text-white shadow-[var(--shadow-lift)]"
+      style={{ background: "linear-gradient(125deg, #0a2152 0%, #071636 55%, #051234 100%)" }}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ background: "radial-gradient(520px 220px at 90% -20%, color-mix(in oklab, var(--live) 28%, transparent), transparent 70%)" }} />
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[rgba(255,255,255,0.1)] text-[#ec8560]"><Mic size={18} /></span>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[6px] bg-[rgba(255,255,255,0.1)] text-[#fe772c]"><Mic size={18} /></span>
           <div>
             <h2 className="font-display text-lg font-bold">Clear the queue by speaking</h2>
             <p className="mt-1 max-w-xl text-sm leading-relaxed text-white/75">
@@ -162,7 +162,7 @@ function SpeakBanner({ count }: { count: number }) {
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
-          <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-3 py-1 font-mono text-[12px] font-semibold text-[#f3af96]">
+          <span className="rounded-pill bg-[rgba(255,255,255,0.12)] px-3 py-1 font-mono text-[12px] font-semibold text-[#ffc7a3]">
             {count} awaiting your nod
           </span>
           <span className="font-mono text-[11px] text-white/55">
@@ -184,10 +184,10 @@ function ApprovalCard({ item, onApprove, onDismiss }: { item: ReviewItem; onAppr
   const isDup = item.kind === "duplicate";
 
   return (
-    <div className={cn("rounded-[14px] border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5", isDup ? "border-live/50" : "border-border")}>
+    <div className={cn("rounded-[6px] border bg-surface p-4 shadow-[var(--shadow-soft)] sm:p-5", isDup ? "border-live/50" : "border-border")}>
       {/* head */}
       <div className="flex items-center gap-2.5">
-        {item.channel ? <ChannelIcon channel={item.channel} size={14} withBg /> : <span className="grid h-7 w-7 place-items-center rounded-lg bg-accent-soft text-accent"><Sparkles size={14} /></span>}
+        {item.channel ? <ChannelIcon channel={item.channel} size={14} withBg /> : <span className="grid h-7 w-7 place-items-center rounded-[6px] bg-accent-soft text-accent"><Sparkles size={14} /></span>}
         <Pill variant={meta.variant}>{meta.label}</Pill>
         <span className="truncate font-mono text-[11px] text-text-faint">{item.leadId} · {item.buyerName}</span>
       </div>
@@ -201,7 +201,7 @@ function ApprovalCard({ item, onApprove, onDismiss }: { item: ReviewItem; onAppr
       </p>
 
       {/* body */}
-      <div className="mt-3 rounded-[10px] border border-border bg-surface-inset px-3.5 py-2.5 text-sm leading-relaxed text-text-muted">
+      <div className="mt-3 rounded-[5px] border border-border bg-surface-inset px-3.5 py-2.5 text-sm leading-relaxed text-text-muted">
         {item.body}
       </div>
 
@@ -224,7 +224,7 @@ function ApprovalCard({ item, onApprove, onDismiss }: { item: ReviewItem; onAppr
           <span className="w-20"><Meter value={item.confidence} color={cColor} height={5} /></span>
           <span className="font-mono font-semibold tabular" style={{ color: cColor }}>{item.confidence}%</span>
         </span>
-        <span className="w-full rounded-md bg-surface-2 px-2 py-1 text-center font-mono text-[10px] text-text-muted sm:w-auto">{item.autonomyLabel}</span>
+        <span className="w-full rounded-[4px] bg-surface-2 px-2 py-1 text-center font-mono text-[10px] text-text-muted sm:w-auto">{item.autonomyLabel}</span>
       </div>
 
       {/* actions */}
@@ -232,18 +232,18 @@ function ApprovalCard({ item, onApprove, onDismiss }: { item: ReviewItem; onAppr
         <button
           onClick={onApprove}
           className={cn(
-            "flex h-10 items-center justify-center gap-1.5 rounded-[10px] px-5 text-sm font-semibold shadow-[0_0_22px_-8px_var(--accent)] transition-transform hover:scale-[1.015] active:scale-95",
+            "flex h-10 items-center justify-center gap-1.5 rounded-[5px] px-5 text-sm font-semibold shadow-[0_0_22px_-8px_var(--accent)] transition-transform hover:scale-[1.015] active:scale-95",
             isDup ? "bg-live text-[#2a0e03]" : "bg-accent text-accent-contrast",
           )}
         >
           {isDup ? <GitMerge size={15} strokeWidth={2.4} /> : <Check size={15} strokeWidth={2.4} />} {item.cta}
         </button>
         {!isDup && (
-          <button onClick={() => toast("Opening the draft to edit…", { description: item.title })} className="flex h-10 items-center gap-1.5 rounded-[10px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">
+          <button onClick={() => toast("Opening the draft to edit…", { description: item.title })} className="flex h-10 items-center gap-1.5 rounded-[5px] border border-border px-4 text-sm font-medium text-text transition-colors hover:bg-surface-2">
             <Pencil size={14} /> Edit first
           </button>
         )}
-        <button onClick={onDismiss} className="ml-auto flex h-10 items-center gap-1.5 rounded-[10px] px-3 text-sm font-medium text-text-faint transition-colors hover:text-negative">
+        <button onClick={onDismiss} className="ml-auto flex h-10 items-center gap-1.5 rounded-[5px] px-3 text-sm font-medium text-text-faint transition-colors hover:text-negative">
           {isDup ? "Not a match" : "Dismiss"}
         </button>
       </div>
@@ -253,7 +253,7 @@ function ApprovalCard({ item, onApprove, onDismiss }: { item: ReviewItem; onAppr
 
 function MergeRecord({ source, label }: { source: ReviewItem["source"]; label: string }) {
   return (
-    <div className="flex-1 rounded-[10px] border border-border bg-surface-2 px-3.5 py-2.5">
+    <div className="flex-1 rounded-[5px] border border-border bg-surface-2 px-3.5 py-2.5">
       <p className="font-mono text-[11px] uppercase tracking-wide text-live">{SOURCE_LABEL[source]}</p>
       <p className="mt-0.5 text-sm leading-snug text-text">{label}</p>
     </div>
@@ -266,7 +266,7 @@ function EmptyState({ all }: { all: boolean }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center gap-4 rounded-[14px] border border-border bg-surface px-6 py-16 text-center shadow-[var(--shadow-soft)]"
+      className="flex flex-col items-center gap-4 rounded-[6px] border border-border bg-surface px-6 py-16 text-center shadow-[var(--shadow-soft)]"
     >
       <span className="grid size-16 place-items-center rounded-full bg-positive-soft text-positive"><ShieldCheck size={32} strokeWidth={2} /></span>
       <div>

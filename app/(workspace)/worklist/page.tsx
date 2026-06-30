@@ -87,7 +87,7 @@ export default function WorklistPage() {
         actions={
           <button
             onClick={() => conductBuyerReply()}
-            className="flex h-10 items-center gap-2 rounded-[10px] bg-accent px-4 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-6px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95"
+            className="flex h-10 items-center gap-2 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-6px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95"
           >
             <Zap size={16} /> Simulate a buyer reply
           </button>
@@ -108,7 +108,7 @@ export default function WorklistPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex h-9 items-center gap-2 rounded-[10px] border border-border bg-surface px-3">
+          <div className="flex h-9 items-center gap-2 rounded-[5px] border border-border bg-surface px-3">
             <Search size={14} className="text-text-faint" />
             <input
               value={query}
@@ -121,7 +121,7 @@ export default function WorklistPage() {
             <select
               value={agentFilter}
               onChange={(e) => setAgentFilter(e.target.value)}
-              className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+              className="h-9 rounded-[5px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
               title="Assigned agent"
             >
               <option value="all">All agents</option>
@@ -131,7 +131,7 @@ export default function WorklistPage() {
           <select
             value={source}
             onChange={(e) => setSource(e.target.value as Source | "all")}
-            className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+            className="h-9 rounded-[5px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
             title="Lead source"
           >
             <option value="all">All sources</option>
@@ -140,7 +140,7 @@ export default function WorklistPage() {
           <select
             value={dateMode === "custom" ? "custom" : dateMode}
             onChange={(e) => { const v = e.target.value as DateMode; setDateMode(v); if (v !== "custom") { setCustomFrom(""); setCustomTo(""); } }}
-            className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+            className="h-9 rounded-[5px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
             title="Follow-up date"
           >
             {(Object.keys(DATE_LABEL) as (keyof typeof DATE_LABEL)[]).map((k) => (
@@ -149,7 +149,7 @@ export default function WorklistPage() {
             <option value="custom">Custom range…</option>
           </select>
           {dateMode === "custom" && (
-            <div className="flex h-9 items-center gap-1.5 rounded-[10px] border border-border bg-surface px-2.5">
+            <div className="flex h-9 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-2.5">
               <input
                 type="date" value={customFrom} max={customTo || undefined}
                 onChange={(e) => setCustomFrom(e.target.value)}
@@ -166,7 +166,7 @@ export default function WorklistPage() {
           <select
             value={config}
             onChange={(e) => setConfig(e.target.value as Config | "all")}
-            className="h-9 rounded-[10px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
+            className="h-9 rounded-[5px] border border-border bg-surface px-2.5 text-sm text-text outline-none"
           >
             <option value="all">All configs</option>
             {CONFIGS.map((c) => (<option key={c} value={c}>{c}</option>))}
@@ -174,7 +174,7 @@ export default function WorklistPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-[14px] border border-border bg-surface shadow-[var(--shadow-soft)]">
+      <div className="overflow-hidden rounded-[6px] border border-border bg-surface shadow-[var(--shadow-soft)]">
         <div className="hidden items-center gap-4 border-b border-border px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.12em] text-text-faint md:flex">
           <span className="w-7 text-center">#</span>
           <span className="w-12">Score</span>

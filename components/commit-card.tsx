@@ -74,7 +74,7 @@ export function CommitCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "relative overflow-hidden rounded-[14px] border bg-surface p-4 transition-colors",
+        "relative overflow-hidden rounded-[6px] border bg-surface p-4 transition-colors",
         phase === "verified" ? "border-positive/40" : "border-border",
       )}
     >
@@ -99,7 +99,7 @@ export function CommitCard({
               className="flex items-center gap-2 text-sm"
             >
               <span className="font-mono text-[11px] uppercase tracking-wide text-text-faint">{f.label}</span>
-              <span className="rounded-md bg-accent-soft px-2 py-0.5 font-medium text-accent">{f.value}</span>
+              <span className="rounded-[4px] bg-accent-soft px-2 py-0.5 font-medium text-accent">{f.value}</span>
             </motion.div>
           ))}
         </div>

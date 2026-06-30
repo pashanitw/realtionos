@@ -58,13 +58,13 @@ export default function ClientsPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: i * 0.06 }}
-            className="overflow-hidden rounded-[16px] border border-border bg-surface shadow-[var(--shadow-soft)]"
+            className="overflow-hidden rounded-[6px] border border-border bg-surface shadow-[var(--shadow-soft)]"
           >
             <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, hsl(${c.hue} 60% 45%), hsl(${(c.hue + 40) % 360} 55% 40%))` }} />
             <div className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-[12px] text-white" style={{ background: `linear-gradient(140deg, hsl(${c.hue} 55% 44%), hsl(${(c.hue + 40) % 360} 60% 34%))` }}><Building size={20} /></span>
+                  <span className="grid h-11 w-11 place-items-center rounded-[6px] text-white" style={{ background: `linear-gradient(140deg, hsl(${c.hue} 55% 44%), hsl(${(c.hue + 40) % 360} 60% 34%))` }}><Building size={20} /></span>
                   <div>
                     <h2 className="font-display text-lg font-bold leading-none">{c.name}</h2>
                     <p className="mt-1 text-xs text-text-muted">{c.city} · {agents.length} agents</p>
@@ -92,7 +92,7 @@ export default function ClientsPage() {
                   {manager && <Avatar name={manager.name} hue={manager.hue} size={22} />}
                   <span>{manager?.name} · <span className="text-text-faint">Manager</span></span>
                 </div>
-                <button onClick={() => enter(c.id, c.name)} className="group inline-flex h-9 items-center gap-1.5 rounded-[10px] bg-accent px-3.5 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95">
+                <button onClick={() => enter(c.id, c.name)} className="group inline-flex h-9 items-center gap-1.5 rounded-[5px] bg-accent px-3.5 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95">
                   Enter client <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
                 </button>
               </div>
@@ -106,7 +106,7 @@ export default function ClientsPage() {
 
 function Kpi({ label, value, valueText, sub }: { label: string; value?: number; valueText?: string; sub: string }) {
   return (
-    <div className="rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+    <div className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
       <Label>{label}</Label>
       <div className="mt-2 font-display text-2xl font-bold leading-none text-text md:text-[28px]">{valueText ?? <AnimatedNumber value={value ?? 0} />}</div>
       <p className="mt-1.5 text-xs text-text-faint">{sub}</p>
@@ -116,7 +116,7 @@ function Kpi({ label, value, valueText, sub }: { label: string; value?: number; 
 
 function Stat({ label, value, valueText }: { label: string; value?: number; valueText?: string }) {
   return (
-    <div className="rounded-[10px] bg-surface-2 px-3 py-2.5">
+    <div className="rounded-[5px] bg-surface-2 px-3 py-2.5">
       <div className="font-display text-lg font-bold leading-none text-text tabular">{valueText ?? <AnimatedNumber value={value ?? 0} />}</div>
       <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">{label}</div>
     </div>

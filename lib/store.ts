@@ -31,6 +31,8 @@ import {
   type Channel,
   type Config,
   type Source,
+  CONFIGS,
+  type Availability,
 } from "./data/types";
 import { seedWorkflows, workflowMessage } from "./workflows";
 
@@ -103,6 +105,9 @@ interface StoreState {
   addCab: (input: { model: string; plate: string; seats: number; driverId: string }) => string;
   removeCab: (id: string) => void;
 
+  /** Bulk-import units (manager Excel upload). Resolves/creates projects by name. */
+  addUnits: (rows: ImportUnitRow[]) => { added: number; projectsCreated: number };
+
   createWorkflow: (name: string, nodes: WorkflowNode[]) => string;
   toggleWorkflow: (id: string) => void;
   runWorkflow: (id: string) => void;
@@ -129,6 +134,30 @@ function writeClientId(s: StoreState): string {
   const u = s.users.find((x) => x.id === s.currentUserId);
   return u?.clientId ?? s.activeClientId;
 }
+
+/** A row parsed from an uploaded properties Excel/CSV. */
+export type ImportUnitRow = {
+  project?: string; tower?: string; unitNo?: string | number; config?: string;
+  carpetAreaSqft?: string | number; priceInr?: string | number; floor?: string | number;
+  facing?: string; availability?: string; locality?: string; builder?: string;
+};
+
+const toNum = (v: unknown): number => {
+  if (typeof v === "number") return v;
+  const n = parseFloat(String(v ?? "").replace(/[^0-9.]/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+const normConfig = (v: unknown): Config | null => {
+  const s = String(v ?? "").toUpperCase().replace(/\s+/g, "");
+  return CONFIGS.find((c) => c.toUpperCase().replace(/\s+/g, "") === s) ?? null;
+};
+const normAvail = (v: unknown): Availability => {
+  const s = String(v ?? "").toLowerCase().trim();
+  if (s.startsWith("block")) return "blocked";
+  if (s.startsWith("book")) return "booked";
+  if (s.startsWith("sold")) return "sold";
+  return "available";
+};
 
 export const useStore = create<StoreState>((set, get) => ({
   clients: seed.clients,
@@ -414,6 +443,51 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   removeCab: (id) => set((s) => ({ cabs: s.cabs.filter((c) => c.id !== id) })),
+
+  addUnits: (rows) => {
+    let added = 0, projectsCreated = 0;
+    set((s) => {
+      const cid = writeClientId(s);
+      const projects = [...s.projects];
+      const units = [...s.units];
+      let pSeq = projects.length, uSeq = units.length;
+      const findProj = (name: string) =>
+        projects.find((p) => p.clientId === cid && p.name.toLowerCase().trim() === name.toLowerCase().trim());
+      for (const r of rows) {
+        const config = normConfig(r.config);
+        if (!config) continue; // skip rows without a valid config
+        const pname = String(r.project ?? "").trim();
+        let proj = pname ? findProj(pname) : undefined;
+        if (!proj && pname) {
+          proj = {
+            id: `${cid}-pimp${++pSeq}`, clientId: cid, name: pname,
+            builder: String(r.builder ?? "").trim() || "Imported",
+            reraNo: "—", locality: String(r.locality ?? "").trim() || "—",
+            status: "under-construction", possessionDate: "—", amenities: [], towers: 1,
+          };
+          projects.push(proj);
+          projectsCreated += 1;
+        }
+        if (!proj) proj = projects.find((p) => p.clientId === cid) ?? projects[0];
+        if (!proj) continue;
+        units.push({
+          id: `${cid}-uimp${++uSeq}`, clientId: cid, projectId: proj.id,
+          tower: String(r.tower ?? "").trim() || "Tower A",
+          unitNo: String(r.unitNo ?? uSeq),
+          config,
+          carpetAreaSqft: Math.round(toNum(r.carpetAreaSqft)) || 1000,
+          priceInr: Math.round(toNum(r.priceInr)),
+          floor: Math.round(toNum(r.floor)) || 1,
+          facing: String(r.facing ?? "").trim() || "East",
+          availability: normAvail(r.availability),
+        });
+        added += 1;
+      }
+      return { units, projects };
+    });
+    if (added) get().pushActivity({ kind: "lead", text: `Imported ${added} unit${added === 1 ? "" : "s"} from Excel`, meta: projectsCreated ? `${projectsCreated} new project${projectsCreated === 1 ? "" : "s"}` : undefined });
+    return { added, projectsCreated };
+  },
 
   createWorkflow: (name, nodes) => {
     const wf: Workflow = { id: uid("wf"), clientId: writeClientId(get()), name, nodes, active: true, runs: 0, lastRun: Date.now() };

@@ -22,7 +22,7 @@ const CH_COLOR: Record<Channel, string> = {
   whatsapp: "var(--positive)",
   call: "var(--live)",
   email: "var(--accent)",
-  web: "#4a78c4",
+  web: "#3b8bff",
   sms: "var(--text-faint)",
 };
 
@@ -53,35 +53,35 @@ function HeroBand({ hero, bookingTrend, clientName }: { hero: { pipelineValue: n
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: EASE_OUT }}
-      className="overflow-hidden rounded-[20px] border border-[#2e5599] bg-[linear-gradient(135deg,#1f3f74_0%,#122244_52%,#0a1a30_100%)] text-white shadow-[var(--shadow-lift)]"
+      className="overflow-hidden rounded-[5px] border border-[#1466e0] bg-[linear-gradient(135deg,#0a2152_0%,#071636_52%,#051234_100%)] text-white shadow-[var(--shadow-lift)]"
     >
       <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1.7fr_1fr] lg:items-center">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#8baedd]">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93b4e6]">
             <span className="relative inline-flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent)] opacity-60" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--accent)]" /></span>
             Live · {clientName}
           </div>
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
             {kpis.map((k) => (
               <div key={k.label} className="min-w-0">
-                <k.Icon size={15} className={k.accent ? "text-[#ec8560]" : "text-[#8baedd]"} />
-                <div className={cn("tabular mt-2 font-display text-[26px] font-bold leading-none", k.accent ? "text-[#ec8560]" : "text-white")}>
+                <k.Icon size={15} className={k.accent ? "text-[#fe772c]" : "text-[#93b4e6]"} />
+                <div className={cn("tabular mt-2 font-display text-[26px] font-bold leading-none", k.accent ? "text-[#fe772c]" : "text-white")}>
                   {typeof k.value === "number" ? <AnimatedNumber value={k.value} /> : k.value}
                 </div>
-                <div className="mt-1.5 font-mono text-[10px] uppercase tracking-wide text-[#8baedd]">{k.label}</div>
-                <div className="text-[11px] text-[#8baedd]">{k.hint}</div>
+                <div className="mt-1.5 font-mono text-[10px] uppercase tracking-wide text-[#93b4e6]">{k.label}</div>
+                <div className="text-[11px] text-[#93b4e6]">{k.hint}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="rounded-[14px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] p-4">
+        <div className="rounded-[6px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] p-4">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-wide text-[#8baedd]">Bookings · last {bookingTrend.length} wks</span>
+            <span className="font-mono text-[10px] uppercase tracking-wide text-[#93b4e6]">Bookings · last {bookingTrend.length} wks</span>
             <span className="font-display text-lg font-bold text-white">{bookingTrend[bookingTrend.length - 1]?.bookings ?? 0}</span>
           </div>
           <AreaSpark points={bookingTrend.map((t) => t.bookings)} />
-          <div className="mt-1.5 flex justify-between font-mono text-[9px] text-[#8baedd]">
+          <div className="mt-1.5 flex justify-between font-mono text-[9px] text-[#93b4e6]">
             {bookingTrend.map((t) => (<span key={t.week}>{t.week}</span>))}
           </div>
         </div>
@@ -199,7 +199,7 @@ function Card({ children, className, delay = 0 }: { children: React.ReactNode; c
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: EASE_OUT, delay }}
-      className={cn("rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] md:p-5", className)}
+      className={cn("rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] md:p-5", className)}
     >
       {children}
     </motion.section>
@@ -261,8 +261,8 @@ function RiskOppRadar({ deals, buyers }: { deals: Deal[]; buyers: Buyer[] }) {
           <div className="mb-2.5 flex items-center gap-1.5"><TriangleAlert size={13} className="text-negative" /><span className="font-mono text-[11px] uppercase tracking-wide text-negative">At risk of slipping</span></div>
           <div className="space-y-2">
             {atRisk.map(({ deal, reason, icon: Icon }) => (
-              <Link key={deal.id} href={`/buyers/${deal.buyerId}`} className="flex items-center gap-2.5 rounded-[10px] border border-border bg-surface-2 px-3 py-2 transition-colors hover:border-border-strong">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-negative-soft text-negative"><Icon size={14} /></span>
+              <Link key={deal.id} href={`/buyers/${deal.buyerId}`} className="flex items-center gap-2.5 rounded-[5px] border border-border bg-surface-2 px-3 py-2 transition-colors hover:border-border-strong">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[6px] bg-negative-soft text-negative"><Icon size={14} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-text">{deal.name}</span>
                   <span className="block truncate text-[11px] text-text-muted">{reason}</span>
@@ -277,8 +277,8 @@ function RiskOppRadar({ deals, buyers }: { deals: Deal[]; buyers: Buyer[] }) {
           <div className="mb-2.5 flex items-center gap-1.5"><Lightbulb size={13} className="text-positive" /><span className="font-mono text-[11px] uppercase tracking-wide text-positive">Opportunities to chase</span></div>
           <div className="space-y-2">
             {opps.map(({ buyer, text, tag, icon: Icon }) => (
-              <Link key={buyer.id} href={`/buyers/${buyer.id}`} className="flex items-center gap-2.5 rounded-[10px] border border-border bg-surface-2 px-3 py-2 transition-colors hover:border-border-strong">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-positive-soft text-positive"><Icon size={14} /></span>
+              <Link key={buyer.id} href={`/buyers/${buyer.id}`} className="flex items-center gap-2.5 rounded-[5px] border border-border bg-surface-2 px-3 py-2 transition-colors hover:border-border-strong">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[6px] bg-positive-soft text-positive"><Icon size={14} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-medium text-text">{text}</span>
                   <span className="block truncate text-[11px] text-text-muted">{buyer.name} · {buyer.config} · {buyer.localityPrefs[0]}</span>
@@ -359,7 +359,7 @@ function NLQueryBox({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: EASE_OUT }}
-      className="rounded-[14px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] md:p-5"
+      className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)] md:p-5"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -371,11 +371,11 @@ function NLQueryBox({
       <p className="mt-1.5 text-sm leading-snug text-text-muted">Ask a question in plain English and get a chart back — e.g. “bookings by locality this month” or “best source by conversion.”</p>
 
       <form onSubmit={(e) => { e.preventDefault(); run(); }} className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="flex h-11 flex-1 items-center gap-2 rounded-[10px] border border-border bg-surface-inset px-3 transition-colors focus-within:border-border-strong">
+        <div className="flex h-11 flex-1 items-center gap-2 rounded-[5px] border border-border bg-surface-inset px-3 transition-colors focus-within:border-border-strong">
           <Sparkles size={14} className="shrink-0 text-accent" />
           <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Ask anything about your pipeline…" className="w-full bg-transparent text-sm text-text outline-none placeholder:text-text-faint" />
         </div>
-        <button type="submit" className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-[10px] bg-accent px-5 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+        <button type="submit" className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-[5px] bg-accent px-5 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-8px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
           <Send size={15} /> Ask
         </button>
       </form>
@@ -391,12 +391,12 @@ function NLQueryBox({
       <AnimatePresence mode="wait">
         {phase === "loading" && (
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="mt-4 space-y-2.5">
-            <div className="shimmer h-3 w-1/3 rounded-md" />
-            {[0.9, 0.6, 0.4, 0.25].map((w, i) => (<div key={i} className="shimmer h-7 rounded-md" style={{ width: `${w * 100}%` }} />))}
+            <div className="shimmer h-3 w-1/3 rounded-[4px]" />
+            {[0.9, 0.6, 0.4, 0.25].map((w, i) => (<div key={i} className="shimmer h-7 rounded-[4px]" style={{ width: `${w * 100}%` }} />))}
           </motion.div>
         )}
         {phase === "done" && result && (
-          <motion.div key="done" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: EASE_OUT }} className="mt-5 rounded-[12px] border border-border bg-surface-inset/50 p-4">
+          <motion.div key="done" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease: EASE_OUT }} className="mt-5 rounded-[6px] border border-border bg-surface-inset/50 p-4">
             <div className="mb-3 flex items-baseline gap-2">
               <span className="font-display text-3xl font-bold leading-none text-text tabular">
                 {result.title.match(/^\d+/) ? <AnimatedNumber value={parseInt(result.title)} /> : null}
@@ -420,8 +420,8 @@ function HBars({ bars, pctMode }: { bars: { label: string; value: number }[]; pc
       {bars.map((b, i) => (
         <div key={b.label} className="flex items-center gap-3">
           <span className="w-24 shrink-0 truncate text-sm text-text-muted">{b.label}</span>
-          <div className="h-6 flex-1 overflow-hidden rounded-md bg-surface-2">
-            <motion.div className="h-full rounded-md" style={{ background: "var(--accent)" }} initial={{ width: 0 }} animate={{ width: `${(b.value / max) * 100}%` }} transition={{ duration: 0.55, ease: EASE, delay: 0.05 * i }} />
+          <div className="h-6 flex-1 overflow-hidden rounded-[4px] bg-surface-2">
+            <motion.div className="h-full rounded-[4px]" style={{ background: "var(--accent)" }} initial={{ width: 0 }} animate={{ width: `${(b.value / max) * 100}%` }} transition={{ duration: 0.55, ease: EASE, delay: 0.05 * i }} />
           </div>
           <span className="w-10 shrink-0 text-right font-mono text-sm font-semibold text-text tabular">{b.value}{pctMode ? "%" : ""}</span>
         </div>
@@ -457,9 +457,9 @@ function FunnelCard({ funnel }: { funnel: { stage: string; count: number }[] }) 
             <div key={f.stage}>
               <div className="flex items-center gap-3">
                 <span className="w-20 shrink-0 text-sm font-medium text-text">{f.stage}</span>
-                <div className="h-8 flex-1 overflow-hidden rounded-[8px] bg-surface-inset">
+                <div className="h-8 flex-1 overflow-hidden rounded-[5px] bg-surface-inset">
                   <motion.div
-                    className="flex h-full items-center rounded-[8px] px-2.5 font-mono text-xs font-bold text-accent-contrast tabular"
+                    className="flex h-full items-center rounded-[5px] px-2.5 font-mono text-xs font-bold text-accent-contrast tabular"
                     style={{ background: funnelColor(t) }}
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.max(8, (f.count / max) * 100)}%` }}
@@ -594,7 +594,7 @@ function AutomationHealthCard({ health }: { health: { capturePrecision: number; 
       <CardHead icon={<ShieldCheck size={15} className="text-positive" />} title="Automation health" caption="How much the AI is carrying — capture accuracy, share handled without a human, and dedupe rate." />
       <div className="grid grid-cols-2 gap-2.5">
         {metrics.map((m, i) => (
-          <motion.div key={m.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.05 * i }} className="rounded-[12px] border border-border bg-surface-2 p-3">
+          <motion.div key={m.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.05 * i }} className="rounded-[6px] border border-border bg-surface-2 p-3">
             <div className="font-display text-2xl font-bold leading-none text-text">{m.value}</div>
             <div className="mt-1.5 text-[13px] font-semibold leading-tight text-text">{m.label}</div>
             <div className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-text-faint">
@@ -653,7 +653,7 @@ function AgentLeaderboard({ agents }: { agents: { name: string; initials: string
       <CardHead icon={<Trophy size={15} className="text-live" />} title="Agent leaderboard" caption="Agents ranked by flats booked, with each one's visit→booking close rate." />
       <div className="space-y-2.5">
         {sorted.map((a, i) => (
-          <motion.div key={a.name} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.06 * i }} className="flex items-center gap-3 rounded-[10px] border border-border bg-surface-2 px-3 py-2.5">
+          <motion.div key={a.name} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.06 * i }} className="flex items-center gap-3 rounded-[5px] border border-border bg-surface-2 px-3 py-2.5">
             <span className="w-4 shrink-0 text-center font-mono text-sm text-text-faint tabular">{i + 1}</span>
             <Avatar name={a.name} hue={a.hue} size={36} />
             <div className="min-w-0 flex-1">
@@ -767,9 +767,9 @@ function RevenueLeakage({ sourceROI }: { sourceROI: { source: Source; enquiries:
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.06 * i }}
-            className="group flex items-center gap-3 rounded-[10px] border border-border bg-surface-2 px-3 py-2.5 transition-colors hover:border-border-strong hover:bg-surface-inset"
+            className="group flex items-center gap-3 rounded-[5px] border border-border bg-surface-2 px-3 py-2.5 transition-colors hover:border-border-strong hover:bg-surface-inset"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] text-negative" style={{ background: "color-mix(in oklab, var(--negative) 14%, transparent)" }}>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[5px] text-negative" style={{ background: "color-mix(in oklab, var(--negative) 14%, transparent)" }}>
               {r.icon}
             </span>
             <div className="min-w-0 flex-1">
@@ -898,7 +898,7 @@ function WeeklyBriefCard({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.05 * i }}
-              className="rounded-[12px] border border-border bg-surface-2 p-3"
+              className="rounded-[6px] border border-border bg-surface-2 p-3"
             >
               <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{b.label}</div>
               <div className="mt-1 font-display text-2xl font-bold leading-none text-text tabular">{b.value}</div>
@@ -950,7 +950,7 @@ function BriefList({
 }) {
   const dot = tone === "positive" ? "var(--positive)" : "var(--negative)";
   return (
-    <div className="rounded-[12px] border border-border bg-surface-2 p-3.5">
+    <div className="rounded-[6px] border border-border bg-surface-2 p-3.5">
       <div className="mb-2.5 flex items-center gap-2">{icon}<Label>{title}</Label></div>
       <ul className="space-y-2">
         {items.map((it) => (
@@ -998,7 +998,7 @@ function WinLossCard({ funnel, bookingTrend }: { funnel: FunnelRow[]; bookingTre
       </div>
 
       {/* split bar */}
-      <div className="mt-4 flex h-7 overflow-hidden rounded-[8px] bg-surface-inset">
+      <div className="mt-4 flex h-7 overflow-hidden rounded-[5px] bg-surface-inset">
         <motion.div
           className="flex h-full items-center justify-start rounded-l-[8px] pl-2.5 font-mono text-[11px] font-bold text-accent-contrast tabular"
           style={{ background: "var(--positive)" }}

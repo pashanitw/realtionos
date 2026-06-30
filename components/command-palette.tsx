@@ -99,7 +99,7 @@ export function CommandPalette() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ type: "spring", stiffness: 420, damping: 32 }}
-            className="relative w-full max-w-[600px] overflow-hidden rounded-[16px] border border-border bg-surface shadow-[var(--shadow-lift)]"
+            className="relative w-full max-w-[600px] overflow-hidden rounded-[6px] border border-border bg-surface shadow-[var(--shadow-lift)]"
           >
             <Command shouldFilter={false} loop>
               <div className="flex items-center gap-3 border-b border-border px-4">
@@ -123,7 +123,7 @@ export function CommandPalette() {
                   {showCapture && (
                     <Command.Group heading={<GroupLabel>Agent Copilot</GroupLabel>}>
                       <Item onSelect={() => runCommit(query.trim())} value="capture">
-                        <span className="grid h-8 w-8 place-items-center rounded-lg bg-live-soft text-live">
+                        <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-live-soft text-live">
                           <Sparkles size={15} />
                         </span>
                         <div className="flex-1">
@@ -158,7 +158,7 @@ export function CommandPalette() {
                     <Command.Group heading={<GroupLabel>Navigate</GroupLabel>}>
                       {navMatches.map((n) => (
                         <Item key={n.href} value={n.href} onSelect={() => { router.push(n.href); close(); }}>
-                          <span className="grid h-8 w-8 place-items-center rounded-lg bg-surface-2 text-text-muted">
+                          <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-surface-2 text-text-muted">
                             <n.icon size={15} />
                           </span>
                           <span className="flex-1 text-sm text-text">{n.label}</span>
@@ -169,15 +169,15 @@ export function CommandPalette() {
 
                   <Command.Group heading={<GroupLabel>Demo conductor</GroupLabel>}>
                     <Item value="conduct-reply" onSelect={() => { close(); conductBuyerReply(); }}>
-                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-positive-soft text-positive"><MessageCircle size={15} /></span>
+                      <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-positive-soft text-positive"><MessageCircle size={15} /></span>
                       <span className="flex-1 text-sm text-text">Simulate a buyer WhatsApp reply</span>
                     </Item>
                     <Item value="conduct-concierge" onSelect={() => { close(); conductConciergeLead(); }}>
-                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-accent-soft text-accent"><CalendarCheck size={15} /></span>
+                      <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-accent-soft text-accent"><CalendarCheck size={15} /></span>
                       <span className="flex-1 text-sm text-text">AI Inbox qualifies + books a visit</span>
                     </Item>
                     <Item value="conduct-call" onSelect={() => { close(); conductMissedCall(); }}>
-                      <span className="grid h-8 w-8 place-items-center rounded-lg bg-live-soft text-live"><PhoneIncoming size={15} /></span>
+                      <span className="grid h-8 w-8 place-items-center rounded-[6px] bg-live-soft text-live"><PhoneIncoming size={15} /></span>
                       <span className="flex-1 text-sm text-text">Simulate a missed call</span>
                     </Item>
                   </Command.Group>
@@ -205,7 +205,7 @@ function Item({ children, value, onSelect }: { children: React.ReactNode; value:
     <Command.Item
       value={value}
       onSelect={onSelect}
-      className="flex cursor-pointer items-center gap-3 rounded-[10px] px-2.5 py-2 text-text data-[selected=true]:bg-surface-2"
+      className="flex cursor-pointer items-center gap-3 rounded-[5px] px-2.5 py-2 text-text data-[selected=true]:bg-surface-2"
     >
       {children}
     </Command.Item>
