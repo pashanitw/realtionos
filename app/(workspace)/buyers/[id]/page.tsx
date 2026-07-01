@@ -8,14 +8,14 @@ import { toast } from "sonner";
 import {
   ArrowLeft, ChevronDown, Play, Sparkles, TrendingUp, ScanSearch, ArrowUpRight, Bot,
   CheckCircle2, Circle, CircleDot, Phone, Mail, MessageCircle, ShieldCheck, Headphones,
-  Gauge, Check, Pencil, X, Building2, Link2, Newspaper, ExternalLink, BadgeCheck,
-  Wallet, Landmark, BookOpen, Lightbulb, Trophy, ArrowRight, Zap,
+  Gauge, Check, Pencil, X, Building2, Link2, Newspaper, ExternalLink, BadgeCheck, TriangleAlert,
+  Wallet, Landmark, BookOpen, Lightbulb, Trophy, ArrowRight, Zap, Copy,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { PageContainer } from "@/components/ui/page";
 import { useConfirm } from "@/components/ui/confirm";
 import { Avatar, ChannelIcon, ScoreBadge, Sparkline, Label, Pill, Meter } from "@/components/ui/primitives";
-import { CHANNEL_LABEL, type Message, type Buyer, type Stage } from "@/lib/data/types";
+import { CHANNEL_LABEL, type Message, type Buyer, type Stage, type Channel } from "@/lib/data/types";
 import { rupees, relativeTime, cn } from "@/lib/utils";
 
 /* provenance: hover a score reason / field → its source message highlights */
@@ -67,12 +67,12 @@ function deriveCapture(msg: Message, buyer: Buyer, isLatestInbound: boolean): Ca
 
 /* real-estate milestone pack */
 const MILESTONES = [
-  "Site Visit Scheduled", "Site Visit Completed", "Unit Selected", "Booking Amount Paid",
+  "New Enquiry", "Qualified", "Site Visit Scheduled", "Site Visit Completed", "Unit Selected", "Booking Amount Paid",
   "Booking Confirmed", "Agreement Signed", "Loan Sanction", "Registration", "Handover",
 ];
 const STAGE_DONE: Record<Stage, number> = {
-  "New Enquiry": 0, Qualified: 0, "Site Visit Scheduled": 1, "Site Visit Completed": 2, "Unit Selected": 3,
-  "Booking Amount Paid": 4, "Booking Confirmed": 5, "Agreement Signed": 6, "Loan Sanction": 7, Registration: 8, Handover: 9,
+  "New Enquiry": 1, Qualified: 2, "Site Visit Scheduled": 3, "Site Visit Completed": 4, "Unit Selected": 5,
+  "Booking Amount Paid": 6, "Booking Confirmed": 7, "Agreement Signed": 8, "Loan Sanction": 9, Registration: 10, Handover: 11,
 };
 
 const ACTION_BY_STAGE: Record<Stage, { cta: string; body: (b: Buyer, unit: string) => string }> = {
@@ -100,6 +100,11 @@ export default function BuyerCanvasPage() {
     [allMessages, id],
   );
   const [active, setActive] = useState<Prov>({ msgId: null, quote: null });
+  // the most recent message, if it's inbound → the "reply now" affordance (order-independent)
+  const latestInboundId = useMemo(() => {
+    const last = messages[messages.length - 1];
+    return last && last.direction === "inbound" ? last.id : null;
+  }, [messages]);
 
   if (!buyer) {
     return (
@@ -120,15 +125,17 @@ export default function BuyerCanvasPage() {
   return (
     <ProvenanceCtx.Provider value={{ active, set: setActive }}>
       <PageContainer className="max-w-[1320px]">
-        <BuyerHeader buyer={buyer} unitLabel={unitLabel} project={project?.name ?? ""} progress={done / MILESTONES.length} />
+        <BuyerHeader buyer={buyer} messages={messages} unitLabel={unitLabel} project={project?.name ?? ""} progress={done / MILESTONES.length} />
+        {/* Page-level "Context to speak" card temporarily hidden — per-channel context now lives in the Call/WhatsApp/Email drawers */}
+        {/* <ConversationContext buyer={buyer} messages={messages} unitLabel={unitLabel} project={project?.name ?? ""} /> */}
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="min-w-0">
-            <div className="mb-3"><Label>Unified timeline · every channel, one history</Label></div>
+            <div className="mb-3"><Label>Unified timeline · newest first · every channel, one history</Label></div>
             <div className="relative space-y-3">
               <span className="absolute bottom-2 left-[19px] top-2 w-px bg-border" aria-hidden />
               <AnimatePresence initial={false}>
-                {messages.map((m, i) => (
-                  <MessageCard key={m.id} message={m} buyer={buyer} isLatestInbound={m.direction === "inbound" && i === messages.length - 1} />
+                {[...messages].reverse().map((m) => (
+                  <MessageCard key={m.id} message={m} buyer={buyer} isLatestInbound={m.id === latestInboundId} />
                 ))}
               </AnimatePresence>
             </div>
@@ -162,7 +169,7 @@ function BackButton() {
   );
 }
 
-function BuyerHeader({ buyer, unitLabel, project, progress }: { buyer: Buyer; unitLabel: string; project: string; progress: number }) {
+function BuyerHeader({ buyer, messages, unitLabel, project, progress }: { buyer: Buyer; messages: Message[]; unitLabel: string; project: string; progress: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
       <div className="mb-2 flex items-center gap-1.5 font-mono text-[11px] text-text-faint">
@@ -191,16 +198,333 @@ function BuyerHeader({ buyer, unitLabel, project, progress }: { buyer: Buyer; un
               <span className="ml-1 font-mono text-[11px] text-text-faint" suppressHydrationWarning>last touch {relativeTime(buyer.lastTouch)}</span>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button onClick={() => toast("Dialing via Vocalis…", { description: buyer.name })} className="flex h-10 items-center gap-2 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
-              <Phone size={15} /> Call via Vocalis
-            </button>
-            <button onClick={() => toast("Opening WhatsApp…")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><MessageCircle size={15} className="text-positive" /> WhatsApp</button>
-            <button onClick={() => toast("Composing email…")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><Mail size={15} className="text-accent" /> Email</button>
-          </div>
+          <ChannelActions buyer={buyer} messages={messages} unitLabel={unitLabel} project={project} />
         </div>
       </div>
     </motion.div>
+  );
+}
+
+/* ---------------- AI "context to speak" — talk track derived from the prior conversation ---------------- */
+function ConversationContext({ buyer, messages, unitLabel, project }: { buyer: Buyer; messages: Message[]; unitLabel: string; project: string }) {
+  const firstName = buyer.name.split(" ")[0];
+  const agentFirst = buyer.agent.split(" ")[0];
+  const locality = buyer.localityPrefs[0] ?? "the area";
+  const nextStep = NEXT_BY_STAGE[buyer.stage];
+
+  // where we left off — the most recent thing the lead actually said
+  const lastInbound = [...messages].reverse().find((m) => m.direction === "inbound");
+  const lastInboundText = lastInbound
+    ? (lastInbound.channel === "call" ? (lastInbound.summary ?? "Spoke on a call") : lastInbound.body.replace(/\n+/g, " "))
+    : null;
+
+  // channel the lead engages on most (inbound)
+  const chanCount = new Map<Message["channel"], number>();
+  messages.filter((m) => m.direction === "inbound").forEach((m) => chanCount.set(m.channel, (chanCount.get(m.channel) ?? 0) + 1));
+  const topChannel = [...chanCount.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+
+  // reasons → what to lean on / what to be ready for
+  const positive = buyer.scoreReasons.find((r) => r.polarity === "positive");
+  const objection = buyer.scoreReasons.find((r) => r.polarity === "negative");
+
+  const points: { icon: typeof ArrowRight; text: string }[] = [];
+  if (lastInboundText) points.push({ icon: MessageCircle, text: `Acknowledge their last message: “${truncate(lastInboundText, 74)}”` });
+  points.push({ icon: ArrowRight, text: `Drive toward the next step — ${nextStep.toLowerCase()}.` });
+  if (positive) points.push({ icon: TrendingUp, text: `Lean on: ${positive.text}` });
+  if (objection) points.push({ icon: ShieldCheck, text: `Be ready for: ${objection.text}` });
+
+  const opener = lastInbound
+    ? `Hi ${firstName}, this is ${agentFirst} from ${project}. Last time you mentioned “${truncate(lastInboundText ?? "", 52)}” — I'd love to help you ${nextStep.toLowerCase()}. Is now a good time?`
+    : `Hi ${firstName}, this is ${agentFirst} from ${project}. I saw your interest in a ${buyer.config} around ${locality} — I'd love to help you ${nextStep.toLowerCase()}. Is now a good time?`;
+
+  const facts = [
+    buyer.config,
+    rupees(buyer.budgetMax),
+    locality,
+    `Loan · ${buyer.loanStatus}`,
+    unitLabel !== "—" ? `Best-fit · ${unitLabel}` : null,
+  ].filter(Boolean) as string[];
+
+  const copyOpener = async () => {
+    try { await navigator.clipboard.writeText(opener); toast.success("Opener copied", { description: "Paste it into your dialer notes." }); }
+    catch { toast("Opener ready", { description: opener }); }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-5 overflow-hidden rounded-[6px] border border-accent/25 bg-surface shadow-[var(--shadow-soft)]">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border bg-accent-soft/50 px-4 py-2.5">
+        <Sparkles size={15} className="text-accent" />
+        <span className="text-sm font-semibold text-text">Context to speak</span>
+        <span className="rounded-[4px] bg-accent px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-contrast">AI</span>
+        <span className="ml-auto font-mono text-[11px] text-text-faint">
+          from {messages.length} message{messages.length === 1 ? "" : "s"}{topChannel ? ` · replies most on ${CHANNEL_LABEL[topChannel]}` : ""}
+        </span>
+      </div>
+      <div className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        {/* talk track */}
+        <div>
+          <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
+            {facts.map((f) => (<span key={f} className="rounded-[4px] bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-muted">{f}</span>))}
+          </div>
+          <ul className="space-y-1.5">
+            {points.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <li key={i} className="flex items-start gap-2 text-sm text-text-muted">
+                  <Icon size={14} className="mt-0.5 shrink-0 text-accent" />
+                  <span>{p.text}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        {/* suggested opener */}
+        <div className="flex flex-col rounded-[5px] border border-border bg-surface-inset p-3">
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <Lightbulb size={13} className="text-live" />
+            <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Suggested opener · from the conversation</span>
+          </div>
+          <p className="flex-1 text-sm leading-relaxed text-text">{opener}</p>
+          <button onClick={copyOpener} className="mt-2.5 inline-flex h-8 w-fit items-center gap-1.5 rounded-[5px] border border-border bg-surface px-2.5 text-xs font-semibold text-text-muted transition-colors hover:text-text">
+            <Copy size={13} /> Copy opener
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ---------------- channel actions → per-channel conversation drawer ---------------- */
+const CH_META: Record<Channel, { label: string; Icon: typeof Phone; verb: string }> = {
+  call: { label: "Call", Icon: Phone, verb: "Start call via Vocalis" },
+  whatsapp: { label: "WhatsApp", Icon: MessageCircle, verb: "Send on WhatsApp" },
+  email: { label: "Email", Icon: Mail, verb: "Compose email" },
+  sms: { label: "SMS", Icon: MessageCircle, verb: "Send SMS" },
+  web: { label: "Web chat", Icon: MessageCircle, verb: "Reply on web" },
+};
+
+/** Everything the drawer shows is derived from THIS lead's conversation on THIS channel. */
+function channelTalk(channel: Channel, buyer: Buyer, messages: Message[], unitLabel: string, project: string) {
+  const firstName = buyer.name.split(" ")[0];
+  const agentFirst = buyer.agent.split(" ")[0];
+  const nextStep = NEXT_BY_STAGE[buyer.stage];
+  const locality = buyer.localityPrefs[0] ?? "the area";
+
+  // chat order: oldest → newest, like a real messaging thread
+  const thread = messages.filter((m) => m.channel === channel).sort((a, b) => a.timestamp - b.timestamp);
+  const lastInbound = [...messages].reverse().find((m) => m.direction === "inbound");
+  const lastInboundText = lastInbound
+    ? (lastInbound.channel === "call" ? (lastInbound.summary ?? "Spoke on a call") : lastInbound.body.replace(/\n+/g, " "))
+    : null;
+  const lastInboundWhen = lastInbound ? shortDate(lastInbound.timestamp) : null;
+
+  const positives = buyer.scoreReasons.filter((r) => r.polarity === "positive");
+  const objections = buyer.scoreReasons.filter((r) => r.polarity === "negative");
+
+  const facts = [
+    `Stage · ${buyer.stage}`, `Score · ${buyer.score}`, `Budget · ${rupees(buyer.budgetMax)}`,
+    buyer.config, locality, `Possession · ${buyer.possession}`, `Loan · ${buyer.loanStatus}`,
+    unitLabel !== "—" ? `Fit · ${unitLabel}` : null,
+  ].filter(Boolean) as string[];
+
+  const questions = [
+    "Which floor & facing works best for you?",
+    `Ideal possession timeline? (they lean ${buyer.possession})`,
+    (buyer.loanStatus === "pre-approved" || buyer.loanStatus === "not needed")
+      ? "Who else is involved in the final decision?"
+      : "Shall we connect our banker for loan pre-approval?",
+  ];
+
+  let suggested: string;
+  let subject: string | null = null;
+  if (channel === "whatsapp" || channel === "sms" || channel === "web") {
+    suggested = ACTION_BY_STAGE[buyer.stage].body(buyer, unitLabel);
+  } else if (channel === "email") {
+    subject = `${project} · ${ACTION_BY_STAGE[buyer.stage].cta}`;
+    suggested = ACTION_BY_STAGE[buyer.stage].body(buyer, unitLabel);
+  } else {
+    suggested = lastInboundText
+      ? `Hi ${firstName}, this is ${agentFirst} from ${project}. Last time you mentioned “${truncate(lastInboundText, 48)}” — I wanted to follow up and help you ${nextStep.toLowerCase()}. Is now a good time to talk?`
+      : `Hi ${firstName}, this is ${agentFirst} from ${project}. I saw your interest in a ${buyer.config} around ${locality} — do you have a couple of minutes to talk it through?`;
+  }
+  return { thread, suggested, subject, facts, positives, objections, questions, lastInboundText, lastInboundWhen, nextStep };
+}
+
+function ChannelActions({ buyer, messages, unitLabel, project }: { buyer: Buyer; messages: Message[]; unitLabel: string; project: string }) {
+  const [open, setOpen] = useState<Channel | null>(null);
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-2">
+        <button onClick={() => setOpen("call")} className="flex h-10 items-center gap-2 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast shadow-[0_0_22px_-7px_var(--accent)] transition-transform hover:scale-[1.02] active:scale-95">
+          <Phone size={15} /> Call via Vocalis
+        </button>
+        <button onClick={() => setOpen("whatsapp")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><MessageCircle size={15} className="text-positive" /> WhatsApp</button>
+        <button onClick={() => setOpen("email")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><Mail size={15} className="text-accent" /> Email</button>
+      </div>
+      <AnimatePresence>
+        {open && <ChannelDrawer key={open} channel={open} buyer={buyer} messages={messages} unitLabel={unitLabel} project={project} onClose={() => setOpen(null)} />}
+      </AnimatePresence>
+    </>
+  );
+}
+
+/** Renders a channel thread as a real chat — buyer left, agent right, call transcripts expanded into turns. */
+function ChatThread({ thread, buyer }: { thread: Message[]; buyer: Buyer }) {
+  type Turn = { key: string; kind: "call" | "bubble" | "sys"; side?: "in" | "out"; text: string; sub?: string; subject?: string; time: number; dur?: number };
+  const turns: Turn[] = [];
+  for (const m of thread) {
+    if (m.channel === "call" && m.transcript && m.transcript.length) {
+      turns.push({ key: `${m.id}-h`, kind: "call", text: m.summary ?? "Call", time: m.timestamp, dur: m.durationSec });
+      m.transcript.forEach((ln, i) => turns.push({
+        key: `${m.id}-t${i}`,
+        kind: ln.speaker === "ai" ? "sys" : "bubble",
+        side: ln.speaker === "buyer" ? "in" : "out",
+        text: ln.text, sub: ln.t, time: m.timestamp,
+      }));
+    } else {
+      turns.push({ key: m.id, kind: "bubble", side: m.direction === "inbound" ? "in" : "out", text: m.channel === "call" ? (m.summary ?? "Call") : m.body, subject: m.subject, time: m.timestamp });
+    }
+  }
+  return (
+    <div className="space-y-2.5">
+      {turns.map((t) => {
+        if (t.kind === "call") {
+          const mm = t.dur ? `${Math.floor(t.dur / 60)}:${String(t.dur % 60).padStart(2, "0")}` : null;
+          return (
+            <div key={t.key} className="flex items-center justify-center py-1">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-surface-2 px-2.5 py-1 font-mono text-[10px] text-text-faint"><Phone size={11} /> Call{mm ? ` · ${mm}` : ""} · {shortDate(t.time)}</span>
+            </div>
+          );
+        }
+        if (t.kind === "sys") {
+          return <div key={t.key} className="flex justify-center"><span className="rounded-[4px] bg-live-soft px-2 py-0.5 text-[11px] text-live">✦ AI · {t.text}</span></div>;
+        }
+        const inbound = t.side === "in";
+        return (
+          <div key={t.key} className={cn("flex items-end gap-2", inbound ? "justify-start" : "justify-end")}>
+            {inbound && <Avatar name={buyer.name} hue={buyer.hue} size={24} />}
+            <div className={cn("max-w-[80%] rounded-[9px] px-3 py-2 shadow-[var(--shadow-soft)]", inbound ? "rounded-bl-[3px] bg-surface-2 text-text" : "rounded-br-[3px] bg-accent text-accent-contrast")}>
+              {t.subject && <div className={cn("mb-0.5 text-[11px] font-semibold", inbound ? "text-text" : "text-accent-contrast")}>✉ {t.subject}</div>}
+              <p className="whitespace-pre-line text-[13px] leading-relaxed">{t.text}</p>
+              <div className={cn("mt-1 text-right font-mono text-[9px]", inbound ? "text-text-faint" : "text-white/70")} suppressHydrationWarning>{t.sub ? `${t.sub} · ` : ""}{shortDate(t.time)}</div>
+            </div>
+            {!inbound && <Avatar name={buyer.agent} hue={(buyer.hue + 150) % 360} size={24} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ChannelDrawer({ channel, buyer, messages, unitLabel, project, onClose }: { channel: Channel; buyer: Buyer; messages: Message[]; unitLabel: string; project: string; onClose: () => void }) {
+  const meta = CH_META[channel];
+  const Icon = meta.Icon;
+  const { thread, suggested, subject, facts, positives, objections, questions, lastInboundText, lastInboundWhen, nextStep } = channelTalk(channel, buyer, messages, unitLabel, project);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const copy = async () => {
+    const payload = subject ? `Subject: ${subject}\n\n${suggested}` : suggested;
+    try { await navigator.clipboard.writeText(payload); toast.success("Copied", { description: `${meta.label} message copied.` }); }
+    catch { toast(meta.label, { description: suggested }); }
+  };
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-50 bg-[rgba(5,18,52,0.45)] backdrop-blur-[2px]" />
+      <motion.aside
+        initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+        transition={{ type: "spring", stiffness: 320, damping: 34 }}
+        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[460px] flex-col bg-surface shadow-[var(--shadow-lift)]"
+      >
+        {/* header */}
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><Icon size={17} /></span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-text">{meta.label} · {buyer.name}</div>
+            <div className="font-mono text-[11px] text-text-faint">{thread.length} {meta.label.toLowerCase()} message{thread.length === 1 ? "" : "s"} · {buyer.config} · {rupees(buyer.budgetMax)}</div>
+          </div>
+          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] border border-border text-text-muted transition-colors hover:text-text" aria-label="Close"><X size={16} /></button>
+        </div>
+
+        {/* scroll body */}
+        <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          {/* BRIEFING — full context to speak, all from this lead */}
+          <div className="rounded-[6px] border border-accent/25 bg-accent-soft/40 p-3.5">
+            <div className="mb-2.5 flex items-center gap-1.5"><Sparkles size={14} className="text-accent" /><span className="font-mono text-[10px] uppercase tracking-wide text-accent">Context to speak · {meta.label}</span></div>
+
+            <div className="mb-3 flex flex-wrap gap-1.5">
+              {facts.map((f) => (<span key={f} className="rounded-[4px] bg-surface px-2 py-0.5 font-mono text-[11px] text-text-muted">{f}</span>))}
+            </div>
+
+            {lastInboundText && (
+              <div className="mb-3">
+                <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">Where you left off</div>
+                <p className="text-[13px] leading-relaxed text-text">“{truncate(lastInboundText, 130)}” <span className="text-text-faint">· {lastInboundWhen}</span></p>
+              </div>
+            )}
+
+            {positives.length > 0 && (
+              <div className="mb-3">
+                <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">What they've told us</div>
+                <ul className="space-y-1">
+                  {positives.map((r) => (<li key={r.id} className="flex items-start gap-1.5 text-[13px] text-text-muted"><Check size={13} className="mt-0.5 shrink-0 text-positive" /><span>{r.text}</span></li>))}
+                </ul>
+              </div>
+            )}
+
+            {objections.length > 0 && (
+              <div className="mb-3">
+                <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">Watch out for</div>
+                <ul className="space-y-1">
+                  {objections.map((r) => (<li key={r.id} className="flex items-start gap-1.5 text-[13px] text-text-muted"><TriangleAlert size={12} className="mt-0.5 shrink-0 text-live" /><span>{r.text}</span></li>))}
+                </ul>
+              </div>
+            )}
+
+            <div>
+              <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">Your goal on this {meta.label.toLowerCase()}</div>
+              <p className="mb-1.5 text-[13px] font-medium text-text">{nextStep}.</p>
+              <ul className="space-y-1">
+                {questions.map((q, i) => (<li key={i} className="flex items-start gap-1.5 text-[13px] text-text-muted"><ArrowRight size={13} className="mt-0.5 shrink-0 text-accent" /><span>{q}</span></li>))}
+              </ul>
+            </div>
+          </div>
+
+          {/* SUGGESTED opener / message */}
+          <div className="rounded-[6px] border border-border bg-surface-inset p-3.5">
+            <div className="mb-1.5 flex items-center gap-1.5"><Lightbulb size={13} className="text-live" /><span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{channel === "call" ? "Suggested opener" : channel === "email" ? "Suggested email" : "Suggested message"}</span></div>
+            {subject && <div className="mb-1.5 text-[13px] font-semibold text-text">Subject: {subject}</div>}
+            <p className="whitespace-pre-line text-sm leading-relaxed text-text">{suggested}</p>
+            <button onClick={copy} className="mt-2.5 inline-flex h-8 items-center gap-1.5 rounded-[5px] border border-border bg-surface px-2.5 text-xs font-semibold text-text-muted transition-colors hover:text-text"><Copy size={13} /> Copy</button>
+          </div>
+
+          {/* CONVERSATION — rendered as a chat, call transcripts expanded */}
+          <div>
+            <div className="mb-2.5 flex items-center justify-between">
+              <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{meta.label} conversation</span>
+              <span className="font-mono text-[10px] text-text-faint">{thread.length} message{thread.length === 1 ? "" : "s"}</span>
+            </div>
+            {thread.length === 0 ? (
+              <div className="rounded-[6px] border border-dashed border-border p-4 text-center text-sm text-text-faint">No {meta.label.toLowerCase()} conversation yet — open with the {channel === "call" ? "opener" : "message"} above.</div>
+            ) : (
+              <ChatThread thread={thread} buyer={buyer} />
+            )}
+          </div>
+        </div>
+
+        {/* footer CTA */}
+        <div className="border-t border-border p-4">
+          <button onClick={() => toast(meta.verb, { description: buyer.name })} className="flex h-11 w-full items-center justify-center gap-2 rounded-[5px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.01] active:scale-95">
+            <Icon size={16} /> {meta.verb}
+          </button>
+        </div>
+      </motion.aside>
+    </>
   );
 }
 

@@ -23,11 +23,12 @@ export default function LeadSearchPage() {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
 
-  const isManager = user.role === "manager" || user.role === "super-admin";
-  const scopeNote = isManager ? `all ${buyers.length} company leads` : `your ${buyers.length} leads`;
+  // Managers, super-admins and telecallers see the whole company book; agents see only their own.
+  const seesWholeClient = user.role !== "agent";
+  const scopeNote = seesWholeClient ? `all ${buyers.length} company leads` : `your ${buyers.length} leads`;
 
-  // Always start from the full role-scoped book (the manager sees the whole client,
-  // an agent/telecaller only their own), then filter as the user types.
+  // Always start from the full role-scoped book (whole client for manager/telecaller,
+  // only their own for an agent), then filter as the user types.
   const results = useMemo(() => {
     const base = [...buyers].sort((a, b) => b.score - a.score);
     if (!query) return base.slice(0, 100);

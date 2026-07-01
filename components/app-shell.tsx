@@ -233,7 +233,8 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
             <Activity size={16} />
             <span className="absolute right-2 top-2"><StatusDot color="var(--live)" pulse size={6} /></span>
           </button>
-          <ThemeToggle />
+          {/* Theme toggle temporarily disabled */}
+          {/* <ThemeToggle /> */}
           <PersonaSwitcher />
           <SignOut />
         </div>

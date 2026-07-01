@@ -141,7 +141,9 @@ interface BuyerCtx {
 function buildBuyer(idx: number, tone: "hot" | "warm" | "cool", ctx: BuyerCtx): { buyer: Buyer; messages: Message[] } {
   const id = `${ctx.clientId}-b${idx + 1}`;
   const name = ctx.name;
-  const agentUser = faker.helpers.arrayElement(ctx.agents);
+  faker.helpers.arrayElement(ctx.agents); // keep the RNG draw so all other buyer data stays identical
+  // round-robin assignment so every agent gets a fair share of leads (no empty books)
+  const agentUser = ctx.agents[idx % ctx.agents.length];
   const hue = faker.number.int({ min: 0, max: 360 });
   const config = faker.helpers.weightedArrayElement<Config>([
     { weight: 4, value: "3BHK" }, { weight: 3, value: "2BHK" }, { weight: 1, value: "4BHK" }, { weight: 1, value: "Villa" },
@@ -227,6 +229,22 @@ function buildBuyer(idx: number, tone: "hot" | "warm" | "cool", ctx: BuyerCtx): 
   const q6 = consume(1, m6);
   messages.push({ id: m6, clientId: cid, buyerId: id, channel: faker.helpers.arrayElement<Channel>(["whatsapp", "sms"]), direction: "inbound", timestamp: NOW - faker.number.int({ min: 2, max: 20 }) * HOUR, body: q6[0]?.text ?? faker.helpers.arrayElement(["Any update on the availability and next steps?", "Can you confirm the unit is still available?", "Following up — when can we close this?"]), summary: q6[0] ? undefined : "Follow-up nudge.", handledBy: "ai" });
 
+  // ---- richer ongoing conversation: brochure → floor-rise → cost sheet → call ask ----
+  const m7 = `${id}-m${++mIdx}`;
+  messages.push({ id: m7, clientId: cid, buyerId: id, channel: "whatsapp", direction: "outbound", timestamp: NOW - 7 * DAY - 4 * HOUR, body: `Hi ${first}, sharing the brochure and floor plans for the ${config} in ${loc}. The east-facing units get the best light — shall I hold one for a site visit this weekend?`, summary: "Sent brochure + floor plans; offered to hold a unit.", handledBy: "agent" });
+
+  const m8 = `${id}-m${++mIdx}`;
+  messages.push({ id: m8, clientId: cid, buyerId: id, channel: "whatsapp", direction: "inbound", timestamp: NOW - 6 * DAY - 20 * HOUR, body: `The higher floors look great 👍 What's the floor-rise difference, and is the corner ${config} still available?`, summary: "Asked about floor-rise pricing and corner-unit availability.", handledBy: "ai" });
+
+  const m9 = `${id}-m${++mIdx}`;
+  messages.push({ id: m9, clientId: cid, buyerId: id, channel: "whatsapp", direction: "outbound", timestamp: NOW - 6 * DAY - 18 * HOUR, body: `Floor-rise is about ₹250/sq.ft per floor. The corner ${config} is still open — I can block it for 48 hours while you decide. Shall I? — ${agentFirst}`, summary: "Explained floor-rise; offered a 48-hour hold.", handledBy: "agent" });
+
+  const m10 = `${id}-m${++mIdx}`;
+  messages.push({ id: m10, clientId: cid, buyerId: id, channel: "email", direction: "outbound", timestamp: NOW - 5 * DAY - 6 * HOUR, subject: `All-in cost breakdown — ${config} in ${loc}`, body: `Hi ${first},\n\nAs requested, here's the all-in cost for the ${config}: base price, floor-rise, GST, registration and parking — net around ${rupeeRange(budgetMin, budgetMax)}. The detailed sheet is attached.\n\nHappy to walk through it on a quick call whenever suits you.\n\nBest,\n${agentFirst}`, summary: "Sent all-in cost breakdown (base, floor-rise, GST, registration).", handledBy: "agent" });
+
+  const m11 = `${id}-m${++mIdx}`;
+  messages.push({ id: m11, clientId: cid, buyerId: id, channel: "email", direction: "inbound", timestamp: NOW - 4 * DAY - 10 * HOUR, subject: "Re: All-in cost breakdown", body: `Thanks, this is really clear. Reviewing it with my family this week — could we do a quick call tomorrow evening to finalise the unit?`, summary: "Reviewing with family; wants a call to finalise.", handledBy: "ai" });
+
   const signals: Record<SignalCategory, number> = { "Budget fit": 55, "Config & locality match": 55, Engagement: 50, "Site-visit intent": 48, "Loan readiness": 52 };
   for (const r of reasons) signals[r.category] = Math.max(8, Math.min(98, signals[r.category] + r.weight * 2.7));
   (Object.keys(signals) as SignalCategory[]).forEach((k) => (signals[k] = Math.round(signals[k])));
@@ -286,7 +304,7 @@ function buildDeals(clientId: string, buyers: Buyer[], projects: Project[], unit
     const p = u && projects.find((pp) => pp.id === u.projectId);
     return { project: p?.name ?? projects[0].name, unitLabel: u ? `${u.tower} · ${u.config}` : "3BHK" };
   };
-  return buyers.slice(0, Math.min(16, buyers.length)).map((b, i) => {
+  return buyers.slice(0, Math.min(48, buyers.length)).map((b, i) => {
     const unitId = b.matchedUnitIds[0];
     const pn = projName(unitId ?? "");
     const sIdx = STAGES.indexOf(b.stage);
@@ -524,9 +542,9 @@ function buildOvernight(clientId: string, buyers: Buyer[]): { overnightLeads: Ov
   const picks: Buyer[] = [];
   for (const arr of byAgent.values()) {
     arr.sort((x, y) => y.score - x.score);
-    picks.push(...arr.slice(0, 2)); // up to 2 per agent
+    picks.push(...arr.slice(0, 3)); // up to 3 per agent
   }
-  const pool = picks.sort((x, y) => y.score - x.score).slice(0, 12); // intent-ranked, capped
+  const pool = picks.sort((x, y) => y.score - x.score).slice(0, 18); // intent-ranked, capped
   const statusFor = (b: Buyer): OvernightLead["status"] => (b.siteVisitDue ? "visit-booked" : b.score >= 60 ? "qualified" : "new");
   const overnightLeads: OvernightLead[] = pool.map((b, i) => {
     const status = statusFor(b);
@@ -585,7 +603,7 @@ interface ClientSpec {
 const CLIENT_SPECS: ClientSpec[] = [
   {
     id: "c1", name: "Aurum Realty", city: "Hyderabad", hue: 168, plan: "Enterprise", seed: 990077,
-    buyerCount: 32, manager: "Rohan Desai", telecaller: "Divya Pillai",
+    buyerCount: 60, manager: "Rohan Desai", telecaller: "Divya Pillai",
     localities: ["Kokapet", "Gachibowli", "Narsingi", "Tellapur", "Kondapur", "Manikonda", "Financial District", "Nanakramguda"],
     teams: [
       { name: "West Zone", agents: [{ name: "Anita Rao", target: 8 }, { name: "Vimal Shetty", target: 7 }, { name: "Reshma Khan", target: 7 }] },
