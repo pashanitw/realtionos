@@ -34,6 +34,10 @@ import {
   VISITED_STAGES,
   isBooked,
   SOURCE_LABEL,
+  type KbArticle,
+  type KbCategory,
+  type BuyerIntel,
+  type BuyerUrgency,
 } from "./types";
 import { computeScore, DEFAULT_WEIGHTS } from "./scoring";
 import { SEED_NOW, rupeeRange, rupees, initials } from "../utils";
@@ -136,6 +140,43 @@ interface BuyerCtx {
   agents: OrgUser[];
   localities: string[];
   name: string;
+}
+
+// ---------- Buyer Intelligence (Stage 2): evolving profile, seeded deterministically ----------
+const INTEL_FLOORS = ["Higher floors (12+)", "Mid floors (6–11)", "Lower floors", "Any floor"];
+const INTEL_FAMILY = ["Couple, no kids", "Couple + 1 child", "Couple + 2 kids", "Nuclear family (4)", "Joint family (5)", "Single professional"];
+const INTEL_OFFICE = ["Financial District", "Gachibowli IT park", "HITEC City", "Madhapur", "Kondapur", "Manikonda"];
+const INTEL_SCHOOL = ["School within 3 km preferred", "CBSE school nearby", "International school access", "No school requirement", "Play-school proximity"];
+const INTEL_DECISION = ["Self", "Self + spouse", "Spouse has final call", "Parents involved", "Whole family decides"];
+const INTEL_COMPETITOR = ["My Home Avatar", "Prestige High Fields", "Rajapushpa Provincia", "Aparna Cyberzon", "None named", "Comparing 2 others"];
+const INTEL_CONCERNS = ["Possession delay risk", "Loan approval", "Floor-rise cost", "Resale value", "Commute time", "Amenity upkeep", "Price negotiation"];
+const INTEL_BESTTIME = ["Weekday evenings · 6–8 PM", "Weekend mornings · 10 AM–12 PM", "Weekday lunch · 1–2 PM", "Late evenings · 8–10 PM", "Saturday afternoons · 3–5 PM", "Early mornings · 8–9 AM"];
+
+function buildIntel(idx: number, tone: "hot" | "warm" | "cool", budgetMax: number): BuyerIntel {
+  const pick = <T,>(arr: T[], k: number) => arr[(idx * k + k) % arr.length];
+  const urgency: BuyerUrgency = tone === "hot" ? "high" : tone === "warm" ? "medium" : (idx % 2 ? "low" : "exploring");
+  const concerns = Array.from(new Set([INTEL_CONCERNS[(idx * 19) % INTEL_CONCERNS.length], INTEL_CONCERNS[(idx * 23 + 1) % INTEL_CONCERNS.length]]));
+  const budgetHistory = ["8w ago", "6w ago", "4w ago", "2w ago", "Now"].map((label, i) => ({ label, value: round5L(budgetMax * (0.84 + i * 0.04)) }));
+  budgetHistory[budgetHistory.length - 1].value = budgetMax;
+
+  const intel: BuyerIntel = {
+    preferredFloor: pick(INTEL_FLOORS, 3),
+    facing: FACINGS[(idx * 2) % FACINGS.length],
+    family: pick(INTEL_FAMILY, 5),
+    office: pick(INTEL_OFFICE, 7),
+    school: pick(INTEL_SCHOOL, 11),
+    urgency,
+    decisionMaker: pick(INTEL_DECISION, 13),
+    competitor: pick(INTEL_COMPETITOR, 17),
+    bestContact: pick(INTEL_BESTTIME, 29),
+    concerns,
+    budgetHistory,
+  };
+  // Leave 1–2 gaps for Guardian to flag (deterministic, varies per buyer).
+  const gappable: (keyof BuyerIntel)[] = ["school", "decisionMaker", "competitor", "office", "family"];
+  const drop = 1 + (idx % 2);
+  for (let k = 0; k < drop; k++) (intel as unknown as Record<string, unknown>)[gappable[(idx + k) % gappable.length]] = undefined;
+  return intel;
 }
 
 function buildBuyer(idx: number, tone: "hot" | "warm" | "cool", ctx: BuyerCtx): { buyer: Buyer; messages: Message[] } {
@@ -284,6 +325,7 @@ function buildBuyer(idx: number, tone: "hot" | "warm" | "cool", ctx: BuyerCtx): 
       : NOW + (tone === "cool" ? faker.number.int({ min: -48, max: 6 }) : faker.number.int({ min: 4, max: 60 })) * HOUR,
     agentId: agentUser.id, agent: agentUser.name, agentInitials: agentUser.initials,
     stage, lastTouch: NOW - lastTouch, signals, weights: { ...DEFAULT_WEIGHTS }, scoreHistory: history, matchedUnitIds: [],
+    intel: buildIntel(idx, tone, budgetMax),
   };
 
   return { buyer, messages };
@@ -650,11 +692,80 @@ const CLIENT_SPECS: ClientSpec[] = [
 
 const SUPER_ADMIN: OrgUser = { id: "u-super", name: "Maya Chen", initials: "MC", hue: 172, role: "super-admin", title: "Platform Admin · TheVertical.ai" };
 
+// ---------- Knowledge Base: the org's approved answers (AI + agents quote these) ----------
+function buildKb(clientId: string, projects: Project[], author: string): KbArticle[] {
+  let n = 0;
+  const mk = (
+    category: KbCategory, title: string, summary: string, body: string, tags: string[],
+    opts?: { usedByAi?: boolean; approved?: boolean; ageDays?: number; views?: number },
+  ): KbArticle => {
+    n += 1;
+    return {
+      id: `${clientId}-kb${n}`, clientId, category, title, summary, body, tags,
+      usedByAi: opts?.usedByAi ?? true, approved: opts?.approved ?? true, author,
+      updatedAt: NOW - (opts?.ageDays ?? (2 + n)) * DAY, views: opts?.views ?? (45 + ((n * 53) % 240)),
+    };
+  };
+
+  const articles: KbArticle[] = [];
+
+  // Project briefs — generated from the client's own inventory (dynamic per tenant)
+  for (const p of projects.slice(0, 3)) {
+    articles.push(mk("Projects",
+      `${p.name} — project brief`,
+      `${p.builder} · ${p.locality} · ${p.status === "ready" ? "Ready to move" : "Under construction"} · RERA ${p.reraNo}`,
+      `Builder: ${p.builder}\nLocality: ${p.locality}\nStatus: ${p.status === "ready" ? "Ready to move in" : `Under construction · possession ${p.possessionDate}`}\nRERA: ${p.reraNo}\nTowers: ${p.towers}\nAmenities: ${p.amenities.join(", ")}\n\nPositioning: a premium ${p.locality} address with strong resale and rental demand. Use for first-touch pitches and site-visit briefings.`,
+      [p.name.toLowerCase().split(" ")[0], p.locality.toLowerCase(), "project", "rera"],
+      { views: 120 + p.towers * 12 }));
+  }
+
+  articles.push(
+    mk("Pricing & Payment", "Floor-rise, GST & registration — all-in cost", "Floor-rise ₹250/sq.ft per floor; add 5% GST + ~6% registration + parking to the base price.",
+      "How to quote an all-in price:\n- Base price = carpet area × the tower's per-sq.ft rate\n- Floor-rise: +₹250/sq.ft for each floor above the base floor\n- GST: 5% on under-construction (nil once OC is received)\n- Registration + stamp duty: ~6% (state-dependent)\n- Parking: ₹4–6 L per covered slot\nAlways quote the net all-in number, never just the base."
+      , ["pricing", "gst", "floor-rise", "registration", "cost", "all-in"]),
+    mk("Pricing & Payment", "Construction-linked payment plan (CLP)", "10% on booking, 80% linked to construction milestones, 10% on possession.",
+      "Standard CLP:\n- 10% on booking (token + agreement)\n- 80% across milestones (foundation → each slab → finishing)\n- 10% on possession / registration\nSubvention and down-payment plans are available on select towers — confirm with the manager before quoting.",
+      ["payment plan", "clp", "booking", "subvention"]),
+    mk("Pricing & Payment", "Discount & negotiation policy", "Agents may offer up to 8%; 8–12% needs manager approval; over 12% is not allowed.",
+      "- Up to 8%: agent discretion (within published price)\n- 8–12%: requires manager approval in Approvals\n- Over 12%: not permitted\n- Never waive floor-rise and GST together\n- Log every concession as a Remark for the audit trail.",
+      ["discount", "negotiation", "policy", "approval"], { usedByAi: false }),
+    mk("Home Loans", "Home-loan eligibility & pre-approval", "Banks lend up to 80% of value; EMI ≈ ₹72k per ₹1 Cr at 8.5% over 20 years.",
+      "- Loan-to-value: up to 80% of the agreement value\n- Eligibility ≈ 60× monthly net income (varies by bank)\n- Indicative EMI: ~₹72,000 per ₹1 Cr @ 8.5% / 20 years\n- Pre-approval needs: PAN, Aadhaar, 6-month bank statement, salary slips / ITR\n- Empanelled banks: HDFC, SBI, ICICI, Axis — we can fast-track pre-approval.",
+      ["loan", "emi", "eligibility", "pre-approval", "bank"]),
+    mk("Legal & Compliance", "Booking documents checklist", "PAN, Aadhaar/address proof, photos and the booking amount to start; income proof for a loan.",
+      "To book, collect from the buyer:\n- PAN card\n- Aadhaar / address proof\n- 2 passport photos\n- Booking amount (₹5 L typical) via cheque / online\n- For a loan: income proof + bank statements\nThe agreement is shared for e-sign once the booking amount is received.",
+      ["documents", "booking", "kyc", "checklist"]),
+    mk("Legal & Compliance", "RERA & agreement basics", "Every project is RERA-registered; quote the RERA number and carpet area on every enquiry.",
+      "- Every project has a RERA registration number (see the project brief)\n- Carpet area (not super-built-up) is the RERA-mandated basis\n- Sale agreement + allotment letter follow the booking amount\n- Possession dates are per the RERA declaration — never promise earlier.",
+      ["rera", "legal", "agreement", "carpet area"]),
+    mk("Objection Handling", "“The project down the road is cheaper”", "Reframe on value: carpet area, possession certainty, amenities and resale — not headline price.",
+      "When a buyer cites a cheaper competitor:\n- Compare carpet area, not just the headline price (₹/sq.ft on usable space)\n- Highlight ready / near-possession vs their delay risk\n- Point to the RERA track record + builder delivery history\n- Bundle value (club membership, parking, floor-rise waiver) instead of cutting base price\nAsk: “If we matched on value, would you book this week?”",
+      ["objection", "competitor", "battle card", "value"]),
+    mk("Objection Handling", "“I need to think / talk to my family”", "Don't push the close — book the next micro-step: a site visit or a call with the decision-maker.",
+      "- Acknowledge; don't push for the close\n- Secure a small commitment: a weekend site visit, or a joint call with the spouse/parent\n- Offer to hold the preferred unit for 48 hours\n- Send the cost sheet + brochure so the family decision is informed.",
+      ["objection", "stall", "follow-up", "site visit"]),
+    mk("Process & SOPs", "Site-visit SOP", "Confirm 24h before, arrange the cab, brief the agent, capture feedback the same day.",
+      "- Confirm the slot 24 hours ahead on WhatsApp\n- Arrange pickup (cab) and share the location pin\n- Agent brief: the buyer's budget, preferred config, and objections\n- On site: show the show-flat + the actual floor/facing they want\n- Same day: log interest level + next step; the AI drafts the follow-up.",
+      ["site visit", "sop", "process", "cab"]),
+    mk("Process & SOPs", "Lead response SLA", "Every new lead gets an AI first-touch within 5 minutes, 24×7; hot leads route to the agent instantly.",
+      "- New leads get an AI first-touch within 5 minutes, at any hour\n- Qualify: budget, config, locality, timeline, loan status\n- Hot leads (score ≥ 80) route to the agent immediately\n- No lead sits unactioned overnight — the morning brief lists anything pending.",
+      ["sla", "response time", "lead", "process"]),
+    mk("Policies", "Cancellation & refund policy", "Booking amount is refundable (less an admin fee) within a 15-day cooling-off window; after that, per the agreement.",
+      "- Cooling-off: booking amount refundable (less ₹25k admin) within 15 days if no agreement is signed\n- After the agreement: refunds per the sale-agreement forfeiture clause\n- All cancellations need manager approval and a logged reason\n- Never promise a full refund verbally.",
+      ["cancellation", "refund", "policy"], { usedByAi: false }),
+    mk("Policies", "Brokerage & channel-partner terms", "Channel partners earn 1–2% on registered bookings — the lead must be registered before the first site visit.",
+      "- Channel partners must register the lead before the first site visit to claim brokerage\n- Payout: 1–2% of booking value on registration, per the CP agreement\n- Duplicate/disputed leads are resolved by first-registration timestamp\n- Use the channel-partner portal login for CP-sourced leads.",
+      ["brokerage", "channel partner", "cp", "policy"], { usedByAi: false, approved: false }),
+  );
+
+  return articles;
+}
+
 interface ClientBundle {
   client: Client; teams: Team[]; users: OrgUser[];
   buyers: Buyer[]; messages: Message[]; projects: Project[]; units: Unit[]; deals: Deal[];
   reviewItems: ReviewItem[]; concierge: ConciergeChat[]; overnightLeads: OvernightLead[]; morningBrief: MorningBrief;
-  activity: ActivityEvent[]; analytics: Analytics;
+  activity: ActivityEvent[]; analytics: Analytics; kbArticles: KbArticle[];
   drivers: Driver[]; cabs: Cab[]; cabBookings: CabBooking[];
 }
 
@@ -708,8 +819,9 @@ function buildClient(spec: ClientSpec): ClientBundle {
   const analytics = buildAnalytics(buyers, agents);
   const { overnightLeads, morningBrief } = buildOvernight(spec.id, buyers);
   const { drivers, cabs, cabBookings } = buildLogistics(spec.id, buyers, projects);
+  const kbArticles = buildKb(spec.id, projects, manager.name);
 
-  return { client, teams, users, buyers, messages, projects, units, deals, reviewItems, concierge, overnightLeads, morningBrief, activity, analytics, drivers, cabs, cabBookings };
+  return { client, teams, users, buyers, messages, projects, units, deals, reviewItems, concierge, overnightLeads, morningBrief, activity, analytics, kbArticles, drivers, cabs, cabBookings };
 }
 
 export interface SeedData {
@@ -728,6 +840,7 @@ export interface SeedData {
   morningBriefByClient: Record<string, MorningBrief>;
   activity: ActivityEvent[];
   analyticsByClient: Record<string, Analytics>;
+  kbArticles: KbArticle[];
   drivers: Driver[];
   cabs: Cab[];
   cabBookings: CabBooking[];
@@ -781,6 +894,7 @@ export function createSeed(): SeedData {
     morningBriefByClient,
     activity: bundles.flatMap((b) => b.activity),
     analyticsByClient,
+    kbArticles: bundles.flatMap((b) => b.kbArticles),
     drivers: bundles.flatMap((b) => b.drivers),
     cabs: bundles.flatMap((b) => b.cabs),
     cabBookings: bundles.flatMap((b) => b.cabBookings),

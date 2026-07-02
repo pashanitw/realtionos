@@ -3,12 +3,13 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronRight, UserSearch, Phone, X } from "lucide-react";
-import { useScopedBuyers, useCurrentUser } from "@/lib/roles";
+import { Search, ChevronRight, ChevronDown, UserSearch, Phone, X, SlidersHorizontal, TrendingUp } from "lucide-react";
+import { useScopedBuyers, useCurrentUser, useActiveClientId } from "@/lib/roles";
+import { useStore } from "@/lib/store";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { Avatar, ScoreBadge, Pill } from "@/components/ui/primitives";
-import { SOURCE_LABEL, interestOf, type Buyer, type Interest } from "@/lib/data/types";
-import { cn, rupeeRange } from "@/lib/utils";
+import { SOURCE_LABEL, SOURCES, STAGES, interestOf, personaOf, type Buyer, type Interest } from "@/lib/data/types";
+import { cn, rupeeRange, bookingProbability } from "@/lib/utils";
 
 const SPRING = { type: "spring" as const, stiffness: 380, damping: 32 };
 
@@ -17,23 +18,54 @@ const INTEREST_VARIANT: Record<Interest, PillVariant> = {
   New: "accent", Hot: "negative", Warm: "live", Cold: "neutral", Interested: "positive", "Not Interested": "outline",
 };
 
+/* ---- lead status (coarse) — used by the Status filter ---- */
+const LEAD_STATUSES = ["New", "Qualified", "Active", "Booked", "Stalled"] as const;
+type LeadStatus = (typeof LEAD_STATUSES)[number];
+const BOOKED_STAGES = ["Booking Amount Paid", "Booking Confirmed", "Agreement Signed", "Loan Sanction", "Registration", "Handover"];
+function statusOf(b: Buyer): LeadStatus {
+  if (b.stalled) return "Stalled";
+  if (BOOKED_STAGES.includes(b.stage)) return "Booked";
+  if (b.stage === "New Enquiry") return "New";
+  if (b.stage === "Qualified") return "Qualified";
+  return "Active";
+}
+
 export default function LeadSearchPage() {
   const buyers = useScopedBuyers();
   const user = useCurrentUser();
+  const cid = useActiveClientId();
+  const users = useStore((s) => s.users);
+  const teams = useStore((s) => s.teams);
+
   const [q, setQ] = useState("");
+  const [agentId, setAgentId] = useState("all");
+  const [teamId, setTeamId] = useState("all");
+  const [source, setSource] = useState("all");
+  const [status, setStatus] = useState("all");
   const query = q.trim().toLowerCase();
 
   // Managers, super-admins and telecallers see the whole company book; agents see only their own.
   const seesWholeClient = user.role !== "agent";
   const scopeNote = seesWholeClient ? `all ${buyers.length} company leads` : `your ${buyers.length} leads`;
 
-  // Always start from the full role-scoped book (whole client for manager/telecaller,
-  // only their own for an agent), then filter as the user types.
+  const agents = useMemo(() => users.filter((u) => u.role === "agent" && u.clientId === cid), [users, cid]);
+  const clientTeams = useMemo(() => teams.filter((t) => t.clientId === cid), [teams, cid]);
+  const teamOfAgent = useMemo(() => Object.fromEntries(agents.map((a) => [a.id, a.teamId ?? ""])), [agents]);
+
+  const activeFilters = [agentId, teamId, source, status].filter((v) => v !== "all").length;
+  const clearFilters = () => { setAgentId("all"); setTeamId("all"); setSource("all"); setStatus("all"); };
+
   const results = useMemo(() => {
-    const base = [...buyers].sort((a, b) => b.score - a.score);
-    if (!query) return base.slice(0, 100);
-    return base
-      .filter((b) =>
+    let base = [...buyers].sort((a, b) => b.score - a.score);
+    base = base.filter((b) => {
+      if (agentId !== "all" && b.agentId !== agentId) return false;
+      if (teamId !== "all" && teamOfAgent[b.agentId] !== teamId) return false;
+      if (source !== "all" && b.source !== source) return false;
+      if (status !== "all" && statusOf(b) !== status) return false;
+      return true;
+    });
+    if (query) {
+      base = base.filter((b) =>
         b.name.toLowerCase().includes(query) ||
         b.phone.toLowerCase().includes(query) ||
         b.config.toLowerCase().includes(query) ||
@@ -41,16 +73,17 @@ export default function LeadSearchPage() {
         SOURCE_LABEL[b.source].toLowerCase().includes(query) ||
         b.stage.toLowerCase().includes(query) ||
         b.agent.toLowerCase().includes(query),
-      )
-      .slice(0, 100);
-  }, [buyers, query]);
+      );
+    }
+    return base.slice(0, 100);
+  }, [buyers, query, agentId, teamId, source, status, teamOfAgent]);
 
   return (
     <PageContainer>
       <PageHeader
         kicker="Find any lead — no duplicates"
         title="Lead search"
-        description={`Search ${scopeNote} by name, phone, locality, configuration or source. Click a result to open the full lead.`}
+        description={`Search ${scopeNote} by name, phone, locality or source — then narrow by agent, team, source and status.`}
       />
 
       {/* search box */}
@@ -70,11 +103,29 @@ export default function LeadSearchPage() {
         )}
       </div>
 
+      {/* advanced filters */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide text-text-faint"><SlidersHorizontal size={13} /> Filters</span>
+        {seesWholeClient && (
+          <FilterSelect value={agentId} onChange={setAgentId} options={[{ value: "all", label: "All agents" }, ...agents.map((a) => ({ value: a.id, label: a.name }))]} />
+        )}
+        {seesWholeClient && (
+          <FilterSelect value={teamId} onChange={setTeamId} options={[{ value: "all", label: "All teams" }, ...clientTeams.map((t) => ({ value: t.id, label: t.name }))]} />
+        )}
+        <FilterSelect value={source} onChange={setSource} options={[{ value: "all", label: "All sources" }, ...SOURCES.map((s) => ({ value: s, label: SOURCE_LABEL[s] }))]} />
+        <FilterSelect value={status} onChange={setStatus} options={[{ value: "all", label: "All statuses" }, ...LEAD_STATUSES.map((s) => ({ value: s, label: s }))]} />
+        {activeFilters > 0 && (
+          <button onClick={clearFilters} className="inline-flex h-9 items-center gap-1 rounded-[5px] border border-border px-2.5 text-xs font-medium text-text-muted transition-colors hover:border-border-strong hover:text-text">
+            <X size={13} /> Clear{activeFilters > 0 ? ` (${activeFilters})` : ""}
+          </button>
+        )}
+      </div>
+
       {/* result count */}
       {buyers.length > 0 && (
         <div className="mt-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-text-faint">
           <span className="tabular rounded-pill bg-surface-2 px-2 py-0.5 text-text-muted">{results.length}</span>
-          {query ? <>leads matching “{q.trim()}”</> : <>leads in your book · ranked by score</>}
+          {query || activeFilters > 0 ? <>leads match your filters</> : <>leads in your book · ranked by score</>}
         </div>
       )}
 
@@ -90,8 +141,8 @@ export default function LeadSearchPage() {
           <EmptyState
             muted
             icon={<Search size={26} />}
-            title={`No leads match “${q.trim()}”`}
-            body="Nothing in the book matches that. Check the spelling, try a phone number or locality — or this may be a brand-new lead worth capturing."
+            title="No leads match"
+            body="Nothing matches those filters. Try clearing a filter, or search by phone or locality — or this may be a brand-new lead worth capturing."
           />
         ) : (
           <AnimatePresence initial={false}>
@@ -105,9 +156,28 @@ export default function LeadSearchPage() {
   );
 }
 
+function FilterSelect({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+  const active = value !== "all";
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={cn("h-9 appearance-none rounded-[5px] border bg-surface py-0 pl-3 pr-8 text-sm outline-none transition-colors focus:border-border-strong", active ? "border-accent/60 font-medium text-text" : "border-border text-text-muted")}
+      >
+        {options.map((o) => (<option key={o.value} value={o.value}>{o.label}</option>))}
+      </select>
+      <ChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-text-faint" />
+    </div>
+  );
+}
+
 /* ---------------- a single lead result → opens the Buyer 360 ---------------- */
 function LeadRow({ buyer, index }: { buyer: Buyer; index: number }) {
   const interest = interestOf(buyer);
+  const bp = bookingProbability(buyer.score, STAGES.indexOf(buyer.stage), STAGES.length);
+  const bpVariant: PillVariant = bp >= 70 ? "positive" : bp >= 45 ? "live" : "neutral";
+  const persona = personaOf(buyer);
   return (
     <motion.div layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ ...SPRING, delay: Math.min(index * 0.02, 0.25) }}>
       <Link
@@ -116,9 +186,11 @@ function LeadRow({ buyer, index }: { buyer: Buyer; index: number }) {
       >
         <ScoreBadge score={buyer.score} size={42} />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="truncate font-semibold text-text">{buyer.name}</span>
             <Pill variant={INTEREST_VARIANT[interest]} className="shrink-0">{interest}</Pill>
+            <Pill variant={bpVariant} className="shrink-0"><TrendingUp size={11} /> {bp}% book</Pill>
+            <span className="shrink-0 rounded-[4px] bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-text-muted">{persona}</span>
           </div>
           <div className="mt-0.5 truncate text-xs text-text-muted">
             {buyer.config} · {buyer.localityPrefs[0]} · {rupeeRange(buyer.budgetMin, buyer.budgetMax)}

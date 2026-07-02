@@ -8,7 +8,7 @@ import { useTheme } from "@/lib/theme";
 import {
   ListChecks, Inbox, Bot, Building, Building2, Columns3, ShieldCheck, BarChart3,
   Users, Car, Megaphone, Video, Workflow, LayoutDashboard, LogOut, ListTodo, Plug, Sun, Moon, Menu, X, Activity,
-  Sparkles, ChevronDown,
+  Sparkles, ChevronDown, BookOpen,
 } from "lucide-react";
 import { TopbarSearch } from "@/components/topbar-search";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,7 @@ const NAV: { group: string; items: NavItem[] }[] = [
       { href: "/worklist", label: "Worklist", icon: ListChecks, roles: EVERYONE },
       { href: "/tasks", label: "Tasks", icon: ListTodo, roles: EVERYONE },
       { href: "/concierge", label: "AI Inbox", icon: Bot, roles: EVERYONE },
+      { href: "/knowledge", label: "Knowledge Base", icon: BookOpen, roles: EVERYONE },
       { href: "/inventory", label: "Inventory", icon: Building2, roles: SALES },
       { href: "/pipeline", label: "Pipeline", icon: Columns3, roles: SALES },
       { href: "/logistics", label: "Logistics", icon: Car, roles: EVERYONE },

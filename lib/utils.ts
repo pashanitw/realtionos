@@ -55,6 +55,12 @@ export function rupeeRange(min: number, max: number): string {
   return `${rupees(min)}–${rupees(max)}`;
 }
 
+/** Predicted booking probability — intent score (70%) blended with pipeline-stage progress (30%). */
+export function bookingProbability(score: number, stageIndex: number, stageCount: number): number {
+  const progress = stageCount > 1 ? (stageIndex / (stageCount - 1)) * 30 : 0;
+  return Math.min(97, Math.max(4, Math.round(score * 0.7 + progress)));
+}
+
 /** Per-sq.ft rate from price + area. */
 export function perSqft(priceInr: number, sqft: number): string {
   if (!sqft) return "";

@@ -52,6 +52,35 @@ export const CHANNEL_LABEL: Record<Channel, string> = {
 export type Config = "1BHK" | "2BHK" | "3BHK" | "4BHK" | "Villa" | "Plot";
 export const CONFIGS: Config[] = ["1BHK", "2BHK", "3BHK", "4BHK", "Villa", "Plot"];
 
+/* ---- Knowledge Base: the org's approved answers the AI + agents quote from ---- */
+export type KbCategory =
+  | "Projects"
+  | "Pricing & Payment"
+  | "Legal & Compliance"
+  | "Home Loans"
+  | "Objection Handling"
+  | "Process & SOPs"
+  | "Policies";
+
+export const KB_CATEGORIES: KbCategory[] = [
+  "Projects", "Pricing & Payment", "Legal & Compliance", "Home Loans", "Objection Handling", "Process & SOPs", "Policies",
+];
+
+export interface KbArticle {
+  id: string;
+  clientId: string;
+  category: KbCategory;
+  title: string;
+  summary: string;      // one-line answer
+  body: string;         // full answer (paragraphs / "- " bullet lines)
+  tags: string[];
+  usedByAi: boolean;    // the AI may quote this in autonomous replies
+  approved: boolean;    // Guardian-cleared
+  author: string;       // who approved it
+  updatedAt: number;
+  views: number;
+}
+
 export type Possession = "ready" | "under-construction" | "either";
 export const POSSESSION_LABEL: Record<Possession, string> = {
   ready: "Ready to move",
@@ -223,6 +252,22 @@ export interface Message {
   isLive?: boolean;
 }
 
+/* ---- Buyer Intelligence: the evolving profile beyond basic contact details ---- */
+export type BuyerUrgency = "high" | "medium" | "low" | "exploring";
+export interface BuyerIntel {
+  preferredFloor?: string;
+  facing?: string;
+  family?: string;
+  office?: string;         // employer / office location
+  school?: string;         // school preference
+  urgency?: BuyerUrgency;
+  decisionMaker?: string;
+  competitor?: string;     // competing project being considered
+  bestContact?: string;    // predicted best time-to-contact window (Insights)
+  concerns: string[];      // emotional / other concerns to address
+  budgetHistory: { label: string; value: number }[]; // budget evolution over time
+}
+
 export interface Buyer {
   id: string;
   clientId: string;
@@ -252,8 +297,17 @@ export interface Buyer {
   weights: Record<SignalCategory, number>;
   scoreHistory: { label: string; score: number }[];
   matchedUnitIds: string[];
+  intel: BuyerIntel; // evolving buyer-intelligence profile (Stage 2)
   followUpAt?: number; // next scheduled follow-up (ms epoch) — drives the SLA / overdue flag
   isNew?: boolean;
+}
+
+/** Lightweight buyer-persona classification (drives best-script suggestions). */
+export function personaOf(b: Buyer): string {
+  if (b.loanStatus === "not needed" && b.budgetMax >= 2.5e7) return "Investor";
+  if (b.config === "Villa" || b.config === "4BHK") return "Luxury";
+  if (b.config === "1BHK" || b.config === "2BHK") return "First home";
+  return "End-user";
 }
 
 /** A requirement string like "3BHK · Kokapet · ₹1.3–1.4 Cr". */

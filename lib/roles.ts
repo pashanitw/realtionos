@@ -100,6 +100,12 @@ export function useClientMessages() {
   const messages = useStore((s) => s.messages);
   return useMemo(() => scopeClient(messages, cid), [messages, cid]);
 }
+// Knowledge Base = org knowledge — everyone in the tenant reads the same approved answers.
+export function useClientKbArticles() {
+  const cid = useActiveClientId();
+  const articles = useStore((s) => s.kbArticles);
+  return useMemo(() => scopeClient(articles, cid), [articles, cid]);
+}
 export function useClientCabs() {
   const cid = useActiveClientId();
   const cabs = useStore((s) => s.cabs);

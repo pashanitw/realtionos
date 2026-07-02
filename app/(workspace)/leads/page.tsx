@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -12,12 +14,15 @@ import { useScopedOvernightLeads, useScopedReviewItems, useClientMorningBrief } 
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { useConfirm } from "@/components/ui/confirm";
 import { ScoreBadge, Avatar, ChannelIcon, Pill, AnimatedNumber, Label } from "@/components/ui/primitives";
-import { SOURCE_LABEL, type OvernightLead, type ReviewItem, type MorningBrief } from "@/lib/data/types";
+import { SOURCE_LABEL, SOURCES, CONFIGS, type Config, type Source, type OvernightLead, type ReviewItem, type MorningBrief } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 
 export default function LeadsPage() {
   const leads = useScopedOvernightLeads();
   const brief = useClientMorningBrief();
+  const addBuyer = useStore((s) => s.addBuyer);
+  const router = useRouter();
+  const [addOpen, setAddOpen] = useState(false);
 
   return (
     <PageContainer>
@@ -31,9 +36,11 @@ export default function LeadsPage() {
 
       <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex items-center justify-between gap-2">
             <Label>While you slept · {leads.length} captured</Label>
-            <span className="font-mono text-[11px] text-text-faint">ranked by intent</span>
+            <button onClick={() => setAddOpen(true)} className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[5px] bg-accent px-3 text-xs font-semibold text-accent-contrast transition-transform hover:scale-[1.03] active:scale-95">
+              <UserPlus size={14} /> Add lead
+            </button>
           </div>
           <div className="space-y-3">
             <AnimatePresence initial={false}>
@@ -53,7 +60,76 @@ export default function LeadsPage() {
           <NeedsYourNod />
         </div>
       </div>
+
+      <AnimatePresence>
+        {addOpen && (
+          <AddLeadDrawer
+            onClose={() => setAddOpen(false)}
+            onSave={(i) => {
+              const id = addBuyer({ name: i.name, config: i.config, locality: i.locality || undefined, budgetMax: i.budgetMax, source: i.source });
+              toast.success("Lead added", { description: `${i.name} · ${i.config} — captured and assigned.` });
+              setAddOpen(false);
+              router.push(`/buyers/${id}`);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </PageContainer>
+  );
+}
+
+/* ---------------- manual add-lead drawer ---------------- */
+function AddLeadDrawer({ onClose, onSave }: { onClose: () => void; onSave: (i: { name: string; config: Config; locality: string; budgetMax?: number; source: Source }) => void }) {
+  const [name, setName] = useState("");
+  const [config, setConfig] = useState<Config>("3BHK");
+  const [locality, setLocality] = useState("");
+  const [budget, setBudget] = useState(""); // in ₹ Cr
+  const [source, setSource] = useState<Source>("whatsapp");
+  const valid = name.trim().length > 1;
+  const inputCls = "w-full rounded-[5px] border border-border bg-surface-inset px-3 py-2 text-sm text-text outline-none transition-colors focus:border-border-strong placeholder:text-text-faint";
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-50 bg-[rgba(5,18,52,0.45)] backdrop-blur-[2px]" />
+      <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 34 }} className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[440px] flex-col bg-surface shadow-[var(--shadow-lift)]">
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><UserPlus size={17} /></span>
+          <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-text">Add a lead</div><div className="font-mono text-[11px] text-text-faint">Captured into the book · auto-assigned to an agent</div></div>
+          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] border border-border text-text-muted transition-colors hover:text-text" aria-label="Close"><X size={16} /></button>
+        </div>
+
+        <div className="flex-1 space-y-3.5 overflow-y-auto p-5">
+          <Field label="Full name"><input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Ananya Sharma" className={inputCls} autoFocus /></Field>
+          <Field label="Configuration">
+            <select value={config} onChange={(e) => setConfig(e.target.value as Config)} className={inputCls}>{CONFIGS.map((c) => (<option key={c} value={c}>{c}</option>))}</select>
+          </Field>
+          <Field label="Preferred locality"><input value={locality} onChange={(e) => setLocality(e.target.value)} placeholder="e.g. Kokapet" className={inputCls} /></Field>
+          <Field label="Budget (₹ Cr)"><input value={budget} onChange={(e) => setBudget(e.target.value)} inputMode="decimal" placeholder="e.g. 1.4" className={inputCls} /></Field>
+          <Field label="Source">
+            <select value={source} onChange={(e) => setSource(e.target.value as Source)} className={inputCls}>{SOURCES.map((s) => (<option key={s} value={s}>{SOURCE_LABEL[s]}</option>))}</select>
+          </Field>
+        </div>
+
+        <div className="border-t border-border p-4">
+          <button
+            disabled={!valid}
+            onClick={() => onSave({ name: name.trim(), config, locality: locality.trim(), budgetMax: budget ? Math.round(parseFloat(budget) * 1e7) : undefined, source })}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-[5px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.01] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+          >
+            <Check size={16} /> Add lead
+          </button>
+        </div>
+      </motion.aside>
+    </>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-text-faint">{label}</div>
+      {children}
+    </div>
   );
 }
 

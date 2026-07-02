@@ -24,7 +24,10 @@
       "Bash(grep -rnE \"hsl\\\\\\(\\\\\\\\\\\\$\" \"app/\\(workspace\\)/home/page.tsx\" \"app/\\(workspace\\)/analytics/page.tsx\" \"app/\\(workspace\\)/team/page.tsx\")",
       "Bash(node -e \"const x=require\\('xlsx'\\); console.log\\('xlsx version:', x.version\\)\")",
       "Bash(node -e \"const i=require\\('lucide-react'\\); ['Upload','FileSpreadsheet','FileUp','Download','Loader2','Sheet','Table'].forEach\\(n=>console.log\\(n, !!i[n]\\)\\)\")",
-      "Bash(cp \"inventory-sample.xlsx\" /tmp/inventory-sample.xlsx)"
+      "Bash(cp \"inventory-sample.xlsx\" /tmp/inventory-sample.xlsx)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

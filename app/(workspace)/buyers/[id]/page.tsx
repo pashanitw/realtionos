@@ -10,12 +10,13 @@ import {
   CheckCircle2, Circle, CircleDot, Phone, Mail, MessageCircle, ShieldCheck, Headphones,
   Gauge, Check, Pencil, X, Building2, Link2, Newspaper, ExternalLink, BadgeCheck, TriangleAlert,
   Wallet, Landmark, BookOpen, Lightbulb, Trophy, ArrowRight, Zap, Copy,
+  Users, Briefcase, GraduationCap, UserCheck, Scale, Compass, Clock, Activity, PhoneCall, PhoneOff,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { PageContainer } from "@/components/ui/page";
 import { useConfirm } from "@/components/ui/confirm";
 import { Avatar, ChannelIcon, ScoreBadge, Sparkline, Label, Pill, Meter } from "@/components/ui/primitives";
-import { CHANNEL_LABEL, type Message, type Buyer, type Stage, type Channel } from "@/lib/data/types";
+import { CHANNEL_LABEL, personaOf, type Message, type Buyer, type Stage, type Channel, type BuyerUrgency } from "@/lib/data/types";
 import { rupees, relativeTime, cn } from "@/lib/utils";
 
 /* provenance: hover a score reason / field → its source message highlights */
@@ -144,6 +145,7 @@ export default function BuyerCanvasPage() {
             <LeadScore buyer={buyer} messages={messages} />
             <DraftedAction buyer={buyer} unitLabel={unitLabel} />
             <AutoFilledFields buyer={buyer} unit={unit} />
+            <BuyerIntelligence buyer={buyer} messages={messages} />
             <Milestones buyer={buyer} done={done} messages={messages} />
             <Enrichment buyer={buyer} />
             <LoanEligibility buyer={buyer} />
@@ -352,6 +354,7 @@ function channelTalk(channel: Channel, buyer: Buyer, messages: Message[], unitLa
 
 function ChannelActions({ buyer, messages, unitLabel, project }: { buyer: Buyer; messages: Message[]; unitLabel: string; project: string }) {
   const [open, setOpen] = useState<Channel | null>(null);
+  const [live, setLive] = useState(false);
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
@@ -362,7 +365,10 @@ function ChannelActions({ buyer, messages, unitLabel, project }: { buyer: Buyer;
         <button onClick={() => setOpen("email")} className="flex h-10 items-center gap-2 rounded-[5px] border border-border bg-surface px-3.5 text-sm font-medium text-text transition-colors hover:bg-surface-2"><Mail size={15} className="text-accent" /> Email</button>
       </div>
       <AnimatePresence>
-        {open && <ChannelDrawer key={open} channel={open} buyer={buyer} messages={messages} unitLabel={unitLabel} project={project} onClose={() => setOpen(null)} />}
+        {open && <ChannelDrawer key={open} channel={open} buyer={buyer} messages={messages} unitLabel={unitLabel} project={project} onClose={() => setOpen(null)} onStartCall={() => { setOpen(null); setLive(true); }} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {live && <LiveCallCopilot buyer={buyer} unitLabel={unitLabel} project={project} onClose={() => setLive(false)} />}
       </AnimatePresence>
     </>
   );
@@ -416,7 +422,7 @@ function ChatThread({ thread, buyer }: { thread: Message[]; buyer: Buyer }) {
   );
 }
 
-function ChannelDrawer({ channel, buyer, messages, unitLabel, project, onClose }: { channel: Channel; buyer: Buyer; messages: Message[]; unitLabel: string; project: string; onClose: () => void }) {
+function ChannelDrawer({ channel, buyer, messages, unitLabel, project, onClose, onStartCall }: { channel: Channel; buyer: Buyer; messages: Message[]; unitLabel: string; project: string; onClose: () => void; onStartCall?: () => void }) {
   const meta = CH_META[channel];
   const Icon = meta.Icon;
   const { thread, suggested, subject, facts, positives, objections, questions, lastInboundText, lastInboundWhen, nextStep } = channelTalk(channel, buyer, messages, unitLabel, project);
@@ -460,6 +466,10 @@ function ChannelDrawer({ channel, buyer, messages, unitLabel, project, onClose }
             <div className="mb-3 flex flex-wrap gap-1.5">
               {facts.map((f) => (<span key={f} className="rounded-[4px] bg-surface px-2 py-0.5 font-mono text-[11px] text-text-muted">{f}</span>))}
             </div>
+
+            {buyer.intel.bestContact && (
+              <div className="mb-3 flex items-center gap-1.5 text-[13px]"><Clock size={13} className="shrink-0 text-accent" /><span className="text-text-muted">Best time to reach:</span> <span className="font-semibold text-text">{buyer.intel.bestContact}</span></div>
+            )}
 
             {lastInboundText && (
               <div className="mb-3">
@@ -519,12 +529,178 @@ function ChannelDrawer({ channel, buyer, messages, unitLabel, project, onClose }
 
         {/* footer CTA */}
         <div className="border-t border-border p-4">
-          <button onClick={() => toast(meta.verb, { description: buyer.name })} className="flex h-11 w-full items-center justify-center gap-2 rounded-[5px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.01] active:scale-95">
+          <button onClick={() => { if (channel === "call" && onStartCall) onStartCall(); else toast(meta.verb, { description: buyer.name }); }} className="flex h-11 w-full items-center justify-center gap-2 rounded-[5px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.01] active:scale-95">
             <Icon size={16} /> {meta.verb}
           </button>
         </div>
       </motion.aside>
     </>
+  );
+}
+
+/* ---------------- Live Call Copilot (Stage 4 + 5.1) — real-time in-call guidance ---------------- */
+function LiveCallCopilot({ buyer, unitLabel, project, onClose }: { buyer: Buyer; unitLabel: string; project: string; onClose: () => void }) {
+  const [phase, setPhase] = useState<"live" | "ended">("live");
+  const [secs, setSecs] = useState(0);
+
+  useEffect(() => {
+    if (phase !== "live") return;
+    const t = setInterval(() => setSecs((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [phase]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const firstName = buyer.name.split(" ")[0];
+  const persona = personaOf(buyer);
+  const locality = buyer.localityPrefs[0] ?? "the area";
+  const nextStep = NEXT_BY_STAGE[buyer.stage];
+  const positive = buyer.scoreReasons.find((r) => r.polarity === "positive");
+  const objection = buyer.scoreReasons.find((r) => r.polarity === "negative");
+  const competitor = buyer.intel.competitor && buyer.intel.competitor !== "None named" ? buyer.intel.competitor : null;
+  const office = buyer.intel.office ?? "work";
+  const emiK = Math.max(20, Math.round((buyer.budgetMax / 1e7) * 72));
+
+  const script = persona === "Investor"
+    ? `Lead with the numbers: rental yield in ${locality}, price appreciation and resale liquidity. ${firstName} is buying for returns — frame ${project} as an appreciating asset, not just a home.`
+    : persona === "Luxury"
+      ? `Sell the lifestyle — amenities, the view, the address. ${firstName} wants a statement ${buyer.config}; walk the exclusivity, then justify the price with what's included.`
+      : persona === "First home"
+        ? `Reassure on affordability: EMI ~₹${emiK}k, step-by-step loan help, no hidden costs. ${firstName} is a first-time buyer — make the path feel simple and safe.`
+        : `Focus on daily-life fit: the ${buyer.config} layout, commute to ${office}, and possession certainty. Help ${firstName} picture living there, then move to the next step.`;
+
+  const cues = [
+    { icon: Sparkles, tag: "Open", text: `Greet ${firstName} by name, reference their last message, confirm you're calling about the ${buyer.config} in ${locality}.` },
+    competitor ? { icon: Scale, tag: "Competitor", text: `They're weighing ${competitor} — compare usable carpet area & possession, not headline price.` } : null,
+    objection ? { icon: ShieldCheck, tag: "Objection", text: `Expect: “${objection.text}” → acknowledge, then reframe on value.` } : null,
+    { icon: Wallet, tag: "Pricing", text: `Quote all-in: base + floor-rise ₹250/sq.ft + 5% GST + ~6% registration — never base alone.` },
+    { icon: Landmark, tag: "Payment / loan", text: `Offer the 10/80/10 plan; pre-qualify EMI ~₹${emiK}k (HDFC / SBI / ICICI).` },
+    positive ? { icon: TrendingUp, tag: "Lean in", text: `Reinforce: ${positive.text}.` } : null,
+    { icon: ArrowRight, tag: "Close", text: `Ask for the next step — ${nextStep.toLowerCase()}. Lock a date before you hang up.` },
+  ].filter(Boolean) as { icon: typeof Sparkles; tag: string; text: string }[];
+  const shown = Math.min(cues.length, 1 + Math.floor(secs / 2));
+
+  const faqs = [
+    { q: "It's over our budget", a: "Show carpet-area value + the 10/80/10 plan; a floor-rise waiver beats a base-price cut." },
+    { q: "Possession is too far away", a: "Share the RERA-committed date + construction photos; offer a ready-to-move option." },
+    { q: "We need to talk to family", a: "Book a joint site visit or a call with the decision-maker; hold the unit 48h." },
+    { q: competitor ? `${competitor} is cheaper` : "A competitor is cheaper", a: "They quote super-built-up — compare usable carpet area and delivery track record." },
+  ];
+
+  const h = hash(buyer.id);
+  const wonN = 8 + (h % 12);
+  const totalN = wonN + 3 + ((h >>> 4) % 5);
+  const fasterPct = 26 + ((h >>> 7) % 18);
+  const guardianScore = 88 + ((h >>> 9) % 9);
+  const mmss = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+  const summary = `Spoke with ${firstName} about the ${buyer.config} at ${project}. Covered all-in pricing${competitor ? ` and the ${competitor} comparison` : ""}${objection ? `; addressed “${truncate(objection.text, 40)}”` : ""}. Agreed next: ${nextStep}.`;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-[rgba(5,18,52,0.55)] backdrop-blur-[2px]" />
+      <motion.div initial={{ opacity: 0, y: 16, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.98 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="relative flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-[8px] border border-border bg-surface shadow-[var(--shadow-lift)]">
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><PhoneCall size={17} /></span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 text-sm font-semibold text-text">
+              {phase === "live" ? <><span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-negative opacity-70" /><span className="relative inline-flex h-2 w-2 rounded-full bg-negative" /></span> Live call</> : "Call ended"} · {buyer.name}
+            </div>
+            <div className="font-mono text-[11px] text-text-faint">{phase === "live" ? "Vocalis + AI Copilot · recording" : "summary + CRM update"} · {mmss}</div>
+          </div>
+          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] border border-border text-text-muted transition-colors hover:text-text" aria-label="Close"><X size={16} /></button>
+        </div>
+
+        {phase === "live" ? (
+          <>
+            <div className="flex-1 space-y-4 overflow-y-auto p-5">
+              <div className="flex flex-wrap items-center gap-1.5">
+                {[buyer.config, rupees(buyer.budgetMax), locality, buyer.stage, persona].map((f) => (<span key={f} className="rounded-[4px] bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-muted">{f}</span>))}
+              </div>
+
+              <div className="rounded-[6px] border border-accent/25 bg-accent-soft/40 p-3.5">
+                <div className="mb-1.5 flex items-center gap-1.5"><Lightbulb size={13} className="text-accent" /><span className="font-mono text-[10px] uppercase tracking-wide text-accent">Best script · {persona}</span></div>
+                <p className="text-sm leading-relaxed text-text">{script}</p>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1.5"><Bot size={13} className="text-accent" /><span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Live guidance · in the moment</span></div>
+                <div className="space-y-2">
+                  <AnimatePresence initial={false}>
+                    {cues.slice(0, shown).map((c) => {
+                      const Icon = c.icon;
+                      return (
+                        <motion.div key={c.tag} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} className="flex items-start gap-2.5 rounded-[5px] border border-border bg-surface-2 p-2.5">
+                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-[5px] bg-accent-soft text-accent"><Icon size={13} /></span>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">{c.tag}</div>
+                            <div className="text-[13px] leading-snug text-text">{c.text}</div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                  {shown < cues.length && <div className="flex items-center gap-1.5 pl-1 font-mono text-[10px] text-text-faint"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> Copilot listening…</div>}
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 flex items-center gap-1.5"><ShieldCheck size={13} className="text-live" /><span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Objection FAQs · tap-ready responses</span></div>
+                <div className="space-y-1.5">
+                  {faqs.map((f) => (
+                    <div key={f.q} className="rounded-[5px] border border-border bg-surface-inset p-2.5">
+                      <div className="text-[13px] font-semibold text-text">“{f.q}”</div>
+                      <div className="mt-0.5 flex items-start gap-1.5 text-[12px] leading-snug text-text-muted"><ArrowRight size={12} className="mt-0.5 shrink-0 text-accent" /><span>{f.a}</span></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-t border-border p-4">
+              <span className="flex-1 font-mono text-[10px] text-text-faint">Guardian is scoring this call live</span>
+              <button onClick={() => setPhase("ended")} className="inline-flex h-11 items-center gap-2 rounded-[5px] bg-negative px-5 text-sm font-semibold text-white transition-transform hover:scale-[1.02] active:scale-95">
+                <PhoneOff size={16} /> End call &amp; summarise
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex-1 space-y-4 overflow-y-auto p-5">
+              <div className="rounded-[6px] border border-accent/25 bg-accent-soft/40 p-3.5">
+                <div className="mb-1.5 flex items-center gap-1.5"><Sparkles size={13} className="text-accent" /><span className="font-mono text-[10px] uppercase tracking-wide text-accent">Auto call summary</span></div>
+                <p className="text-sm leading-relaxed text-text">{summary}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-[6px] border border-border bg-surface-2 p-3">
+                  <div className="flex items-center gap-1.5 text-[13px] font-semibold text-text"><Check size={14} className="text-positive" /> CRM updated</div>
+                  <div className="mt-1 text-[11px] text-text-muted">4 fields captured · timeline + stage logged · no manual entry</div>
+                </div>
+                <div className="rounded-[6px] border border-border bg-surface-2 p-3">
+                  <div className="flex items-center gap-1.5 text-[13px] font-semibold text-text"><ShieldCheck size={14} className="text-accent" /> Guardian {guardianScore}/100</div>
+                  <div className="mt-1 text-[11px] text-text-muted">Strong objection handling · in-policy pricing · good talk-ratio</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 rounded-[5px] border border-border bg-surface-inset p-3 text-[12px] leading-relaxed text-text-muted">
+                <Activity size={14} className="mt-0.5 shrink-0 text-accent" />
+                <span>Pitch “<span className="font-semibold text-text">{persona}-first</span>” — won <span className="font-semibold text-text">{wonN}/{totalN}</span> similar · <span className="font-semibold text-positive">+{fasterPct}% faster</span> close. This call's outcome is logged to keep auto-optimising the script.</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 border-t border-border p-4">
+              <span className="flex-1 text-xs text-text-muted"><span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Recommended next</span><br />{ACTION_BY_STAGE[buyer.stage].cta}</span>
+              <button onClick={() => { toast.success("Next action queued", { description: ACTION_BY_STAGE[buyer.stage].cta }); onClose(); }} className="inline-flex h-11 items-center gap-2 rounded-[5px] bg-accent px-5 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95">
+                <ArrowRight size={16} /> Do it
+              </button>
+            </div>
+          </>
+        )}
+      </motion.div>
+    </div>
   );
 }
 
@@ -756,6 +932,118 @@ function AutoFilledFields({ buyer, unit }: { buyer: Buyer; unit?: ReturnType<typ
   );
 }
 
+/* ---------------- Buyer Intelligence (Stage 2) — evolving profile + budget trend + Guardian gaps ---------------- */
+const URGENCY: Record<BuyerUrgency, { label: string; color: string }> = {
+  high: { label: "High — ready to move", color: "var(--live)" },
+  medium: { label: "Medium", color: "var(--accent)" },
+  low: { label: "Low", color: "var(--text-muted)" },
+  exploring: { label: "Just exploring", color: "var(--text-faint)" },
+};
+
+function BuyerIntelligence({ buyer, messages }: { buyer: Buyer; messages: Message[] }) {
+  const x = buyer.intel;
+  const commPref = buyer.channelsUsed[0];
+  const urg = x.urgency ? URGENCY[x.urgency] : null;
+  const rows: { label: string; value?: string; icon: typeof Users }[] = [
+    { label: "Preferred floor", value: x.preferredFloor, icon: Building2 },
+    { label: "Facing", value: x.facing, icon: Compass },
+    { label: "Family", value: x.family, icon: Users },
+    { label: "Office", value: x.office, icon: Briefcase },
+    { label: "School need", value: x.school, icon: GraduationCap },
+    { label: "Buying urgency", value: urg?.label, icon: Gauge },
+    { label: "Decision-maker", value: x.decisionMaker, icon: UserCheck },
+    { label: "Considering", value: x.competitor, icon: Scale },
+    { label: "Prefers", value: commPref ? CHANNEL_LABEL[commPref] : undefined, icon: MessageCircle },
+  ];
+  const filled = rows.filter((r) => r.value);
+  const missing = rows.filter((r) => !r.value).map((r) => r.label);
+  if (!x.bestContact) missing.push("Best time to reach");
+  const total = rows.length + 1; // + best-time
+  const pct = Math.round(((filled.length + (x.bestContact ? 1 : 0)) / total) * 100);
+  const first = x.budgetHistory[0]?.value ?? buyer.budgetMax;
+  const last = x.budgetHistory[x.budgetHistory.length - 1]?.value ?? buyer.budgetMax;
+  const rose = last > first;
+
+  // engagement read (Guardian — engagement effectiveness), derived from the conversation
+  const replies = messages.filter((m) => m.direction === "inbound").length;
+  const respondsH = Math.max(1, Math.round((100 - buyer.score) / 8));
+
+  return (
+    <div className="rounded-[6px] border border-border bg-surface p-5 shadow-[var(--shadow-soft)]">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5"><ScanSearch size={15} className="text-accent" /><Label>Buyer intelligence</Label></div>
+        <span className={cn("inline-flex items-center gap-1 rounded-pill px-2 py-0.5 font-mono text-[10px]", missing.length ? "bg-live-soft text-live" : "bg-positive-soft text-positive")}>
+          <ShieldCheck size={10} /> {pct}% complete
+        </span>
+      </div>
+
+      {/* best time to reach — Insights timing prediction */}
+      {x.bestContact && (
+        <div className="mb-3 flex items-center gap-2.5 rounded-[5px] border border-accent/25 bg-accent-soft/40 px-3 py-2">
+          <Clock size={15} className="shrink-0 text-accent" />
+          <div className="min-w-0 flex-1">
+            <div className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Best time to reach</div>
+            <div className="text-sm font-semibold text-text">{x.bestContact}</div>
+          </div>
+          <span className="shrink-0 font-mono text-[10px] text-text-faint">predicted</span>
+        </div>
+      )}
+
+      {/* engagement effectiveness */}
+      <div className="mb-3 flex items-center gap-2 rounded-[5px] border border-border bg-surface-2 px-3 py-2 text-[11px] text-text-muted">
+        <Activity size={13} className="shrink-0 text-text-faint" />
+        <span><span className="font-semibold text-text">{replies}</span> replies · responds in ~<span className="font-semibold text-text">{respondsH}h</span> · last touch <span suppressHydrationWarning>{relativeTime(buyer.lastTouch)}</span></span>
+      </div>
+
+      {/* budget evolution */}
+      {x.budgetHistory.length > 1 && (
+        <div className="mb-3 rounded-[5px] border border-border bg-surface-2 p-3">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Budget evolution</span>
+            <span className="inline-flex items-center gap-1 font-mono text-[10px]" style={{ color: rose ? "var(--positive)" : "var(--text-muted)" }}>{rose && <TrendingUp size={11} />} {rupees(first)} → {rupees(last)}</span>
+          </div>
+          <Sparkline points={x.budgetHistory.map((h) => h.value)} width={300} height={28} color="var(--accent)" />
+        </div>
+      )}
+
+      {/* known fields */}
+      <div className="space-y-2">
+        {filled.map((r) => {
+          const Icon = r.icon;
+          return (
+            <div key={r.label} className="flex items-center gap-2.5">
+              <Icon size={14} className="shrink-0 text-text-faint" />
+              <span className="w-24 shrink-0 text-xs text-text-faint">{r.label}</span>
+              <span className="flex-1 truncate text-sm font-medium text-text">{r.value}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* emotional concerns */}
+      {x.concerns.length > 0 && (
+        <div className="mt-3">
+          <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-text-faint">Concerns to address</div>
+          <div className="flex flex-wrap gap-1.5">
+            {x.concerns.map((c) => (<span key={c} className="rounded-[4px] bg-live-soft px-2 py-0.5 text-[11px] text-live">{c}</span>))}
+          </div>
+        </div>
+      )}
+
+      {/* Guardian: profile gaps */}
+      {missing.length > 0 && (
+        <div className="mt-3 rounded-[5px] border border-border bg-surface-inset p-3">
+          <div className="mb-1.5 flex items-center gap-1.5"><TriangleAlert size={12} className="text-live" /><span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Guardian · {missing.length} profile gap{missing.length === 1 ? "" : "s"}</span></div>
+          <div className="flex flex-wrap gap-1.5">
+            {missing.map((label) => (<span key={label} className="rounded-[4px] border border-border bg-surface px-2 py-0.5 text-[11px] text-text-muted">{label}</span>))}
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-text-faint">The AI will ask for these on the next touch to complete the profile.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Milestones({ buyer, done, messages }: { buyer: Buyer; done: number; messages: Message[] }) {
   const firstWa = messages.find((m) => m.channel === "whatsapp");
   return (
@@ -977,6 +1265,7 @@ function SalesPlaybook({ buyer }: { buyer: Buyer }) {
   const book = PLAYBOOKS[(h >>> 4) % PLAYBOOKS.length];
   const plays = PLAYS[book](buyer);
   const locality = buyer.localityPrefs[0] ?? "the area";
+  const persona = personaOf(buyer);
 
   /* evidence stats — plausible, deterministic */
   const wonCount = 8 + ((h >>> 7) % 12); // 8–19
@@ -995,7 +1284,10 @@ function SalesPlaybook({ buyer }: { buyer: Buyer }) {
     >
       <div className="mb-3 flex items-center justify-between gap-2">
         <Label>Playbook · what wins deals like this</Label>
-        <Pill variant="accent" mono><Zap size={11} /> {match}% match</Pill>
+        <div className="flex items-center gap-1.5">
+          <Pill variant="neutral" mono>{persona}</Pill>
+          <Pill variant="accent" mono><Zap size={11} /> {match}% match</Pill>
+        </div>
       </div>
 
       {/* recommended playbook */}
@@ -1054,6 +1346,11 @@ function SalesPlaybook({ buyer }: { buyer: Buyer }) {
           <ArrowRight size={12} className="mx-1 inline text-accent" />
           {nextPlay}
         </span>
+      </div>
+
+      {/* auto-optimising pitch — outcome tracking (5.1) */}
+      <div className="mt-2 flex items-center gap-1.5 font-mono text-[10px] text-text-faint">
+        <Activity size={11} className="text-accent" /> Auto-optimising · learning from {wonCount + total} closed deals · pitch refreshed 3d ago
       </div>
     </motion.div>
   );

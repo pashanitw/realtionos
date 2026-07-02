@@ -33,6 +33,8 @@ import {
   type Source,
   CONFIGS,
   type Availability,
+  type KbArticle,
+  type KbCategory,
 } from "./data/types";
 import { seedWorkflows, workflowMessage } from "./workflows";
 
@@ -61,6 +63,7 @@ interface StoreState {
   morningBriefByClient: Record<string, MorningBrief>;
   activity: ActivityEvent[];
   analyticsByClient: Record<string, Analytics>;
+  kbArticles: KbArticle[];
   drivers: Driver[];
   cabs: Cab[];
   cabBookings: CabBooking[];
@@ -107,6 +110,9 @@ interface StoreState {
 
   /** Bulk-import units (manager Excel upload). Resolves/creates projects by name. */
   addUnits: (rows: ImportUnitRow[]) => { added: number; projectsCreated: number };
+
+  /** Add a Knowledge Base article (manager-curated, approved on save). */
+  addKbArticle: (input: { title: string; category: KbCategory; summary: string; body: string; tags?: string[]; usedByAi?: boolean }) => string;
 
   createWorkflow: (name: string, nodes: WorkflowNode[]) => string;
   toggleWorkflow: (id: string) => void;
@@ -175,6 +181,7 @@ export const useStore = create<StoreState>((set, get) => ({
   morningBriefByClient: seed.morningBriefByClient,
   activity: seed.activity,
   analyticsByClient: seed.analyticsByClient,
+  kbArticles: seed.kbArticles,
   drivers: seed.drivers,
   cabs: seed.cabs,
   cabBookings: seed.cabBookings,
@@ -315,6 +322,7 @@ export const useStore = create<StoreState>((set, get) => ({
       lastTouch: Date.now(), isNew: true, stalled: false,
       agentId: agent?.id ?? template.agentId, agent: agent?.name ?? template.agent, agentInitials: agent?.initials ?? template.agentInitials,
       scoreReasons: template.scoreReasons.slice(0, 2), matchedUnitIds: template.matchedUnitIds,
+      intel: { urgency: "medium", concerns: [], budgetHistory: [{ label: "Now", value: budgetMax }] },
     };
     set((st) => ({ buyers: [newBuyer, ...st.buyers].sort((a, b) => b.score - a.score) }));
     get().pushActivity({ kind: "lead", text: `New buyer added · ${input.name}`, meta: `${newBuyer.config} · ${newBuyer.localityPrefs[0]}` });
@@ -487,6 +495,24 @@ export const useStore = create<StoreState>((set, get) => ({
     });
     if (added) get().pushActivity({ kind: "lead", text: `Imported ${added} unit${added === 1 ? "" : "s"} from Excel`, meta: projectsCreated ? `${projectsCreated} new project${projectsCreated === 1 ? "" : "s"}` : undefined });
     return { added, projectsCreated };
+  },
+
+  addKbArticle: (input) => {
+    const id = uid("kb");
+    set((s) => {
+      const cid = writeClientId(s);
+      const author = s.users.find((x) => x.id === s.currentUserId)?.name ?? "Manager";
+      const article: KbArticle = {
+        id, clientId: cid, category: input.category,
+        title: input.title.trim(), summary: input.summary.trim(), body: input.body.trim(),
+        tags: (input.tags ?? []).map((t) => t.trim()).filter(Boolean),
+        usedByAi: input.usedByAi ?? true, approved: true, author,
+        updatedAt: Date.now(), views: 0,
+      };
+      return { kbArticles: [article, ...s.kbArticles] };
+    });
+    get().pushActivity({ kind: "lead", text: `Knowledge Base · added "${input.title}"` });
+    return id;
   },
 
   createWorkflow: (name, nodes) => {
