@@ -27,7 +27,10 @@
       "Bash(cp \"inventory-sample.xlsx\" /tmp/inventory-sample.xlsx)",
       "Bash(git add *)",
       "Bash(git commit -q -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(sed -i 's|const XLSX = require\\(\"xlsx\"\\);|const XLSX = require\\(\"/home/jakeer/personal/TVK/Relation  OS/node_modules/xlsx\"\\);|' \"/tmp/claude-1000/-home-jakeer-personal-TVK-Relation--OS/275d87e4-3331-47c3-b4ae-c307212f68c3/scratchpad/gen-daywise.cjs\")",
+      "Bash(node \"/tmp/claude-1000/-home-jakeer-personal-TVK-Relation--OS/275d87e4-3331-47c3-b4ae-c307212f68c3/scratchpad/gen-daywise.cjs\")",
+      "Bash(git pull *)"
     ]
   }
 }

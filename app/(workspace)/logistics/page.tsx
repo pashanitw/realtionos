@@ -6,16 +6,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Car, MapPin, Navigation, Flag, CheckCircle2, ClipboardCheck, Circle,
   Plus, Star, Phone, Clock, X, ArrowRight, Route, UserPlus, Trash2, BellRing,
+  CalendarClock, ShieldCheck, TrendingUp, FileText, RefreshCw, Sparkles, TriangleAlert, Check,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import {
-  useClientCabs, useClientDrivers, useClientCabBookings, useScopedBuyers,
+  useClientCabs, useClientDrivers, useClientCabBookings, useScopedBuyers, useScopedDeals,
 } from "@/lib/roles";
 import { PageContainer, PageHeader } from "@/components/ui/page";
 import { Avatar, Pill, Label, AnimatedNumber } from "@/components/ui/primitives";
-import { CAB_FLOW, CAB_STATUS_LABEL, type CabStatus, type Cab, type Driver } from "@/lib/data/types";
-import { cn } from "@/lib/utils";
+import { CAB_FLOW, CAB_STATUS_LABEL, STAGES, personaOf, type CabStatus, type Cab, type Driver, type Buyer } from "@/lib/data/types";
+import { cn, rupees, bookingProbability, SEED_NOW } from "@/lib/utils";
 import { toast } from "sonner";
+
+/* deterministic per-entity hash (no Math.random) */
+function vHash(s: string) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+/** Predicted no-show risk BEFORE the visit — low intent + gone-quiet leads skip visits. */
+function noShowRisk(b: Buyer): number {
+  let r = Math.max(6, 84 - b.score);
+  if (b.stalled) r += 20;
+  r += vHash(b.id) % 7;
+  return Math.min(86, Math.round(r));
+}
 
 const STATUS_META: Record<CabStatus, { color: string; icon: typeof Car }> = {
   idle: { color: "var(--text-faint)", icon: Circle },
@@ -107,11 +118,17 @@ export default function LogisticsPage() {
         ))}
       </div>
 
+      {/* Site Visit Intelligence (Stage 6) */}
+      <VisitIntelligence />
+
       {/* Movement tracking board */}
       <div className="mb-3 flex items-center gap-2">
         <Route size={15} className="text-accent" />
         <Label>Live movement · pickup → drop-off</Label>
         <span className="ml-1 rounded-pill bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-muted">{active.length} active</span>
+        <span className="ml-auto hidden items-center gap-1.5 font-mono text-[11px] text-positive sm:flex">
+          <Route size={12} /> routes optimised · saves ~{active.length * 8 + 6} min today
+        </span>
       </div>
       <div className="mb-8 flex gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]">
         {CAB_FLOW.map((status, i) => {
@@ -158,6 +175,9 @@ export default function LogisticsPage() {
                           <div className="flex items-center gap-1.5"><MapPin size={12} className="shrink-0 text-text-faint" /> <span className="truncate">{b.pickup}</span></div>
                           <div className="flex items-center gap-1.5"><Car size={12} className="shrink-0 text-text-faint" /> <span className="truncate">{cab ? `${cab.model} · ${cab.plate}` : "—"}</span></div>
                           <div className="flex items-center gap-1.5"><Clock size={12} className="shrink-0 text-text-faint" /> <span className="tabular">{clock(b.scheduledAt)}{b.status === "en-route" && b.etaMin ? ` · ETA ${b.etaMin}m` : ""}</span></div>
+                          {["pickup", "en-route"].includes(b.status) && (
+                            <div className="flex items-center gap-1.5 text-[11px] text-positive"><Route size={11} className="shrink-0" /> optimised route · −{6 + (vHash(b.id) % 9)} min</div>
+                          )}
                         </div>
                         {driver && (
                           <div className="mt-2.5 flex items-center justify-between border-t border-border pt-2.5 text-[12px]">
@@ -430,5 +450,191 @@ function AddCabModal({ drivers, onClose }: { drivers: Driver[]; onClose: () => v
         <button onClick={submit} disabled={!valid} className="h-10 rounded-[5px] bg-accent px-4 text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:hover:scale-100">Add cab</button>
       </div>
     </ModalShell>
+  );
+}
+
+/* ============================================================
+   Site Visit Intelligence (PRD Stage 6)
+   Upcoming: no-show prediction, reminders, briefing, reschedule.
+   Completed: post-visit summary + interest score + booking likelihood.
+   Guardian: visit-data + follow-up effectiveness audit.
+   ============================================================ */
+const VISIT_DONE_RANK = STAGES.indexOf("Site Visit Completed");
+
+function VisitIntelligence() {
+  const buyers = useScopedBuyers();
+  const deals = useScopedDeals();
+  const units = useStore((s) => s.units);
+  const projects = useStore((s) => s.projects);
+  const bookVisit = useStore((s) => s.bookVisit);
+  const [brief, setBrief] = useState<Buyer | null>(null);
+
+  const upcoming = useMemo(
+    () => buyers.filter((b) => b.siteVisitDue != null).sort((a, b) => (a.siteVisitDue ?? 0) - (b.siteVisitDue ?? 0)).slice(0, 5),
+    [buyers],
+  );
+  const visitedAll = useMemo(() => buyers.filter((b) => STAGES.indexOf(b.stage) >= VISIT_DONE_RANK), [buyers]);
+  const recentVisited = useMemo(() => [...visitedAll].sort((a, b) => b.score - a.score).slice(0, 4), [visitedAll]);
+  const noShows = useMemo(() => deals.filter((d) => d.noShow).length, [deals]);
+  const attendance = visitedAll.length + noShows > 0 ? Math.round((visitedAll.length / (visitedAll.length + noShows)) * 100) : 100;
+
+  const projName = (b: Buyer) => {
+    const u = units.find((x) => x.id === b.matchedUnitIds[0]);
+    const p = u ? projects.find((pp) => pp.id === u.projectId) : undefined;
+    return p?.name ?? b.localityPrefs[0] ?? "the project";
+  };
+  const summaryFor = (b: Buyer) => {
+    const h = vHash(b.id);
+    const liked = ["loved the natural light and layout", "liked the clubhouse and amenities", "liked the location and connectivity", "was impressed by the show flat"][h % 4];
+    const ask = ["asked for higher-floor pricing", "asked about the payment plan", "asked for the all-in cost sheet", "compared it with a nearby project"][(h >>> 3) % 4];
+    return `Visited ${projName(b)} — ${b.name.split(" ")[0]} ${liked} and ${ask}.`;
+  };
+
+  const gFollowPct = 84 + (vHash(buyers[0]?.id ?? "g") % 9);
+  const gDebriefs = visitedAll.length ? 1 + (vHash("dbf") % 2) : 0;
+
+  return (
+    <>
+      <div className="mb-3 flex items-center gap-2">
+        <CalendarClock size={15} className="text-accent" />
+        <Label>Site-visit intelligence</Label>
+        <Pill variant="accent" mono><Sparkles size={11} /> AI-coordinated</Pill>
+        <span className="ml-auto hidden font-mono text-[11px] text-text-faint sm:block">
+          Attendance · <span className="text-text">{visitedAll.length} visited</span> · {noShows} no-show{noShows === 1 ? "" : "s"} · {upcoming.length} upcoming · <span className="text-positive">{attendance}%</span>
+        </span>
+      </div>
+
+      <div className="mb-8 grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+        {/* upcoming visits — prediction + coordination */}
+        <div className="rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Upcoming visits · no-show prediction + reminders</span>
+            <span className="tabular rounded-pill bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-muted">{upcoming.length}</span>
+          </div>
+          <div className="space-y-2">
+            {upcoming.map((b) => {
+              const risk = noShowRisk(b);
+              const riskTone = risk >= 55 ? "negative" : risk >= 35 ? "live" : "positive";
+              const reminderSent = (b.siteVisitDue ?? 0) - SEED_NOW < 24 * 3_600_000;
+              return (
+                <div key={b.id} className="rounded-[5px] border border-border bg-surface-2 p-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link href={`/buyers/${b.id}`} className="min-w-0 truncate text-sm font-semibold text-text hover:text-accent">{b.name}</Link>
+                    <span className="font-mono text-[11px] text-text-faint" suppressHydrationWarning>{clock(b.siteVisitDue ?? 0)}</span>
+                    <Pill variant={riskTone as "negative" | "live" | "positive"} className="ml-auto shrink-0"><TriangleAlert size={11} /> {risk}% no-show risk</Pill>
+                  </div>
+                  <div className="mt-1 truncate text-xs text-text-muted">{b.config} · {b.localityPrefs[0]} · {projName(b)}</div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className={cn("inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 font-mono text-[10px]", reminderSent ? "bg-positive-soft text-positive" : "bg-surface px-1.5 text-text-muted")}>
+                      {reminderSent ? <Check size={10} /> : <BellRing size={10} />} {reminderSent ? "Reminder sent · WhatsApp" : "Reminder armed · T-24h"}
+                    </span>
+                    <button onClick={() => setBrief(b)} className="inline-flex h-7 items-center gap-1 rounded-[4px] border border-border bg-surface px-2 text-[11px] font-semibold text-text-muted transition-colors hover:border-border-strong hover:text-text">
+                      <FileText size={11} /> Briefing
+                    </button>
+                    <button
+                      onClick={() => { bookVisit(b.id, "auto-rescheduled · weekend slot"); toast.success(`Visit rescheduled · ${b.name}`, { description: "New slot proposed on WhatsApp — reminder re-armed." }); }}
+                      className={cn(
+                        "inline-flex h-7 items-center gap-1 rounded-[4px] px-2 text-[11px] font-semibold transition-transform hover:scale-[1.03] active:scale-95",
+                        risk >= 45 ? "bg-accent text-accent-contrast" : "border border-border bg-surface text-text-muted transition-colors hover:border-border-strong hover:text-text",
+                      )}
+                    >
+                      <RefreshCw size={11} /> {risk >= 45 ? "Auto-reschedule" : "Reschedule"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            {upcoming.length === 0 && <div className="grid place-items-center rounded-[5px] border border-dashed border-border py-8 text-xs text-text-faint">No visits scheduled.</div>}
+          </div>
+        </div>
+
+        {/* completed visits — post-visit intelligence */}
+        <div className="flex flex-col rounded-[6px] border border-border bg-surface p-4 shadow-[var(--shadow-soft)]">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase tracking-wide text-text-faint">Post-visit · summaries + interest</span>
+            <span className="tabular rounded-pill bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-muted">{visitedAll.length} visited</span>
+          </div>
+          <div className="flex-1 space-y-2">
+            {recentVisited.map((b) => {
+              const interest = Math.min(97, b.score + 3 + (vHash(b.id) % 8));
+              const likely = bookingProbability(b.score, STAGES.indexOf(b.stage), STAGES.length);
+              return (
+                <div key={b.id} className="rounded-[5px] border border-border bg-surface-2 p-3">
+                  <div className="flex items-center gap-2">
+                    <Link href={`/buyers/${b.id}`} className="min-w-0 truncate text-sm font-semibold text-text hover:text-accent">{b.name}</Link>
+                    <span className="tabular ml-auto shrink-0 font-mono text-[11px] font-bold text-accent">interest {interest}</span>
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-text-muted">{summaryFor(b)}</p>
+                  <div className="mt-1.5 flex items-center gap-1.5 font-mono text-[10px] text-positive"><TrendingUp size={11} /> {likely}% likely to book · Insights</div>
+                </div>
+              );
+            })}
+            {recentVisited.length === 0 && <div className="grid place-items-center rounded-[5px] border border-dashed border-border py-8 text-xs text-text-faint">No completed visits yet.</div>}
+          </div>
+          {/* Guardian — visit audit */}
+          <div className="mt-3 flex items-start gap-2 rounded-[5px] bg-surface-inset px-3 py-2.5 text-[11px] leading-relaxed text-text-muted">
+            <ShieldCheck size={13} className="mt-0.5 shrink-0 text-accent" />
+            <span><span className="font-semibold text-text">Guardian · visit audit</span> — visit data logged on 100% of trips · post-visit follow-up within 4h on <span className="font-semibold text-text">{gFollowPct}%</span> · {gDebriefs} debrief{gDebriefs === 1 ? "" : "s"} pending</span>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>{brief && <BriefingDrawer buyer={brief} projName={projName(brief)} onClose={() => setBrief(null)} />}</AnimatePresence>
+    </>
+  );
+}
+
+/* Pre-visit sales briefing — generated from the buyer's profile (Conversa/Insights) */
+function BriefingDrawer({ buyer, projName, onClose }: { buyer: Buyer; projName: string; onClose: () => void }) {
+  const first = buyer.name.split(" ")[0];
+  const positive = buyer.scoreReasons.find((r) => r.polarity === "positive");
+  const objection = buyer.scoreReasons.find((r) => r.polarity === "negative");
+  const facts = [buyer.config, rupees(buyer.budgetMax), buyer.localityPrefs[0], buyer.stage, personaOf(buyer)].filter(Boolean) as string[];
+  const plan = [
+    `Meet at ${projName} — walk the model ${buyer.config}${buyer.intel.preferredFloor ? `, then the ${buyer.intel.preferredFloor.toLowerCase()}` : ""}${buyer.intel.facing ? ` (${buyer.intel.facing}-facing)` : ""}.`,
+    positive ? `Lean on: ${positive.text}.` : `Reinforce the ${buyer.config} fit for their budget.`,
+    objection ? `Be ready for: ${objection.text}.` : "Pre-empt pricing questions with the all-in cost sheet.",
+    "Close with the next step before they leave — quote on the spot if interest is high.",
+  ];
+  return (
+    <>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 z-50 bg-[rgba(5,18,52,0.45)] backdrop-blur-[2px]" />
+      <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 34 }} className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[420px] flex-col bg-surface shadow-[var(--shadow-lift)]">
+        <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[6px] bg-accent-soft text-accent"><FileText size={17} /></span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-text">Visit briefing · {buyer.name}</div>
+            <div className="font-mono text-[11px] text-text-faint" suppressHydrationWarning>{projName} · {buyer.siteVisitDue ? clock(buyer.siteVisitDue) : "to schedule"}</div>
+          </div>
+          <button onClick={onClose} className="grid h-8 w-8 shrink-0 place-items-center rounded-[5px] border border-border text-text-muted transition-colors hover:text-text" aria-label="Close"><X size={16} /></button>
+        </div>
+        <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          <div className="flex flex-wrap gap-1.5">{facts.map((f) => (<span key={f} className="rounded-[4px] bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-text-muted">{f}</span>))}</div>
+          {buyer.intel.bestContact && (
+            <div className="flex items-center gap-1.5 text-[13px]"><Clock size={13} className="shrink-0 text-accent" /><span className="text-text-muted">Best time to reach:</span> <span className="font-semibold text-text">{buyer.intel.bestContact}</span></div>
+          )}
+          {buyer.intel.concerns.length > 0 && (
+            <div>
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-text-faint">They care about</div>
+              <div className="flex flex-wrap gap-1.5">{buyer.intel.concerns.map((c) => (<span key={c} className="rounded-[4px] bg-live-soft px-2 py-0.5 text-[11px] text-live">{c}</span>))}</div>
+            </div>
+          )}
+          <div>
+            <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-text-faint">Visit plan · generated</div>
+            <ul className="space-y-1.5">
+              {plan.map((p, i) => (<li key={i} className="flex items-start gap-2 text-[13px] leading-snug text-text-muted"><ArrowRight size={13} className="mt-0.5 shrink-0 text-accent" /><span>{p}</span></li>))}
+            </ul>
+          </div>
+          <div className="rounded-[5px] border border-accent/25 bg-accent-soft/40 p-3 text-[13px] leading-relaxed text-text">
+            “Hi {first}, looking forward to Saturday — I've lined up the {buyer.config} you shortlisted at {projName}. The cab will pick you up; see you there!”
+          </div>
+        </div>
+        <div className="border-t border-border p-4">
+          <button onClick={() => { toast.success("Briefing sent to the agent", { description: `${buyer.agent} has the pre-visit brief on WhatsApp.` }); onClose(); }} className="flex h-11 w-full items-center justify-center gap-2 rounded-[5px] bg-accent text-sm font-semibold text-accent-contrast transition-transform hover:scale-[1.01] active:scale-95">
+            <Sparkles size={16} /> Send briefing to agent
+          </button>
+        </div>
+      </motion.aside>
+    </>
   );
 }
